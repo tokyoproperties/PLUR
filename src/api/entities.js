@@ -1,41 +1,26 @@
-// entities.js
-// Plain-English: These are the "things" in your world.
-// Species, Trails, Habitats, etc. Each one uses the waiter (restClient).
+// src/api/entities.js
+// Plain-English: Central API functions for species, trails, and observations.
 
-import { getJSON, postJSON, putJSON, deleteJSON } from "./restClient";
-
-// ─────────────────────────────────────────────────────────────
-// SPECIES API
-// These functions talk to your /species endpoint.
-// ─────────────────────────────────────────────────────────────
+// Example placeholder data fetchers.
+// Replace these with real API calls when ready.
 
 export async function listSpecies() {
-  return getJSON("/species");
+  return [
+    // { id: 1, name: "Red-tailed Hawk" },
+    // { id: 2, name: "Western Fence Lizard" },
+  ];
 }
-
-export async function getSpeciesById(id) {
-  return getJSON(`/species/${id}`);
-}
-
-export async function createSpecies(data) {
-  return postJSON("/species", data);
-}
-
-export async function updateSpecies(id, data) {
-  return putJSON(`/species/${id}`, data);
-}
-
-export async function deleteSpecies(id) {
-  return deleteJSON(`/species/${id}`);
-}
-
-// ─────────────────────────────────────────────────────────────
-// TRAILS API
-// These functions talk to your /trails endpoint.
-// ─────────────────────────────────────────────────────────────
 
 export async function listTrails() {
-  return getJSON("/trails");
+  return [
+    // { id: 1, name: "Canyon Loop" },
+    // { id: 2, name: "River Path" },
+  ];
 }
 
-// Add more entities later using the same pattern.
+// Added because Field.jsx imports it
+export async function listObservations() {
+  return [
+    // { id: 1, name: "Hawk spotted near ridge" },
+  ];
+}
