@@ -1,26 +1,70 @@
 // src/api/entities.js
-// Plain-English: Central API functions for species, trails, and observations.
+// EarthEye OC — entity fetch functions connected to live backend
 
-// Example placeholder data fetchers.
-// Replace these with real API calls when ready.
+import { getJSON, postJSON, putJSON, deleteJSON } from "./restClient";
 
-export async function listSpecies() {
-  return [
-    // { id: 1, name: "Red-tailed Hawk" },
-    // { id: 2, name: "Western Fence Lizard" },
-  ];
+// ── Species ──────────────────────────────────────────────────────────────────
+export async function listSpecies(filters = {}) {
+  const params = new URLSearchParams(filters).toString();
+  return getJSON(params ? `Species?${params}` : "Species");
 }
 
-export async function listTrails() {
-  return [
-    // { id: 1, name: "Canyon Loop" },
-    // { id: 2, name: "River Path" },
-  ];
+export async function getSpecies(id) {
+  return getJSON(`Species/${id}`);
 }
 
-// Added because Field.jsx imports it
-export async function listObservations() {
-  return [
-    // { id: 1, name: "Hawk spotted near ridge" },
-  ];
+export async function createSpecies(data) {
+  return postJSON("Species", data);
+}
+
+export async function updateSpecies(id, data) {
+  return putJSON(`Species/${id}`, data);
+}
+
+export async function deleteSpecies(id) {
+  return deleteJSON(`Species/${id}`);
+}
+
+// ── Trail ─────────────────────────────────────────────────────────────────────
+export async function listTrails(filters = {}) {
+  const params = new URLSearchParams(filters).toString();
+  return getJSON(params ? `Trail?${params}` : "Trail");
+}
+
+export async function getTrail(id) {
+  return getJSON(`Trail/${id}`);
+}
+
+export async function createTrail(data) {
+  return postJSON("Trail", data);
+}
+
+export async function updateTrail(id, data) {
+  return putJSON(`Trail/${id}`, data);
+}
+
+export async function deleteTrail(id) {
+  return deleteJSON(`Trail/${id}`);
+}
+
+// ── Observation ───────────────────────────────────────────────────────────────
+export async function listObservations(filters = {}) {
+  const params = new URLSearchParams(filters).toString();
+  return getJSON(params ? `Observation?${params}` : "Observation");
+}
+
+export async function getObservation(id) {
+  return getJSON(`Observation/${id}`);
+}
+
+export async function createObservation(data) {
+  return postJSON("Observation", data);
+}
+
+export async function updateObservation(id, data) {
+  return putJSON(`Observation/${id}`, data);
+}
+
+export async function deleteObservation(id) {
+  return deleteJSON(`Observation/${id}`);
 }
