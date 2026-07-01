@@ -5,40 +5,565 @@
       "type": "Feature",
       "id": 1,
       "properties": {
-        "name": "Trailhead Alpha",
-        "type": "Trail"
+        "name": "Trailhead Alpha (Crystal Cove)",
+        "type": "Trail",
+        "park": "Crystal Cove",
+        "difficulty": "Moderate",
+        "length_km": 7.2
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [-118.9, 35.4]
+        "coordinates": [-118.1, 35.1]
       }
     },
     {
       "type": "Feature",
       "id": 2,
       "properties": {
-        "name": "Species Node Bravo",
-        "type": "Species"
+        "name": "Trailhead Bravo (Peters Canyon)",
+        "type": "Trail",
+        "park": "Peters Canyon",
+        "difficulty": "Easy",
+        "length_km": 5.1
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [-118.92, 35.42]
+        "coordinates": [-118.2, 35.1]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3,
+      "properties": {
+        "name": "Trailhead Charlie (Santiago Oaks)",
+        "type": "Trail",
+        "park": "Santiago Oaks",
+        "difficulty": "Moderate",
+        "length_km": 8.3
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.1]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 4,
+      "properties": {
+        "name": "Black Star Canyon Route",
+        "type": "Trail",
+        "park": "Black Star Canyon",
+        "difficulty": "Hard",
+        "length_km": 10.5
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.4, 35.1]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 5,
+      "properties": {
+        "name": "Saddleback Peak Route",
+        "type": "Trail",
+        "park": "Saddleback",
+        "difficulty": "Hard",
+        "length_km": 12.0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.5, 35.1]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 6,
+      "properties": {
+        "name": "Pacific Chorus Frog",
+        "type": "Species",
+        "habitat": "Riparian, wetlands, seasonal pools",
+        "range": "Western North America",
+        "photo": "/placeholder-species.jpg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.1, 35.2]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 7,
+      "properties": {
+        "name": "Western Fence Lizard",
+        "type": "Species",
+        "habitat": "Rocky outcrops, chaparral, open woodland",
+        "range": "Western United States",
+        "photo": "/placeholder-species.jpg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2, 35.2]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 8,
+      "properties": {
+        "name": "California Ground Squirrel",
+        "type": "Species",
+        "habitat": "Grasslands, open scrub, park edges",
+        "range": "California and surrounding regions",
+        "photo": "/placeholder-species.jpg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.2]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 9,
+      "properties": {
+        "name": "Belted Kingfisher",
+        "type": "Species",
+        "habitat": "Rivers, creeks, ponds",
+        "range": "North America",
+        "photo": "/placeholder-species.jpg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.4, 35.2]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 10,
+      "properties": {
+        "name": "Red-tailed Hawk",
+        "type": "Species",
+        "habitat": "Open country, foothills, canyons",
+        "range": "North America",
+        "photo": "/placeholder-species.jpg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.5, 35.2]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 11,
+      "properties": {
+        "name": "Riparian Habitat",
+        "type": "Habitat",
+        "description": "Vegetation along streams and rivers"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.1, 35.3]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 12,
+      "properties": {
+        "name": "Oak Woodland",
+        "type": "Habitat",
+        "description": "Mixed oak canopy with understory shrubs"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2, 35.3]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 13,
+      "properties": {
+        "name": "Chaparral Slope",
+        "type": "Habitat",
+        "description": "Dense, drought-adapted shrub community"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.3]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 14,
+      "properties": {
+        "name": "Coastal Biome",
+        "type": "Biome",
+        "description": "Marine-influenced coastal hills and bluffs"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.1, 35.4]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 15,
+      "properties": {
+        "name": "Foothill Biome",
+        "type": "Biome",
+        "description": "Transitional zone between valley and mountains"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2, 35.4]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 16,
+      "properties": {
+        "name": "Mountain Biome",
+        "type": "Biome",
+        "description": "Higher elevation mixed conifer and chaparral"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.4]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 17,
+      "properties": {
+        "name": "North–South Corridor",
+        "type": "Corridor",
+        "description": "Wildlife movement path along foothills"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.4, 35.3]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 18,
+      "properties": {
+        "name": "East–West Corridor",
+        "type": "Corridor",
+        "description": "Linking coastal and inland habitats"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.5, 35.3]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 19,
+      "properties": {
+        "name": "River Corridor",
+        "type": "Corridor",
+        "description": "Riparian corridor following a main creek"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.4, 35.35]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 20,
+      "properties": {
+        "name": "Kern River Watershed",
+        "type": "Watershed",
+        "description": "Major river system shaping the region"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.1, 35.5]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 21,
+      "properties": {
+        "name": "Caliente Creek Watershed",
+        "type": "Watershed",
+        "description": "Seasonal creek and tributary network"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2, 35.5]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 22,
+      "properties": {
+        "name": "Poso Creek Watershed",
+        "type": "Watershed",
+        "description": "Ephemeral watershed with agricultural interface"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.5]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 23,
+      "properties": {
+        "name": "Sky Zenith",
+        "type": "Sky",
+        "description": "Directly overhead sky reference point"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.1, 35.6]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 24,
+      "properties": {
+        "name": "Sky Horizon East",
+        "type": "Sky",
+        "description": "Sunrise horizon reference"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2, 35.6]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 25,
+      "properties": {
+        "name": "Sky Horizon West",
+        "type": "Sky",
+        "description": "Sunset horizon reference"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.6]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 26,
+      "properties": {
+        "name": "Field Observation Node",
+        "type": "Field",
+        "description": "General observation point for sightings"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.4, 35.6]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 27,
+      "properties": {
+        "name": "Tracking Node",
+        "type": "Field",
+        "description": "Location for repeated visits and notes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.5, 35.6]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 28,
+      "properties": {
+        "name": "Species Hotspot",
+        "type": "Field",
+        "description": "High diversity observation area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.45, 35.55]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 29,
+      "properties": {
+        "name": "Winter Season",
+        "type": "Season",
+        "description": "Cool, wet conditions; amphibian activity increases"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.1, 35.7]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 30,
+      "properties": {
+        "name": "Spring Season",
+        "type": "Season",
+        "description": "Wildflower bloom and nesting birds"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2, 35.7]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 31,
+      "properties": {
+        "name": "Summer Season",
+        "type": "Season",
+        "description": "Dry heat, reptiles and raptors active"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.7]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 32,
+      "properties": {
+        "name": "Fall Season",
+        "type": "Season",
+        "description": "Migration, acorns, and changing light"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.4, 35.7]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 33,
+      "properties": {
+        "name": "Trail Cleanup Event",
+        "type": "Stewardship",
+        "description": "Community cleanup along a popular trail"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.1, 35.8]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 34,
+      "properties": {
+        "name": "Habitat Restoration Site",
+        "type": "Stewardship",
+        "description": "Native planting and invasive removal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2, 35.8]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 35,
+      "properties": {
+        "name": "Water Quality Testing",
+        "type": "Stewardship",
+        "description": "Monitoring creek health and flow"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.8]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 36,
+      "properties": {
+        "name": "Fire Recovery Story",
+        "type": "Story",
+        "description": "Landscape recovering after wildfire"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.4, 35.8]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 37,
+      "properties": {
+        "name": "Migration Path Story",
+        "type": "Story",
+        "description": "Seasonal movement of birds through the corridor"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.5, 35.8]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 38,
+      "properties": {
+        "name": "Keystone Species Story",
+        "type": "Story",
+        "description": "How one species shapes the whole system"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.45, 35.85]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "id": 39,
+      "properties": {
+        "name": "Nearby Trail",
+        "type": "NearMe",
+        "description": "Closest trail experience node"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.1, 35.9]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 40,
+      "properties": {
+        "name": "Nearby Species",
+        "type": "NearMe",
+        "description": "Representative species near your location"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2, 35.9]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 41,
+      "properties": {
+        "name": "Nearby Habitat",
+        "type": "NearMe",
+        "description": "Closest habitat node"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.3, 35.9]
       }
     }
   ]
-}
-{
-  "type": "Feature",
-  "id": 2,
-  "properties": {
-    "name": "Pacific Chorus Frog",
-    "type": "Species",
-    "habitat": "Riparian, wetlands, seasonal pools",
-    "range": "Western North America",
-    "photo": "/placeholder-species.jpg"
-  },
-  "geometry": {
-    "type": "Point",
-    "coordinates": [-118.92, 35.42]
-  }
 }

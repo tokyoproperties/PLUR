@@ -1,82 +1,86 @@
-// Field.jsx
-// Plain-English: Field mode for quick observations, species lookup, and trail context.
-
-import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { listSpecies, listTrails, listObservations } from "@/api/entities";
-import BottomNav from "./BottomNav";
+// Field.jsx — EarthEye Lite
+// Minimal field mode page with simple observation-focused layout
 
 export default function Field() {
-  const navigate = useNavigate();
-
-  const [species, setSpecies] = useState([]);
-  const [trails, setTrails] = useState([]);
-  const [observations, setObservations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadFieldData() {
-      try {
-        const [speciesData, trailsData, obsData] = await Promise.all([
-          listSpecies(),
-          listTrails(),
-          listObservations?.() ?? Promise.resolve([]),
-        ]);
-
-        setSpecies(speciesData || []);
-        setTrails(trailsData || []);
-        setObservations(obsData || []);
-      } catch (err) {
-        console.error("Error loading field data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadFieldData();
-  }, []);
-
-  const recentObservations = useMemo(() => {
-    return observations.slice(0, 5);
-  }, [observations]);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.5rem" }}>
-        Loading field data…
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
         Field Mode
       </h1>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Species Nearby</h2>
-        <p>{species.length} species available</p>
-      </section>
+      <div
+        style={{
+          background: "#1a1a18",
+          borderRadius: "12px",
+          padding: "1.5rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+        }}
+      >
+        <div style={{ opacity: 0.8, marginBottom: "1rem" }}>
+          A lightweight space for observations
+        </div>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Trails Nearby</h2>
-        <p>{trails.length} trails available</p>
-      </section>
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Quick Notes</div>
+          <div style={{ opacity: 0.7 }}>
+            Capture simple field thoughts (full logging later)
+          </div>
+        </div>
 
-      <section>
-        <h2>Recent Observations</h2>
-        {recentObservations.length === 0 ? (
-          <p>No observations yet</p>
-        ) : (
-          <ul>
-            {recentObservations.map((obs, i) => (
-              <li key={i}>{obs.name || "Unknown observation"}</li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Species Awareness</div>
+          <div style={{ opacity: 0.7 }}>
+            Notice movement, sound, and presence
+          </div>
+        </div>
 
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Environmental Cues</div>
+          <div style={{ opacity: 0.7 }}>
+            Light, wind, temperature, and patterns
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Field Intelligence (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Full observation engine coming later
+        </div>
+      </div>
     </div>
   );
 }

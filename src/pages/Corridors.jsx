@@ -1,79 +1,86 @@
-// Corridors.jsx
-// Plain-English: Shows wildlife corridors, species movement, and related trails.
-
-import { useState, useEffect, useRef } from "react";
-import { listSpecies, listTrails } from "@/api/entities";
-import { useNavigate, useParams } from "react-router-dom";
+// Corridors.jsx — EarthEye Lite
+// Minimal ecological corridor placeholder page
 
 export default function Corridors() {
-  const { corridorId } = useParams();
-  const navigate = useNavigate();
-
-  const [species, setSpecies] = useState([]);
-  const [trails, setTrails] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const hasLoaded = useRef(false);
-
-  useEffect(() => {
-    if (hasLoaded.current) return;
-    hasLoaded.current = true;
-
-    async function loadCorridorData() {
-      try {
-        const [speciesData, trailsData] = await Promise.all([
-          listSpecies(),
-          listTrails(),
-        ]);
-
-        setSpecies(speciesData || []);
-        setTrails(trailsData || []);
-      } catch (err) {
-        console.error("Error loading corridor data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadCorridorData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.5rem" }}>
-        Loading corridor…
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: "2rem" }}>
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          marginBottom: "1rem",
-          padding: "0.5rem 1rem",
-          borderRadius: "6px",
-          border: "1px solid #ccc",
-          cursor: "pointer",
-        }}
-      >
-        ← Back
-      </button>
-
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        Corridor: {corridorId}
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
+        Corridors
       </h1>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Species using this corridor</h2>
-        <p>{species.length} species available</p>
-      </section>
+      <div
+        style={{
+          background: "#1a1a18",
+          borderRadius: "12px",
+          padding: "1.5rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+        }}
+      >
+        <div style={{ opacity: 0.8, marginBottom: "1rem" }}>
+          Wildlife movement pathways
+        </div>
 
-      <section>
-        <h2>Trails connected to this corridor</h2>
-        <p>{trails.length} trails available</p>
-      </section>
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>North–South Corridor</div>
+          <div style={{ opacity: 0.7 }}>
+            Foothill movement and seasonal travel
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>East–West Corridor</div>
+          <div style={{ opacity: 0.7 }}>
+            Linking coastal and inland habitats
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>River Corridor</div>
+          <div style={{ opacity: 0.7 }}>
+            Movement along riparian waterways
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Corridor Intelligence (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Full movement engine coming later
+        </div>
+      </div>
     </div>
   );
 }

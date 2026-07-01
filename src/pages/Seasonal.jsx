@@ -1,91 +1,98 @@
-// Seasonal.jsx
-// Plain-English: Shows seasonal species patterns and trail conditions.
-
-import BottomNav from "./BottomNav";
-import { useState, useEffect } from "react";
-import { listSpecies, listTrails, listObservations } from "@/api/entities";
-import { useNavigate } from "react-router-dom";
+// Seasonal.jsx — EarthEye Lite
+// Minimal seasonal cycle page with simple four-season layout
 
 export default function Seasonal() {
-  const navigate = useNavigate();
-
-  const [species, setSpecies] = useState([]);
-  const [trails, setTrails] = useState([]);
-  const [observations, setObservations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [speciesData, trailsData, obsData] = await Promise.all([
-          listSpecies(),
-          listTrails(),
-          listObservations(),
-        ]);
-
-        setSpecies(speciesData || []);
-        setTrails(trailsData || []);
-        setObservations(obsData || []);
-      } catch (err) {
-        console.error("Error loading seasonal data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.5rem" }}>
-        Loading seasonal insights…
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          marginBottom: "1rem",
-          padding: "0.5rem 1rem",
-          borderRadius: "6px",
-          border: "1px solid #ccc",
-          cursor: "pointer",
-        }}
-      >
-        ← Back
-      </button>
-
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        Seasonal Patterns
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
+        Seasonal Cycle
       </h1>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Species Active This Season</h2>
-        <p>{species.length} species observed</p>
-      </section>
+      <div
+        style={{
+          background: "#1a1a18",
+          borderRadius: "12px",
+          padding: "1.5rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+        }}
+      >
+        <div style={{ opacity: 0.8, marginBottom: "1rem" }}>
+          The year in four phases
+        </div>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Trail Conditions</h2>
-        <p>{trails.length} trails monitored</p>
-      </section>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1rem",
+          }}
+        >
+          <div
+            style={{
+              padding: "1rem",
+              background: "#22221f",
+              borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div style={{ fontWeight: "bold" }}>Winter</div>
+            <div style={{ opacity: 0.7 }}>Cool, quiet, reflective</div>
+          </div>
 
-      <section>
-        <h2>Recent Seasonal Observations</h2>
-        {observations.length === 0 ? (
-          <p>No recent observations</p>
-        ) : (
-          <ul>
-            {observations.map((obs, i) => (
-              <li key={i}>{obs.name || "Unknown observation"}</li>
-            ))}
-          </ul>
-        )}
-      </section>
+          <div
+            style={{
+              padding: "1rem",
+              background: "#22221f",
+              borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div style={{ fontWeight: "bold" }}>Spring</div>
+            <div style={{ opacity: 0.7 }}>Bloom, growth, renewal</div>
+          </div>
 
+          <div
+            style={{
+              padding: "1rem",
+              background: "#22221f",
+              borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div style={{ fontWeight: "bold" }}>Summer</div>
+            <div style={{ opacity: 0.7 }}>Heat, activity, motion</div>
+          </div>
+
+          <div
+            style={{
+              padding: "1rem",
+              background: "#22221f",
+              borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div style={{ fontWeight: "bold" }}>Fall</div>
+            <div style={{ opacity: 0.7 }}>Change, migration, light shift</div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Seasonal Intelligence (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Full seasonal engine coming later
+        </div>
+      </div>
     </div>
   );
 }

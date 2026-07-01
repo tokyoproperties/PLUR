@@ -1,102 +1,64 @@
-// Map.jsx
-// Plain-English: A conceptual overview map of the region — simplified and Vite-safe.
-
-import { useState, useEffect } from "react";
-import BottomNav from "./BottomNav";
-import { listTrails, listSpecies, listObservations } from "@/api/entities";
+// Map.jsx — EarthEye Lite
+// Minimal placeholder for the future interactive map
 
 export default function Map() {
-  const [trails, setTrails] = useState([]);
-  const [species, setSpecies] = useState([]);
-  const [observations, setObservations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const [t, s, o] = await Promise.all([
-          listTrails(),
-          listSpecies(),
-          listObservations(),
-        ]);
-
-        setTrails(t || []);
-        setSpecies(s || []);
-        setObservations(o || []);
-      } catch (err) {
-        console.error("Error loading map data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.5rem" }}>
-        Loading map…
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
         Map
       </h1>
 
-      <p style={{ marginBottom: "1.5rem", lineHeight: "1.5" }}>
-        This is a conceptual map of the region — a high-level view of trails,
-        species presence, and observation density. It is not a geographic map,
-        but a structural overview of how the land is organized.
-      </p>
+      <div
+        style={{
+          background: "#1a1a18",
+          borderRadius: "12px",
+          padding: "2rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Map (Lite)
+        </div>
+        <div style={{ opacity: 0.7, marginTop: "0.5rem" }}>
+          Interactive map coming in a future build
+        </div>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Dataset Summary</h2>
-        <ul>
-          <li>Trails: {trails.length}</li>
-          <li>Species: {species.length}</li>
-          <li>Observations: {observations.length}</li>
-        </ul>
-      </section>
+        <div
+          style={{
+            marginTop: "1.5rem",
+            height: "150px",
+            borderRadius: "8px",
+            background:
+              "linear-gradient(to bottom right, #22221f, #0f0f0d)",
+            border: "1px solid rgba(255,255,255,0.05)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: 0.5,
+            fontSize: "0.9rem",
+          }}
+        >
+          Map preview placeholder
+        </div>
+      </div>
 
-      <section>
-        <h2>Regions</h2>
-        {Object.entries(
-          trails.reduce((acc, t) => {
-            const region = t.region || "Unknown Region";
-            acc[region] = acc[region] || [];
-            acc[region].push(t);
-            return acc;
-          }, {})
-        ).map(([region, regionTrails]) => (
-          <div
-            key={region}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              padding: "1rem",
-              marginBottom: "1rem",
-            }}
-          >
-            <h3 style={{ marginBottom: "0.5rem" }}>{region}</h3>
-            <p style={{ fontSize: "0.9rem", color: "#666" }}>
-              Trails: {regionTrails.length}
-            </p>
-
-            <ul style={{ marginTop: "0.5rem", paddingLeft: "1.2rem" }}>
-              {regionTrails.map((t) => (
-                <li key={t.id} style={{ marginBottom: "0.25rem" }}>
-                  {t.name}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
-
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Map Intelligence (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Trails, species, and layers will appear here later
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,81 +1,86 @@
-// Constitution.jsx
-// Plain-English: The constitutional spine of the Atlas — the rules the organism lives by.
-
-import BottomNav from "./BottomNav";
+// Constitution.jsx — EarthEye Lite
+// Minimal placeholder for EarthEye's guiding principles
 
 export default function Constitution() {
-  const articles = [
-    {
-      title: "Article I — Presence Over Performance",
-      body:
-        "The Atlas is not a scoreboard. It rewards attention, not accumulation. " +
-        "Every observation is a moment of presence, not a metric.",
-    },
-    {
-      title: "Article II — Land First",
-      body:
-        "The land is the primary author. The Atlas listens before it speaks, " +
-        "and reflects what the land expresses through species, seasons, and movement.",
-    },
-    {
-      title: "Article III — Stewardship, Not Ownership",
-      body:
-        "Users are stewards, not collectors. The Atlas encourages care, reciprocity, " +
-        "and ecological humility.",
-    },
-    {
-      title: "Article IV — Transparency of Engines",
-      body:
-        "Every engine — Seasonal, Corridor, Habitat, Phenology, Journal, Companion — " +
-        "must be understandable, inspectable, and explainable.",
-    },
-    {
-      title: "Article V — Local Truth",
-      body:
-        "The Atlas prioritizes hyperlocal accuracy. A species is not 'present' " +
-        "unless it is truly present here, now, in this biome.",
-    },
-    {
-      title: "Article VI — No Harm",
-      body:
-        "The Atlas must never encourage behavior that harms wildlife, habitats, " +
-        "or ecological processes.",
-    },
-    {
-      title: "Article VII — Human Scale",
-      body:
-        "The Atlas is designed for the human nervous system — simple, calm, " +
-        "and grounded in the rhythms of place.",
-    },
-  ];
-
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
         Constitution
       </h1>
 
-      <p style={{ marginBottom: "1.5rem", lineHeight: "1.5" }}>
-        The Constitution defines the principles the Atlas must obey. It is the
-        backbone of the organism — the rules that ensure the system remains
-        ecological, ethical, and human.
-      </p>
+      <div
+        style={{
+          background: "#1a1a18",
+          borderRadius: "12px",
+          padding: "1.5rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+        }}
+      >
+        <div style={{ opacity: 0.8, marginBottom: "1rem" }}>
+          The core principles that guide EarthEye
+        </div>
 
-      {articles.map((a) => (
         <div
-          key={a.title}
           style={{
-            border: "1px solid #ddd",
-            borderRadius: "8px",
             padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
             marginBottom: "1rem",
           }}
         >
-          <h2 style={{ marginBottom: "0.5rem" }}>{a.title}</h2>
-          <p style={{ lineHeight: "1.5" }}>{a.body}</p>
+          <div style={{ fontWeight: "bold" }}>Awareness</div>
+          <div style={{ opacity: 0.7 }}>
+            Seeing the land, sky, and life with clarity
+          </div>
         </div>
-      ))}
 
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Stewardship</div>
+          <div style={{ opacity: 0.7 }}>
+            Acting with care, responsibility, and reciprocity
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Connection</div>
+          <div style={{ opacity: 0.7 }}>
+            Understanding the relationships that sustain life
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Constitution (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Full principles and structure coming later
+        </div>
+      </div>
     </div>
   );
 }

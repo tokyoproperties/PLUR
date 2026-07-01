@@ -1,23 +1,17 @@
-// BottomNav.jsx
-// Plain-English: The persistent navigation bar that anchors the organism.
+// BottomNav.jsx — EarthEye Lite
+// Minimal bottom navigation for A3-Lite
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function BottomNav() {
   const location = useLocation();
-  const navigate = useNavigate();
 
-  const tabs = [
-    { key: "home", label: "Home", path: "/home", icon: "🏠" },
-    { key: "species", label: "Species", path: "/species", icon: "🌿" },
-    { key: "trails", label: "Trails", path: "/trails", icon: "🥾" },
-    { key: "sky", label: "Sky", path: "/sky", icon: "🌤️" },
-    { key: "index", label: "Index", path: "/index", icon: "📚" },
+  const navItems = [
+    { label: "Home", path: "/PLUR" },
+    { label: "Sky", path: "/PLUR/sky" },
+    { label: "Seasonal", path: "/PLUR/seasonal" },
+    { label: "Field", path: "/PLUR/field" },
   ];
-
-  function isActive(path) {
-    return location.pathname.startsWith(path);
-  }
 
   return (
     <div
@@ -26,62 +20,30 @@ export default function BottomNav() {
         bottom: 0,
         left: 0,
         right: 0,
-        height: "64px",
-        background: "#0F0F0D",
+        background: "#1a1a18",
         borderTop: "1px solid rgba(255,255,255,0.08)",
         display: "flex",
         justifyContent: "space-around",
-        alignItems: "center",
-        zIndex: 999,
+        padding: "0.75rem 0",
+        zIndex: 100,
       }}
     >
-      {tabs.map((tab) => {
-        const active = isActive(tab.path);
+      {navItems.map((item) => {
+        const active = location.pathname === item.path;
 
         return (
-          <div
-            key={tab.key}
-            onClick={() => navigate(tab.path)}
+          <Link
+            key={item.path}
+            to={item.path}
             style={{
-              flex: 1,
-              textAlign: "center",
-              cursor: "pointer",
-              color: active
-                ? "rgba(255,255,255,0.9)"
-                : "rgba(255,255,255,0.28)",
-              fontSize: "0.75rem",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              paddingTop: "6px",
+              color: active ? "#ffffff" : "rgba(255,255,255,0.6)",
+              textDecoration: "none",
+              fontSize: "0.9rem",
+              fontWeight: active ? "bold" : "normal",
             }}
           >
-            <div style={{ fontSize: "1.2rem", marginBottom: "2px" }}>
-              {tab.icon}
-            </div>
-
-            <div
-              style={{
-                opacity: active ? 1 : 0.22,
-                fontSize: "0.7rem",
-                marginBottom: active ? "2px" : "4px",
-              }}
-            >
-              {tab.label}
-            </div>
-
-            {active && (
-              <div
-                style={{
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "50%",
-                  background: "#9BC4A5", // sage green
-                }}
-              />
-            )}
-          </div>
+            {item.label}
+          </Link>
         );
       })}
     </div>

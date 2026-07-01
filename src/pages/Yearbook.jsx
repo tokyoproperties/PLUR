@@ -1,124 +1,101 @@
-// Yearbook.jsx
-// Plain-English: Annual ecological memory — species streaks, seasons, and yearly summaries.
-
-import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { listSpecies, listObservations } from "@/api/entities";
-import BottomNav from "./BottomNav";
+// Yearbook.jsx — EarthEye Lite
+// Minimal memory + seasonal moments placeholder
 
 export default function Yearbook() {
-  const navigate = useNavigate();
-
-  const [species, setSpecies] = useState([]);
-  const [observations, setObservations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [speciesData, obsData] = await Promise.all([
-          listSpecies(),
-          listObservations(),
-        ]);
-
-        setSpecies(speciesData || []);
-        setObservations(obsData || []);
-      } catch (err) {
-        console.error("Error loading Yearbook:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
-
-  // Group observations by year
-  const byYear = useMemo(() => {
-    const map = {};
-    observations.forEach((obs) => {
-      const year = new Date(obs.timestamp || Date.now()).getFullYear();
-      if (!map[year]) map[year] = [];
-      map[year].push(obs);
-    });
-    return map;
-  }, [observations]);
-
-  // Compute species streaks (simple version)
-  const streaks = useMemo(() => {
-    const map = {};
-    observations.forEach((obs) => {
-      const name = obs.name || "Unknown species";
-      if (!map[name]) map[name] = 0;
-      map[name] += 1;
-    });
-    return Object.entries(map)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
-  }, [observations]);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.5rem" }}>
-        Building your Yearbook…
-      </div>
-    );
-  }
-
-  const years = Object.keys(byYear).sort((a, b) => b - a);
-
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
         Yearbook
       </h1>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Top Species Streaks</h2>
-        {streaks.length === 0 ? (
-          <p>No observations yet.</p>
-        ) : (
-          <ul>
-            {streaks.map(([name, count]) => (
-              <li key={name}>
-                {name}: {count} sightings
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <div
+        style={{
+          background: "#1a1a18",
+          borderRadius: "12px",
+          padding: "1.5rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+        }}
+      >
+        <div style={{ opacity: 0.8, marginBottom: "1rem" }}>
+          A simple record of the year’s moments
+        </div>
 
-      <section>
-        <h2>Yearly Records</h2>
-        {years.length === 0 ? (
-          <p>No yearly data yet.</p>
-        ) : (
-          years.map((year) => (
-            <div
-              key={year}
-              style={{
-                marginBottom: "1.5rem",
-                padding: "1rem",
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: "1.4rem",
-                  marginBottom: "0.5rem",
-                  cursor: "pointer",
-                }}
-                onClick={() => navigate(`/year/${year}`)}
-              >
-                {year}
-              </h3>
-              <p>{byYear[year].length} observations</p>
-            </div>
-          ))
-        )}
-      </section>
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Winter</div>
+          <div style={{ opacity: 0.7 }}>
+            Quiet mornings, low sun, stillness
+          </div>
+        </div>
 
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Spring</div>
+          <div style={{ opacity: 0.7 }}>
+            First blooms, birdsong, new movement
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Summer</div>
+          <div style={{ opacity: 0.7 }}>
+            Heat, long days, high activity
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Fall</div>
+          <div style={{ opacity: 0.7 }}>
+            Color shift, migration, cooling light
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Yearbook Intelligence (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Full memory engine coming later
+        </div>
+      </div>
     </div>
   );
 }

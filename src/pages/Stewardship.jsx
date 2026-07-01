@@ -1,120 +1,86 @@
-// Stewardship.jsx
-// Plain-English: The stewardship dashboard — your actions, patterns, and ecological impact.
-
-import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { listSpecies, listTrails, listObservations } from "@/api/entities";
-import BottomNav from "./BottomNav";
+// Stewardship.jsx — EarthEye Lite
+// Minimal placeholder for care, responsibility, and community action
 
 export default function Stewardship() {
-  const navigate = useNavigate();
-
-  const [species, setSpecies] = useState([]);
-  const [trails, setTrails] = useState([]);
-  const [observations, setObservations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [speciesData, trailsData, obsData] = await Promise.all([
-          listSpecies(),
-          listTrails(),
-          listObservations(),
-        ]);
-
-        setSpecies(speciesData || []);
-        setTrails(trailsData || []);
-        setObservations(obsData || []);
-      } catch (err) {
-        console.error("Error loading stewardship data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
-
-  // Stewardship metrics
-  const metrics = useMemo(() => {
-    return {
-      speciesCount: species.length,
-      trailCount: trails.length,
-      observationCount: observations.length,
-    };
-  }, [species, trails, observations]);
-
-  // Stewardship narrative
-  const narrative = useMemo(() => {
-    return `
-Your Stewardship Summary
-
-You’ve observed ${metrics.speciesCount} species,
-walked or monitored ${metrics.trailCount} trails,
-and recorded ${metrics.observationCount} ecological moments.
-
-Stewardship isn’t performance — it’s presence.
-It’s noticing patterns, returning to places,
-and letting the land teach you how to care for it.
-
-This dashboard reflects your quiet work.
-    `.trim();
-  }, [metrics]);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.5rem" }}>
-        Loading stewardship…
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          marginBottom: "1rem",
-          padding: "0.5rem 1rem",
-          borderRadius: "6px",
-          border: "1px solid #ccc",
-          cursor: "pointer",
-        }}
-      >
-        ← Back
-      </button>
-
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
         Stewardship
       </h1>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Your Metrics</h2>
-        <ul>
-          <li>Species logged: {metrics.speciesCount}</li>
-          <li>Trails engaged: {metrics.trailCount}</li>
-          <li>Observations recorded: {metrics.observationCount}</li>
-        </ul>
-      </section>
+      <div
+        style={{
+          background: "#1a1a18",
+          borderRadius: "12px",
+          padding: "1.5rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+        }}
+      >
+        <div style={{ opacity: 0.8, marginBottom: "1rem" }}>
+          Caring for land, water, and community
+        </div>
 
-      <section>
-        <h2>Your Stewardship Story</h2>
-        <pre
+        <div
           style={{
-            whiteSpace: "pre-wrap",
-            lineHeight: "1.5",
-            fontSize: "1.1rem",
-            background: "#f7f7f7",
             padding: "1rem",
+            background: "#22221f",
             borderRadius: "8px",
-            border: "1px solid #ddd",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
           }}
         >
-          {narrative}
-        </pre>
-      </section>
+          <div style={{ fontWeight: "bold" }}>Local Actions</div>
+          <div style={{ opacity: 0.7 }}>
+            Small steps that strengthen ecosystems
+          </div>
+        </div>
 
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Community</div>
+          <div style={{ opacity: 0.7 }}>
+            Working together to protect shared spaces
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Responsibility</div>
+          <div style={{ opacity: 0.7 }}>
+            Acting with intention and long‑term awareness
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Stewardship (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Full stewardship engine coming later
+        </div>
+      </div>
     </div>
   );
 }

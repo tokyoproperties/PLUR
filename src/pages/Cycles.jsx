@@ -1,81 +1,86 @@
-// Cycles.jsx
-// Plain-English: The repeating rhythms of the land — daily, seasonal, lunar, ecological.
-
-import BottomNav from "./BottomNav";
+// Cycles.jsx — EarthEye Lite
+// Minimal ecological cycles page with simple system placeholders
 
 export default function Cycles() {
-  const cycles = [
-    {
-      name: "Daily Cycle",
-      desc:
-        "Light, temperature, wind, and animal activity shift across the day. " +
-        "Dawn chorus, midday stillness, golden hour, nocturnal emergence.",
-    },
-    {
-      name: "Seasonal Cycle",
-      desc:
-        "Bloom, migration, molt, breeding, drying, greening. " +
-        "The land expresses itself differently in each season.",
-    },
-    {
-      name: "Lunar Cycle",
-      desc:
-        "Tides, nocturnal behavior, predator-prey dynamics, and navigation " +
-        "shift with the moon’s phases.",
-    },
-    {
-      name: "Hydrological Cycle",
-      desc:
-        "Rain, runoff, infiltration, evaporation. " +
-        "Creeks pulse, soils breathe, and habitats transform.",
-    },
-    {
-      name: "Phenological Cycle",
-      desc:
-        "First bloom, first call, first arrival, first hatch. " +
-        "The timing of life events across species.",
-    },
-    {
-      name: "Fire Cycle",
-      desc:
-        "Chaparral and coastal sage scrub are fire-adapted. " +
-        "Recovery, succession, and renewal follow disturbance.",
-    },
-    {
-      name: "Human Cycle",
-      desc:
-        "Our own rhythms — school years, work weeks, holidays, routines — " +
-        "shape how we encounter the land.",
-    },
-  ];
-
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
         Cycles
       </h1>
 
-      <p style={{ marginBottom: "1.5rem", lineHeight: "1.5" }}>
-        The land moves in rhythms — some fast, some slow, some ancient. The
-        Atlas listens to these cycles and uses them to understand what is
-        happening now, what is emerging, and what is fading.
-      </p>
+      <div
+        style={{
+          background: "#1a1a18",
+          borderRadius: "12px",
+          padding: "1.5rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+        }}
+      >
+        <div style={{ opacity: 0.8, marginBottom: "1rem" }}>
+          The repeating patterns that shape the landscape
+        </div>
 
-      {cycles.map((c) => (
         <div
-          key={c.name}
           style={{
-            border: "1px solid #ddd",
-            borderRadius: "8px",
             padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
             marginBottom: "1rem",
           }}
         >
-          <h2 style={{ marginBottom: "0.5rem" }}>{c.name}</h2>
-          <p style={{ lineHeight: "1.5" }}>{c.desc}</p>
+          <div style={{ fontWeight: "bold" }}>Water Cycle</div>
+          <div style={{ opacity: 0.7 }}>
+            Rain, flow, evaporation, and return
+          </div>
         </div>
-      ))}
 
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Light Cycle</div>
+          <div style={{ opacity: 0.7 }}>
+            Day, night, and shifting seasonal light
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: "1rem",
+            background: "#22221f",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>Life Cycle</div>
+          <div style={{ opacity: 0.7 }}>
+            Growth, reproduction, migration, renewal
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Cycle Intelligence (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Full systems engine coming later
+        </div>
+      </div>
     </div>
   );
 }

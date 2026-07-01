@@ -1,0 +1,27 @@
+import { useEffect, useState } from 'react';
+import { NativeEventEmitter, NativeModules } from 'react-native';
+
+const { AmbientLight } = NativeModules;
+const ambientLightEmitter = new NativeEventEmitter(AmbientLight);
+
+export function useAmbientLight() {
+  const [lux, setLux] = useState<number>(0);
+
+  useEffect(() => {
+    const subscription = ambientLightEmitter.addListener(
+      'AmbientLightSensor',
+      (event) => {
+        setLux(event.lux);
+      }
+    );
+
+    AmbientLight.start();
+
+    return () => {
+      AmbientLight.stop();
+      subscription.remove();
+    };
+  }, []);
+
+  return lux;
+}

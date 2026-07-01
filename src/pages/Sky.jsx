@@ -1,94 +1,53 @@
-// Sky.jsx
-// Plain-English: Sky Intelligence — shows sky conditions, celestial events, and observation logs.
-
-import { useState, useEffect, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { listSpecies, listObservations } from "@/api/entities";
-import BottomNav from "./BottomNav";
+// Sky.jsx — EarthEye Lite
+// Minimal sky page with simple horizon + zenith display
 
 export default function Sky() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-
-  const mode = searchParams.get("mode") || "default";
-
-  const [species, setSpecies] = useState([]);
-  const [observations, setObservations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [speciesData, obsData] = await Promise.all([
-          listSpecies(),
-          listObservations(),
-        ]);
-
-        setSpecies(speciesData || []);
-        setObservations(obsData || []);
-      } catch (err) {
-        console.error("Error loading Sky Intelligence data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
-
-  const skySummary = useMemo(() => {
-    return {
-      speciesCount: species.length,
-      observationCount: observations.length,
-    };
-  }, [species, observations]);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.5rem" }}>
-        Loading Sky Intelligence…
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          marginBottom: "1rem",
-          padding: "0.5rem 1rem",
-          borderRadius: "6px",
-          border: "1px solid #ccc",
-          cursor: "pointer",
-        }}
-      >
-        ← Back
-      </button>
-
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        Sky Intelligence
+    <div style={{ padding: "1.5rem", paddingBottom: "5rem" }}>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "1.5rem" }}>
+        Sky
       </h1>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Overview</h2>
-        <p>{skySummary.speciesCount} species logged</p>
-        <p>{skySummary.observationCount} total observations</p>
-      </section>
+      <div
+        style={{
+          background: "linear-gradient(to bottom, #1e1e1c, #0f0f0d)",
+          borderRadius: "12px",
+          padding: "2rem",
+          border: "1px solid rgba(255,255,255,0.08)",
+          marginBottom: "2rem",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Zenith
+        </div>
+        <div style={{ opacity: 0.7, marginBottom: "1.5rem" }}>
+          The point directly overhead
+        </div>
 
-      <section>
-        <h2>Recent Observations</h2>
-        {observations.length === 0 ? (
-          <p>No sky-related observations yet</p>
-        ) : (
-          <ul>
-            {observations.map((obs, i) => (
-              <li key={i}>{obs.name || "Unknown observation"}</li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Horizon
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Where the sky meets the land
+        </div>
+      </div>
 
+      <div
+        style={{
+          padding: "1rem",
+          background: "#1a1a18",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Sky Intelligence (Lite)
+        </div>
+        <div style={{ opacity: 0.7 }}>
+          Full sky engine coming later
+        </div>
+      </div>
     </div>
   );
 }
