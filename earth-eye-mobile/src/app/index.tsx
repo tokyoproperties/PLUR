@@ -1,61 +1,119 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { evaluateLiteMode } from '@/modes/lite';
+import { evaluateYardMode } from '@/modes/yard';
+import { useAmbientLight } from '@/sensors/useAmbientLight';
+import { useMotion } from '@/sensors/useMotion';
+import { useSound } from '@/sensors/useSound';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+function Card({ children }: { children: React.ReactNode }) {
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <ThemedView style={styles.card} type="backgroundElement">
+      {children}
+    </ThemedView>
+  );
+}
+
+function QuickLaunch({ href, label, hint }: { href: '/map' | '/sensors'; label: string; hint: string }) {
+  return (
+    <Link href={href} asChild>
+      <ThemedView style={styles.quickLaunchRow} type="backgroundElement">
+        <ThemedView style={styles.quickLaunchText} type="backgroundElement">
+          <ThemedText type="smallBold">{label}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            {hint}
+          </ThemedText>
+        </ThemedView>
+        <ThemedText type="link" themeColor="text">
+          →
+        </ThemedText>
+      </ThemedView>
+    </Link>
   );
 }
 
 export default function HomeScreen() {
+  const light = useAmbientLight();
+  const motion = useMotion();
+  const sound = useSound();
+
+  const sensorInputs = {
+    lux: light.lux,
+    motionMagnitude: motion.magnitude,
+    soundRelativeDb: sound.relativeDb,
+  };
+
+  const lite = evaluateLiteMode(sensorInputs);
+  const yard = evaluateYardMode(sensorInputs);
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
+        <ScrollView
+          contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}>
           <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+            EarthEye
           </ThemedText>
-        </ThemedView>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.subtitle}>
+            Field atlas for Orange County ecology
+          </ThemedText>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            MODE STATUS
+          </ThemedText>
+          <Card>
+            <ThemedText type="smallBold">Lite Mode</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.cardBody}>
+              {lite.summary}
+            </ThemedText>
+          </Card>
+          <Card>
+            <ThemedText type="smallBold">Yard Mode</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.cardBody}>
+              {yard.summary}
+            </ThemedText>
+            {yard.isFireworkWindow && (
+              <ThemedText type="small" themeColor="textSecondary" style={styles.cardBody}>
+                Firework sensitivity window active — dampening widened automatically.
+              </ThemedText>
+            )}
+          </Card>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            SENSOR SUMMARY
+          </ThemedText>
+          <Card>
+            <ThemedText type="small" themeColor="textSecondary">
+              Light: {light.lux !== null ? `${light.lux.toFixed(1)} lux (${light.band})` : light.isAvailable ? 'reading…' : 'unavailable on this device'}
+            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.cardLine}>
+              Motion: {motion.band}
+            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.cardLine}>
+              Sound: {sound.relativeDb !== null ? `${sound.relativeDb.toFixed(0)} (${sound.band})` : sound.permissionDenied ? 'mic permission denied' : 'reading…'}
+            </ThemedText>
+          </Card>
 
-        {Platform.OS === 'web' && <WebBadge />}
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            QUICK LAUNCH
+          </ThemedText>
+          <QuickLaunch href="/sensors" label="Sensors" hint="Full live readings + mode detail" />
+          <QuickLaunch href="/map" label="Map" hint="Trail + corridor view" />
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            WEATHER
+          </ThemedText>
+          <Card>
+            <ThemedText type="small" themeColor="textSecondary">
+              Not yet connected — weather snapshot integration is planned, not faked.
+            </ThemedText>
+          </Card>
+        </ScrollView>
       </SafeAreaView>
     </ThemedView>
   );
@@ -64,35 +122,49 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
+  content: {
+    width: '100%',
+    maxWidth: MaxContentWidth,
     paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    paddingTop: Spacing.four,
   },
   title: {
-    textAlign: 'center',
+    marginBottom: Spacing.one,
   },
-  code: {
+  subtitle: {
+    marginBottom: Spacing.four,
+  },
+  sectionLabel: {
+    marginTop: Spacing.four,
+    marginBottom: Spacing.two,
     textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  card: {
+    borderRadius: 12,
+    padding: Spacing.three,
+    marginBottom: Spacing.two,
+  },
+  cardBody: {
+    marginTop: Spacing.one,
+  },
+  cardLine: {
+    marginTop: Spacing.half,
+  },
+  quickLaunchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 12,
+    padding: Spacing.three,
+    marginBottom: Spacing.two,
+  },
+  quickLaunchText: {
+    flexShrink: 1,
   },
 });
