@@ -1,14 +1,16 @@
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ModeBadge } from '@/components/ModeBadge';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useSymbolicMode } from '@/contexts/mode-context';
+import { evaluateLiteMode } from '@/modes/lite';
+import { evaluateYardMode } from '@/modes/yard';
 import { useAmbientLight } from '@/sensors/useAmbientLight';
 import { useMotion } from '@/sensors/useMotion';
 import { useSound } from '@/sensors/useSound';
-import { evaluateLiteMode } from '@/modes/lite';
-import { evaluateYardMode } from '@/modes/yard';
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -25,26 +27,34 @@ export default function SensorsScreen() {
   const light = useAmbientLight();
   const motion = useMotion();
   const sound = useSound();
+  const { mode } = useSymbolicMode();
 
-  const lite = evaluateLiteMode({
+  const sensorInputs = {
     lux: light.lux,
     motionMagnitude: motion.magnitude,
     soundRelativeDb: sound.relativeDb,
-  });
+  };
 
-  const yard = evaluateYardMode({
-    lux: light.lux,
-    motionMagnitude: motion.magnitude,
-    soundRelativeDb: sound.relativeDb,
-  });
+  const lite = evaluateLiteMode(sensorInputs);
+  const yard = evaluateYardMode(sensorInputs);
+
+  const interpretation =
+    mode === 'love'
+      ? `In LOVE mode, motion sensitivity is reduced and sound/light dampening is widened (${Math.round(yard.luminanceDampening * 100)}% luminance, ${Math.round(yard.soundSensitivity * 100)}% sound).`
+      : 'In PLUR mode, sensing stays lightweight — no dampening curves applied, just gross condition checks.';
 
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}>
-          <ThemedText type="subtitle" style={styles.heading}>
-            Field Sensors
+          <ThemedView style={styles.header} type="background">
+            <ThemedText type="subtitle">Field Sensors</ThemedText>
+            <ModeBadge mode={mode} compact pulse={false} />
+          </ThemedView>
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.interpretation}>
+            {interpretation}
           </ThemedText>
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
@@ -100,8 +110,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.four,
   },
-  heading: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.two,
+  },
+  interpretation: {
     marginBottom: Spacing.three,
+    lineHeight: 20,
   },
   sectionLabel: {
     marginTop: Spacing.four,

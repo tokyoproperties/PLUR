@@ -2,9 +2,12 @@ import { Link } from 'expo-router';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ModeBadge } from '@/components/ModeBadge';
+import { ModeToggle } from '@/components/ModeToggle';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useSymbolicMode } from '@/contexts/mode-context';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
 import { useAmbientLight } from '@/sensors/useAmbientLight';
@@ -41,6 +44,7 @@ export default function HomeScreen() {
   const light = useAmbientLight();
   const motion = useMotion();
   const sound = useSound();
+  const { mode } = useSymbolicMode();
 
   const sensorInputs = {
     lux: light.lux,
@@ -50,6 +54,9 @@ export default function HomeScreen() {
 
   const lite = evaluateLiteMode(sensorInputs);
   const yard = evaluateYardMode(sensorInputs);
+
+  // PLUR is the lens onto Lite Mode's summary; LOVE is the lens onto Yard Mode's.
+  const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
 
   return (
     <ThemedView style={styles.container}>
@@ -64,7 +71,15 @@ export default function HomeScreen() {
           </ThemedText>
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-            MODE STATUS
+            MODE
+          </ThemedText>
+          <ModeToggle />
+          <ThemedView style={styles.badgeSpacer} type="background">
+            <ModeBadge mode={mode} statusText={activeSummary} />
+          </ThemedView>
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            ENVIRONMENTAL DETAIL
           </ThemedText>
           <Card>
             <ThemedText type="smallBold">Lite Mode</ThemedText>
@@ -144,6 +159,9 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.two,
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  badgeSpacer: {
+    marginTop: Spacing.two,
   },
   card: {
     borderRadius: 12,
