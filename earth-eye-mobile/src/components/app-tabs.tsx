@@ -20,6 +20,16 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="map">
+        <NativeTabs.Trigger.Label>Map</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="map.fill" />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="sensors">
+        <NativeTabs.Trigger.Label>Sensors</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="waveform" />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="explore">
         <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
