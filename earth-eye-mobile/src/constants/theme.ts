@@ -1,6 +1,16 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * EarthEye Mobile — Theme Constants
+ *
+ * Aligned to the EarthEye OC design language (locked May 3 2026):
+ *   Page bg:     #0F0F0D (near-black, organic)
+ *   Card bg:     #1A1A17 (barely lighter than page)
+ *   Border:      rgba(255,255,255,0.07) — barely visible hairlines
+ *   Accent:      #7AB87A (sage — content only, never chrome)
+ *   Alt accents: dusty rose, amber, muted blue, lavender
+ *
+ * The mobile app is dark-only for now (field use at dawn/dusk/night
+ * is the primary context). Light mode tokens are kept for framework
+ * compatibility but are not the design target.
  */
 
 import '@/global.css';
@@ -16,25 +26,31 @@ export const Colors = {
     textSecondary: '#60646C',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    // EarthEye design language — dark is the canonical surface
+    text: 'rgba(255,255,255,0.90)',
+    background: '#0F0F0D',
+    backgroundElement: '#1A1A17',
+    backgroundSelected: 'rgba(255,255,255,0.06)',
+    textSecondary: 'rgba(255,255,255,0.55)',
   },
 } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
+// EarthEye accent palette — content surfaces only, never chrome
+export const Accents = {
+  sage:     '#7AB87A',
+  rose:     '#C47A7A',
+  amber:    '#C4974A',
+  blue:     '#7A9AB8',
+  lavender: '#9A7AB8',
+} as const;
+
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {
@@ -63,3 +79,13 @@ export const Spacing = {
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
+
+// Card physiology (from Developer Edition constitution)
+export const CardStyle = {
+  bg: '#1A1A17',
+  border: '1px solid rgba(255,255,255,0.07)',
+  radius: 12,
+  radiusSm: 8,
+  px: 20,
+  py: 16,
+} as const;

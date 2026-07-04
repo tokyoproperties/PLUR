@@ -12,20 +12,17 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useCorridors } from '@/hooks/useCorridors';
+import { useSensors } from '@/hooks/useSensors';
 import { useYardStrip } from '@/hooks/useYardStrip';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
-import { useAmbientLight } from '@/sensors/useAmbientLight';
-import { useMotion } from '@/sensors/useMotion';
-import { useSound } from '@/sensors/useSound';
 
 /**
  * Map screen.
  *
  * Real data: the 74 active trails, live from the production DB
  * (single-point markers — no walked-path polylines exist yet).
- * Placeholder data, clearly flagged: the yard location (no real GPS
- * point captured yet — see useYardStrip.ts).
+ * Real yard coordinates: 35.392238, -119.099642 (captured 2026-07-02).
  *
  * Mode-aware: PLUR dims the yard and brightens trails ("out in the
  * world"). LOVE dims trails and brightens the yard ("home"), and
@@ -36,21 +33,12 @@ export default function MapScreen() {
   const { mode } = useSymbolicMode();
   const { trails } = useCorridors();
   const yard = useYardStrip();
+  const { snapshot } = useSensors();
 
-  const light = useAmbientLight();
-  const motion = useMotion();
-  const sound = useSound();
-
-  const sensorInputs = {
-    lux: light.lux,
-    motionMagnitude: motion.magnitude,
-    soundRelativeDb: sound.relativeDb,
-  };
-  const lite = evaluateLiteMode(sensorInputs);
-  const yardEval = evaluateYardMode(sensorInputs);
+  const lite = evaluateLiteMode(snapshot);
+  const yardEval = evaluateYardMode(snapshot);
   const sensorSummary = mode === 'plur' ? lite.summary : yardEval.summary;
 
-  // PLUR frames the whole county (trails); LOVE frames home (yard).
   const initialRegion = useMemo(
     () =>
       mode === 'love'
@@ -63,7 +51,7 @@ export default function MapScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <MapView
-          key={mode} // re-center when the mode's framing changes
+          key={mode}
           style={styles.map}
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}>
@@ -75,14 +63,6 @@ export default function MapScreen() {
         <ThemedView style={styles.badgeCorner} type="background">
           <ModeBadge mode={mode} compact pulse={false} />
         </ThemedView>
-
-        {yard.isPlaceholder && (
-          <ThemedView style={styles.notice} type="backgroundElement">
-            <ThemedText type="small" themeColor="textSecondary">
-              Yard location is a placeholder — real GPS point not yet captured.
-            </ThemedText>
-          </ThemedView>
-        )}
       </SafeAreaView>
     </ThemedView>
   );
@@ -103,13 +83,5 @@ const styles = StyleSheet.create({
     top: Spacing.four,
     right: Spacing.four,
     zIndex: 1,
-  },
-  notice: {
-    position: 'absolute',
-    bottom: Spacing.four,
-    left: Spacing.four,
-    right: Spacing.four,
-    borderRadius: 12,
-    padding: Spacing.three,
   },
 });

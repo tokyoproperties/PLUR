@@ -2,25 +2,16 @@ import { Link } from 'expo-router';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Card } from '@/components/Card';
 import { ModeBadge } from '@/components/ModeBadge';
 import { ModeToggle } from '@/components/ModeToggle';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useSymbolicMode } from '@/contexts/mode-context';
+import { useSensors } from '@/hooks/useSensors';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
-import { useAmbientLight } from '@/sensors/useAmbientLight';
-import { useMotion } from '@/sensors/useMotion';
-import { useSound } from '@/sensors/useSound';
-
-function Card({ children }: { children: React.ReactNode }) {
-  return (
-    <ThemedView style={styles.card} type="backgroundElement">
-      {children}
-    </ThemedView>
-  );
-}
 
 function QuickLaunch({ href, label, hint }: { href: '/map' | '/sensors'; label: string; hint: string }) {
   return (
@@ -41,21 +32,12 @@ function QuickLaunch({ href, label, hint }: { href: '/map' | '/sensors'; label: 
 }
 
 export default function HomeScreen() {
-  const light = useAmbientLight();
-  const motion = useMotion();
-  const sound = useSound();
+  const { light, motion, sound, snapshot } = useSensors();
   const { mode } = useSymbolicMode();
 
-  const sensorInputs = {
-    lux: light.lux,
-    motionMagnitude: motion.magnitude,
-    soundRelativeDb: sound.relativeDb,
-  };
+  const lite = evaluateLiteMode(snapshot);
+  const yard = evaluateYardMode(snapshot);
 
-  const lite = evaluateLiteMode(sensorInputs);
-  const yard = evaluateYardMode(sensorInputs);
-
-  // PLUR is the lens onto Lite Mode's summary; LOVE is the lens onto Yard Mode's.
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
 
   return (
@@ -162,11 +144,6 @@ const styles = StyleSheet.create({
   },
   badgeSpacer: {
     marginTop: Spacing.two,
-  },
-  card: {
-    borderRadius: 12,
-    padding: Spacing.three,
-    marginBottom: Spacing.two,
   },
   cardBody: {
     marginTop: Spacing.one,

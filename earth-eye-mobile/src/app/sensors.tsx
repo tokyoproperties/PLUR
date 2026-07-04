@@ -2,41 +2,21 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ModeBadge } from '@/components/ModeBadge';
+import { Row } from '@/components/Row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useSymbolicMode } from '@/contexts/mode-context';
+import { useSensors } from '@/hooks/useSensors';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
-import { useAmbientLight } from '@/sensors/useAmbientLight';
-import { useMotion } from '@/sensors/useMotion';
-import { useSound } from '@/sensors/useSound';
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <ThemedView style={styles.row} type="backgroundElement">
-      <ThemedText type="small" themeColor="textSecondary">
-        {label}
-      </ThemedText>
-      <ThemedText type="smallBold">{value}</ThemedText>
-    </ThemedView>
-  );
-}
 
 export default function SensorsScreen() {
-  const light = useAmbientLight();
-  const motion = useMotion();
-  const sound = useSound();
+  const { light, motion, sound, snapshot } = useSensors();
   const { mode } = useSymbolicMode();
 
-  const sensorInputs = {
-    lux: light.lux,
-    motionMagnitude: motion.magnitude,
-    soundRelativeDb: sound.relativeDb,
-  };
-
-  const lite = evaluateLiteMode(sensorInputs);
-  const yard = evaluateYardMode(sensorInputs);
+  const lite = evaluateLiteMode(snapshot);
+  const yard = evaluateYardMode(snapshot);
 
   const interpretation =
     mode === 'love'
@@ -125,14 +105,5 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.two,
     textTransform: 'uppercase',
     letterSpacing: 1,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.three,
-    borderRadius: 12,
-    marginBottom: Spacing.two,
   },
 });
