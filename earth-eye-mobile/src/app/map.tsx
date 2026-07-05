@@ -3,38 +3,48 @@ import { StyleSheet } from 'react-native';
 import MapView, { PROVIDER_DEFAULT } from 'react-native-maps';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ModeBadge } from '@/components/ModeBadge';
+import { CorridorShading } from '@/components/map/CorridorShading';
 import { CorridorLayer } from '@/components/map/CorridorLayer';
 import { FireworkWindowOverlay } from '@/components/map/FireworkWindowOverlay';
+import { SensorGradientLayer } from '@/components/map/SensorGradientLayer';
+import { TrailProximityRing } from '@/components/map/TrailProximityRing';
+import { YardCorridorRadius } from '@/components/map/YardCorridorRadius';
 import { YardStripLayer } from '@/components/map/YardStripLayer';
+import { ModeBadge } from '@/components/ModeBadge';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
+import { useCorridor } from '@/corridor/useCorridor';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useCorridors } from '@/hooks/useCorridors';
+import { useLocation } from '@/hooks/useLocation';
 import { useSensors } from '@/hooks/useSensors';
 import { useYardStrip } from '@/hooks/useYardStrip';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
 
 /**
- * Map screen.
+ * Map screen — Phase V: full overlay stack.
  *
- * Real data: the 74 active trails, live from the production DB
- * (single-point markers — no walked-path polylines exist yet).
- * Real yard coordinates: 35.392238, -119.099642 (captured 2026-07-02).
+ * Layer order (bottom to top):
+ *   1. SensorGradientLayer  (D) — radial gradient at user position
+ *   2. YardCorridorRadius   (C) — yard zone circle
+ *   3. TrailProximityRing   (B) — nearest trail ring
+ *   4. CorridorLayer        — 74 trail markers
+ *   5. YardStripLayer       — yard marker
+ *   6. FireworkWindowOverlay — July 4th ring (LOVE + firework window only)
+ *   7. CorridorShading      (A+E) — tone + mode tint (View overlay, above map)
  *
- * Mode-aware: PLUR dims the yard and brightens trails ("out in the
- * world"). LOVE dims trails and brightens the yard ("home"), and
- * shows the firework-window ring when Yard Mode's threshold logic
- * says it's active.
+ * All overlays degrade gracefully when GPS is unavailable.
  */
 export default function MapScreen() {
   const { mode } = useSymbolicMode();
   const { trails } = useCorridors();
   const yard = useYardStrip();
   const { snapshot } = useSensors();
+  const { location } = useLocation();
 
+  const corridor = useCorridor();
   const lite = evaluateLiteMode(snapshot);
   const yardEval = evaluateYardMode(snapshot);
   const sensorSummary = mode === 'plur' ? lite.summary : yardEval.summary;
@@ -47,6 +57,16 @@ export default function MapScreen() {
     [mode, yard.lat, yard.lng]
   );
 
+  const hasGPS = location !== null;
+  const userLat = location?.latitude ?? null;
+  const userLng = location?.longitude ?? null;
+
+  // Find the nearest trail object for the proximity ring
+  const nearestTrail = useMemo(() => {
+    if (!hasGPS || corridor.nearestTrailName === null) return null;
+    return trails.find((t) => t.name === corridor.nearestTrailName) ?? null;
+  }, [hasGPS, corridor.nearestTrailName, trails]);
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -55,10 +75,43 @@ export default function MapScreen() {
           style={styles.map}
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}>
+
+          {/* D: Sensor gradient at user location */}
+          <SensorGradientLayer
+            userLat={userLat}
+            userLng={userLng}
+            snapshot={snapshot}
+          />
+
+          {/* C: Yard corridor radius */}
+          <YardCorridorRadius
+            yard={yard}
+            proximity={corridor.proximity}
+            isFireworkWindow={yardEval.isFireworkWindow}
+          />
+
+          {/* B: Trail proximity ring (nearest trail) */}
+          <TrailProximityRing
+            nearestTrail={nearestTrail}
+            distanceMeters={corridor.nearestTrailDistanceMeters}
+            tone={corridor.tone}
+            hasGPS={hasGPS}
+          />
+
+          {/* Existing: 74 trail markers */}
           <CorridorLayer trails={trails} mode={mode} />
+
+          {/* Existing: yard marker */}
           <YardStripLayer yard={yard} mode={mode} sensorSummary={sensorSummary} />
-          {mode === 'love' && yardEval.isFireworkWindow && <FireworkWindowOverlay yard={yard} />}
+
+          {/* Existing: firework window ring (LOVE mode + active window only) */}
+          {mode === 'love' && yardEval.isFireworkWindow && (
+            <FireworkWindowOverlay yard={yard} />
+          )}
         </MapView>
+
+        {/* A + E: Corridor tone + mode tint (View overlay, above map) */}
+        <CorridorShading />
 
         <ThemedView style={styles.badgeCorner} type="background">
           <ModeBadge mode={mode} compact pulse={false} />
@@ -82,6 +135,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Spacing.four,
     right: Spacing.four,
-    zIndex: 1,
+    zIndex: 10,
   },
 });
