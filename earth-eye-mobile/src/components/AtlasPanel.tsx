@@ -2,14 +2,16 @@
  * AtlasPanel.tsx
  *
  * The Field Atlas card — shows the living record of the field.
- * Now includes Field Identity reflection (Phase XI) and seasonal
- * intelligence (Phase XII) at the top.
+ * Now includes Field Identity (Phase XI), seasonal intelligence
+ * (Phase XII), and corridor drift (Phase XIII).
  *
  * Layout:
  *   FIELD ATLAS (whisper label)
- *   ── Seasonal phase badge (whisper label + phase name) ──
+ *   ── Seasonal phase badge ──
  *   ── Field Identity reflection (Georgia italic) ──
- *   Latest moment card (type dot + timestamp + card text)
+ *   ── Seasonal rhythm line ──
+ *   ── Corridor drift line ──
+ *   Latest moment card
  *   Summary line
  *   Recent moments log
  */
@@ -22,6 +24,7 @@ import { Accents, Spacing } from '@/constants/theme';
 import { useAtlas } from '@/atlas/useAtlas';
 import { useFieldIdentity } from '@/atlas/useFieldIdentity';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
+import { useCorridorDrift } from '@/corridor/useCorridorDrift';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
@@ -55,6 +58,7 @@ export function AtlasPanel() {
   const atlas = useAtlas();
   const identity = useFieldIdentity();
   const seasonal = useSeasonalProfile();
+  const drift = useCorridorDrift();
 
   // No moments yet — quiet empty state
   if (atlas.totalMoments === 0 || !atlas.latest) {
@@ -74,7 +78,6 @@ export function AtlasPanel() {
   const cardColor = CARD_TYPE_COLORS[latest.cardType] ?? 'rgba(255,255,255,0.45)';
   const cardLabel = CARD_TYPE_LABELS[latest.cardType] ?? 'Field';
 
-  // Show up to 3 recent moments (excluding the latest, which is shown in full)
   const recentMoments = atlas.moments.slice(-4, -1).reverse();
 
   return (
@@ -105,9 +108,16 @@ export function AtlasPanel() {
       )}
 
       {/* Seasonal rhythm — what this season brings */}
-      <ThemedText style={styles.seasonalRhythm}>
+      <ThemedText style={styles.rhythmLine}>
         {seasonal.fieldRhythm}
       </ThemedText>
+
+      {/* Corridor drift — how the corridor is moving (Phase XIII) */}
+      {drift.isAssessed && (
+        <ThemedText style={styles.driftLine}>
+          {drift.description}
+        </ThemedText>
+      )}
 
       {/* Latest moment — the poetic card */}
       <View style={styles.latestSection}>
@@ -198,11 +208,19 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.82)',
     lineHeight: 1.7,
   },
-  seasonalRhythm: {
+  rhythmLine: {
     fontSize: 13,
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.55)',
+    lineHeight: 1.6,
+    marginBottom: 6,
+  },
+  driftLine: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.50)',
     lineHeight: 1.6,
     marginBottom: Spacing.two,
   },

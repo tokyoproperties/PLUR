@@ -2,15 +2,14 @@
  * CorridorSummary.tsx
  *
  * A compact card for the Home screen showing the current corridor
- * awareness state. Styled to EarthEye design language:
+ * awareness state, now including corridor drift (Phase XIII).
+ *
+ * Styled to EarthEye design language:
  * - dark card surface (#1A1A17)
  * - whisper label (9px, uppercase, 35% white)
  * - muted body text (rgba 0.70)
- * - Georgia serif for tone value
+ * - Georgia serif for tone value and drift note
  * - no exclamation marks, no directives
- *
- * The card observes, it doesn't instruct. "Tone: calm" not "You
- * should be calm."
  */
 
 import { StyleSheet } from 'react-native';
@@ -19,6 +18,7 @@ import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useCorridor } from '@/corridor/useCorridor';
+import { useCorridorDrift } from '@/corridor/useCorridorDrift';
 
 const PROXIMITY_LABEL: Record<string, string> = {
   'in-yard': 'In yard corridor',
@@ -30,6 +30,7 @@ const PROXIMITY_LABEL: Record<string, string> = {
 
 export function CorridorSummary() {
   const corridor = useCorridor();
+  const drift = useCorridorDrift();
 
   return (
     <Card>
@@ -60,6 +61,13 @@ export function CorridorSummary() {
           Stillness suggested — ease up.
         </ThemedText>
       )}
+
+      {/* Corridor drift — Phase XIII */}
+      {drift.isAssessed && (
+        <ThemedText style={styles.driftNote}>
+          {drift.description}
+        </ThemedText>
+      )}
     </Card>
   );
 }
@@ -86,5 +94,16 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.90)',
     marginTop: Spacing.one,
     fontStyle: 'italic',
+  },
+  driftNote: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.55)',
+    lineHeight: 1.6,
+    marginTop: Spacing.two,
+    paddingTop: Spacing.two,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.06)',
   },
 });
