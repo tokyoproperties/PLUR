@@ -2,15 +2,15 @@
  * MicroEcosystemPanel.tsx
  *
  * The "heart" card — shows which species are invited to the current
- * environment and what actions could welcome more. This is where
- * Carson and Jaycie eventually see "what wants to live here."
+ * environment and what actions could welcome more. Now includes
+ * seasonal context (Phase XII) showing which canon species are in
+ * their peak season.
  *
  * Styled to EarthEye design language:
  * - Card component (#1A1A17 surface)
  * - Whisper label 'MICRO-ECOSYSTEM' (9px, uppercase, 35% white)
  * - Georgia italic serif for species names and summary
- * - Conditions score as a single word, not a badge
- * - Suggested actions in quiet, observational language
+ * - Seasonal phase as a quiet whisper label
  * - No exclamation marks, no directives
  */
 
@@ -20,6 +20,7 @@ import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/themed-text';
 import { Accents, Spacing } from '@/constants/theme';
 import { useEcosystem } from '@/ecosystem/useEcosystem';
+import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import type { SuggestedAction } from '@/ecosystem/ecosystem-engine';
 
 const CONDITIONS_COLORS: Record<string, string> = {
@@ -40,11 +41,18 @@ const ACTION_LABELS: Record<SuggestedAction, string> = {
 
 export function MicroEcosystemPanel() {
   const ecosystem = useEcosystem();
+  const seasonal = useSeasonalProfile();
   const conditionsColor = CONDITIONS_COLORS[ecosystem.conditionsScore] ?? Accents.sage;
 
   // Show up to 3 invited species names
   const visibleSpecies = ecosystem.invitedSpecies.slice(0, 3);
   const remainingCount = ecosystem.invitedSpecies.length - visibleSpecies.length;
+
+  // Check which invited species are in their peak season
+  const inPeakSeason = ecosystem.invitedSpecies.filter((inv) =>
+    seasonal.likelySpecies.includes(inv.species.name)
+  );
+  const peakNames = inPeakSeason.map((inv) => inv.species.name);
 
   return (
     <Card>
@@ -70,11 +78,17 @@ export function MicroEcosystemPanel() {
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
             INVITED
           </ThemedText>
-          {visibleSpecies.map((inv, i) => (
-            <ThemedText key={i} style={styles.speciesName}>
-              {inv.species.name}
-            </ThemedText>
-          ))}
+          {visibleSpecies.map((inv, i) => {
+            const isPeak = seasonal.likelySpecies.includes(inv.species.name);
+            return (
+              <ThemedText key={i} style={styles.speciesName}>
+                {inv.species.name}
+                {isPeak && (
+                  <ThemedText style={styles.peakNote}> — peak season</ThemedText>
+                )}
+              </ThemedText>
+            );
+          })}
           {remainingCount > 0 && (
             <ThemedText type="small" themeColor="textSecondary" style={styles.remainingText}>
               +{remainingCount} more
@@ -85,6 +99,18 @@ export function MicroEcosystemPanel() {
         <ThemedText style={styles.emptyText}>
           No species invited at current conditions.
         </ThemedText>
+      )}
+
+      {/* Seasonal context — which species belong to this time of year */}
+      {peakNames.length > 0 && (
+        <View style={styles.seasonalSection}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
+            {seasonal.phaseLabel.toUpperCase()} CANON
+          </ThemedText>
+          <ThemedText style={styles.seasonalText}>
+            {seasonal.fieldRhythm}
+          </ThemedText>
+        </View>
       )}
 
       {ecosystem.suggestedActions.length > 0 && (
@@ -151,6 +177,12 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.88)',
     lineHeight: 1.7,
   },
+  peakNote: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(122,184,122,0.70)',
+  },
   remainingText: {
     marginTop: 2,
   },
@@ -161,6 +193,19 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.45)',
     lineHeight: 1.6,
     marginBottom: Spacing.two,
+  },
+  seasonalSection: {
+    marginTop: Spacing.two,
+    paddingTop: Spacing.two,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.06)',
+  },
+  seasonalText: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.55)',
+    lineHeight: 1.6,
   },
   actionsSection: {
     marginTop: Spacing.two,

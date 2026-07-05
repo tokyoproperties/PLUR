@@ -2,21 +2,16 @@
  * AtlasPanel.tsx
  *
  * The Field Atlas card — shows the living record of the field.
- * Now includes the Field Identity reflection at the top — the
- * land speaking about itself, derived from accumulated moments.
+ * Now includes Field Identity reflection (Phase XI) and seasonal
+ * intelligence (Phase XII) at the top.
  *
  * Layout:
  *   FIELD ATLAS (whisper label)
- *   ── Field Identity reflection (Georgia italic, the poetic voice) ──
+ *   ── Seasonal phase badge (whisper label + phase name) ──
+ *   ── Field Identity reflection (Georgia italic) ──
  *   Latest moment card (type dot + timestamp + card text)
- *   Summary line (N moments · mostly calm · N species seen)
- *   Recent moments log (last 3, quiet timestamp + state)
- *
- * Styled to EarthEye design language:
- * - Card component (#1A1A17 surface)
- * - Whisper labels (9px, uppercase, 35% white)
- * - Georgia italic serif for reflection and card text
- * - No exclamation marks, no directives
+ *   Summary line
+ *   Recent moments log
  */
 
 import { StyleSheet, View } from 'react-native';
@@ -26,6 +21,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Accents, Spacing } from '@/constants/theme';
 import { useAtlas } from '@/atlas/useAtlas';
 import { useFieldIdentity } from '@/atlas/useFieldIdentity';
+import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
@@ -58,6 +54,7 @@ function formatTime(timestamp: number): string {
 export function AtlasPanel() {
   const atlas = useAtlas();
   const identity = useFieldIdentity();
+  const seasonal = useSeasonalProfile();
 
   // No moments yet — quiet empty state
   if (atlas.totalMoments === 0 || !atlas.latest) {
@@ -86,17 +83,31 @@ export function AtlasPanel() {
         FIELD ATLAS
       </ThemedText>
 
+      {/* Seasonal phase — small whisper at top */}
+      <View style={styles.seasonalRow}>
+        <ThemedText type="small" themeColor="textSecondary" style={styles.seasonalLabel}>
+          {seasonal.phaseLabel.toUpperCase()}
+        </ThemedText>
+        {seasonal.patternConfirmed && (
+          <ThemedText type="small" themeColor="textSecondary" style={styles.confirmedText}>
+            pattern confirmed
+          </ThemedText>
+        )}
+      </View>
+
       {/* Field Identity — the land speaking about itself */}
       {identity.isEstablished && (
         <View style={styles.identitySection}>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.identityLabel}>
-            {identity.temperamentLabel.toUpperCase()}
-          </ThemedText>
           <ThemedText style={styles.identityText}>
             {identity.reflection}
           </ThemedText>
         </View>
       )}
+
+      {/* Seasonal rhythm — what this season brings */}
+      <ThemedText style={styles.seasonalRhythm}>
+        {seasonal.fieldRhythm}
+      </ThemedText>
 
       {/* Latest moment — the poetic card */}
       <View style={styles.latestSection}>
@@ -157,18 +168,28 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.45)',
     lineHeight: 1.6,
   },
-  identitySection: {
-    marginBottom: Spacing.three,
-    paddingBottom: Spacing.two,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+  seasonalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.one,
   },
-  identityLabel: {
+  seasonalLabel: {
     fontSize: 9,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 1.2,
-    marginBottom: Spacing.one,
+  },
+  confirmedText: {
+    fontSize: 9,
+    fontStyle: 'italic',
+    opacity: 0.6,
+  },
+  identitySection: {
+    marginBottom: Spacing.two,
+    paddingBottom: Spacing.two,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   identityText: {
     fontSize: 15,
@@ -176,6 +197,14 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.82)',
     lineHeight: 1.7,
+  },
+  seasonalRhythm: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.55)',
+    lineHeight: 1.6,
+    marginBottom: Spacing.two,
   },
   latestSection: {
     marginBottom: Spacing.two,
