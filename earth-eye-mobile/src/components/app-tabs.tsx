@@ -1,7 +1,6 @@
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet } from 'react-native';
-
-import { Colors } from '@/constants/theme';
+import { Platform } from 'react-native';
+import Svg, { Path, Circle } from 'react-native-svg';
 
 /**
  * AppTabs — the bottom navigation bar.
@@ -13,7 +12,7 @@ import { Colors } from '@/constants/theme';
  * - border rgba(255,255,255,0.07) (hairline)
  * - active icon rgba(255,255,255,0.90)
  * - inactive icon rgba(255,255,255,0.30)
- * - labels only on active tab (whisper weight)
+ * - 9px uppercase whisper labels
  */
 
 const INACTIVE = 'rgba(255,255,255,0.30)';
@@ -93,8 +92,9 @@ export default function AppTabs() {
 }
 
 /**
- * TabGlyph — inline SVG glyphs matching the EarthEye glyph system.
+ * TabGlyph — SVG glyphs using react-native-svg.
  * Rounded, organic, naturalist sketchbook energy.
+ * Stroke 1.8 active / 1.5 inactive.
  */
 function TabGlyph({ name, color }: { name: string; color: string }) {
   const isActive = color === ACTIVE;
@@ -104,40 +104,40 @@ function TabGlyph({ name, color }: { name: string; color: string }) {
   switch (name) {
     case 'home':
       return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <path d="M4 11.5 L12 5 L20 11.5 L20 19 Q20 20 19 20 L5 20 Q4 20 4 19 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M10 20 L10 15 Q10 14.5 10.5 14.5 L13.5 14.5 Q14 14.5 14 15 L14 20" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <Path d="M4 11.5 L12 5 L20 11.5 L20 19 Q20 20 19 20 L5 20 Q4 20 4 19 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M10 20 L10 15 Q10 14.5 10.5 14.5 L13.5 14.5 Q14 14.5 14 15 L14 20" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
       );
     case 'map':
       return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <path d="M9 4 L4.5 6 L4.5 20 L9 18 L15 20 L19.5 18 L19.5 4 L15 6 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M9 4 L9 18" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
-          <path d="M15 6 L15 20" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
-        </svg>
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <Path d="M9 4 L4.5 6 L4.5 20 L9 18 L15 20 L19.5 18 L19.5 4 L15 6 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M9 4 L9 18" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
+          <Path d="M15 6 L15 20" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
+        </Svg>
       );
     case 'atlas':
       return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <path d="M12 6 Q8 4 4 5 L4 18 Q8 17 12 19 Q16 17 20 18 L20 5 Q16 4 12 6 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M12 6 L12 19" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
-        </svg>
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <Path d="M12 6 Q8 4 4 5 L4 18 Q8 17 12 19 Q16 17 20 18 L20 5 Q16 4 12 6 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M12 6 L12 19" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
+        </Svg>
       );
     case 'ecosystem':
       return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <path d="M5 19 Q5 10 12 5 Q19 10 19 19 Q12 17 5 19 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M9 16 Q12 13 16 10" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <Path d="M5 19 Q5 10 12 5 Q19 10 19 19 Q12 17 5 19 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M9 16 Q12 13 16 10" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
       );
     case 'suit':
       return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <path d="M4 16 Q4 8 12 8 Q20 8 20 16" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M12 16 L16 11" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="12" cy="16" r="1.5" fill={color} />
-        </svg>
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <Path d="M4 16 Q4 8 12 8 Q20 8 20 16" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M12 16 L16 11" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <Circle cx={12} cy={16} r={1.5} fill={color} />
+        </Svg>
       );
     default:
       return null;
