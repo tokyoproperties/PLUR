@@ -2,17 +2,20 @@
  * AtlasPanel.tsx
  *
  * The Field Atlas card — shows the living record of the field.
- * Displays the most recent field moment, the atlas summary, and
- * a quiet log of recent entries.
+ * Now includes the Field Identity reflection at the top — the
+ * land speaking about itself, derived from accumulated moments.
  *
- * This is where EarthEye stops being reactive and becomes reflective.
- * It remembers. It contextualizes. It reveals patterns.
+ * Layout:
+ *   FIELD ATLAS (whisper label)
+ *   ── Field Identity reflection (Georgia italic, the poetic voice) ──
+ *   Latest moment card (type dot + timestamp + card text)
+ *   Summary line (N moments · mostly calm · N species seen)
+ *   Recent moments log (last 3, quiet timestamp + state)
  *
  * Styled to EarthEye design language:
  * - Card component (#1A1A17 surface)
- * - Whisper label 'FIELD ATLAS' (9px, uppercase, 35% white)
- * - Georgia italic serif for moment text (the poetic register)
- * - Quiet log of recent moments, not a data table
+ * - Whisper labels (9px, uppercase, 35% white)
+ * - Georgia italic serif for reflection and card text
  * - No exclamation marks, no directives
  */
 
@@ -22,6 +25,7 @@ import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/themed-text';
 import { Accents, Spacing } from '@/constants/theme';
 import { useAtlas } from '@/atlas/useAtlas';
+import { useFieldIdentity } from '@/atlas/useFieldIdentity';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
@@ -53,6 +57,7 @@ function formatTime(timestamp: number): string {
 
 export function AtlasPanel() {
   const atlas = useAtlas();
+  const identity = useFieldIdentity();
 
   // No moments yet — quiet empty state
   if (atlas.totalMoments === 0 || !atlas.latest) {
@@ -81,6 +86,18 @@ export function AtlasPanel() {
         FIELD ATLAS
       </ThemedText>
 
+      {/* Field Identity — the land speaking about itself */}
+      {identity.isEstablished && (
+        <View style={styles.identitySection}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.identityLabel}>
+            {identity.temperamentLabel.toUpperCase()}
+          </ThemedText>
+          <ThemedText style={styles.identityText}>
+            {identity.reflection}
+          </ThemedText>
+        </View>
+      )}
+
       {/* Latest moment — the poetic card */}
       <View style={styles.latestSection}>
         <View style={styles.cardTypeRow}>
@@ -108,7 +125,7 @@ export function AtlasPanel() {
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
             RECENT
           </ThemedText>
-          {recentMoments.map((m, i) => (
+          {recentMoments.map((m) => (
             <View key={m.id} style={styles.recentRow}>
               <ThemedText type="small" themeColor="textSecondary" style={styles.recentTime}>
                 {formatTime(m.timestamp)}
@@ -139,6 +156,26 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.45)',
     lineHeight: 1.6,
+  },
+  identitySection: {
+    marginBottom: Spacing.three,
+    paddingBottom: Spacing.two,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
+  },
+  identityLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginBottom: Spacing.one,
+  },
+  identityText: {
+    fontSize: 15,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.82)',
+    lineHeight: 1.7,
   },
   latestSection: {
     marginBottom: Spacing.two,
