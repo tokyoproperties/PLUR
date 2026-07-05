@@ -1,15 +1,14 @@
 /**
  * MicroEcosystemPanel.tsx
  *
- * The "heart" card — shows which species are invited, what actions
- * could welcome more, seasonal context (Phase XII), and species
- * arrival likelihoods (Phase XIV).
+ * The "heart" card — shows invited species, seasonal context,
+ * species arrivals (Phase XIV), and habitat zones (Phase XV).
  *
  * Styled to EarthEye design language:
  * - Card component (#1A1A17 surface)
  * - Whisper labels (9px, uppercase, 35% white)
  * - Georgia italic serif for species names and summaries
- * - Arrival likelihood shown with quiet color dots
+ * - Confidence dots: sage=high, amber=medium, gray=low
  * - No exclamation marks, no directives
  */
 
@@ -21,8 +20,10 @@ import { Accents, Spacing } from '@/constants/theme';
 import { useEcosystem } from '@/ecosystem/useEcosystem';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
+import { useHabitatZones } from '@/ecosystem/useHabitatZones';
 import type { SuggestedAction } from '@/ecosystem/ecosystem-engine';
 import type { ArrivalLikelihood } from '@/ecosystem/speciesArrival';
+import type { HabitatConfidence } from '@/ecosystem/habitatZones';
 
 const CONDITIONS_COLORS: Record<string, string> = {
   good: Accents.sage,
@@ -54,10 +55,17 @@ const ARRIVAL_LABELS: Record<ArrivalLikelihood, string> = {
   dormant: 'dormant',
 };
 
+const HABITAT_COLORS: Record<HabitatConfidence, string> = {
+  high: Accents.sage,
+  medium: Accents.amber,
+  low: 'rgba(255,255,255,0.30)',
+};
+
 export function MicroEcosystemPanel() {
   const ecosystem = useEcosystem();
   const seasonal = useSeasonalProfile();
   const arrivals = useSpeciesArrival();
+  const habitats = useHabitatZones();
   const conditionsColor = CONDITIONS_COLORS[ecosystem.conditionsScore] ?? Accents.sage;
 
   const visibleSpecies = ecosystem.invitedSpecies.slice(0, 3);
@@ -67,8 +75,8 @@ export function MicroEcosystemPanel() {
     seasonal.likelySpecies.includes(inv.species.name)
   );
 
-  // Show top 5 arrival assessments (skip dormant for brevity)
   const visibleArrivals = arrivals.species.filter((s) => s.likelihood !== 'dormant').slice(0, 5);
+  const visibleHabitats = habitats.zones.slice(0, 5);
 
   return (
     <Card>
@@ -89,6 +97,7 @@ export function MicroEcosystemPanel() {
         </ThemedText>
       </View>
 
+      {/* Invited species */}
       {visibleSpecies.length > 0 ? (
         <View style={styles.speciesSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
@@ -137,7 +146,7 @@ export function MicroEcosystemPanel() {
           </ThemedText>
           {visibleArrivals.map((arrival, i) => (
             <View key={i} style={styles.arrivalRow}>
-              <View style={[styles.arrivalDot, { backgroundColor: ARRIVAL_COLORS[arrival.likelihood] }]} />
+              <View style={[styles.dot, { backgroundColor: ARRIVAL_COLORS[arrival.likelihood] }]} />
               <ThemedText style={styles.arrivalName}>
                 {arrival.name}
               </ThemedText>
@@ -154,6 +163,34 @@ export function MicroEcosystemPanel() {
         </View>
       )}
 
+      {/* Habitat Zones — Phase XV */}
+      {visibleHabitats.length > 0 && (
+        <View style={styles.habitatSection}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
+            HABITAT ZONES
+          </ThemedText>
+          {visibleHabitats.map((zone, i) => (
+            <View key={i} style={styles.habitatRow}>
+              <View style={[styles.dot, { backgroundColor: HABITAT_COLORS[zone.confidence] }]} />
+              <ThemedText style={styles.habitatLabel}>
+                {zone.label}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary" style={styles.habitatAffinity}>
+                {zone.speciesAffinity.length > 1
+                  ? `${zone.speciesAffinity[0]} +${zone.speciesAffinity.length - 1}`
+                  : zone.speciesAffinity[0]}
+              </ThemedText>
+            </View>
+          ))}
+          {habitats.primary && (
+            <ThemedText style={styles.habitatNote}>
+              {habitats.primary.description}
+            </ThemedText>
+          )}
+        </View>
+      )}
+
+      {/* Suggested actions */}
       {ecosystem.suggestedActions.length > 0 && (
         <View style={styles.actionsSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
@@ -192,18 +229,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: Spacing.two,
   },
-  conditionsLabel: {
-    lineHeight: 20,
-  },
+  conditionsLabel: { lineHeight: 20 },
   conditionsValue: {
     fontSize: 18,
     fontFamily: 'Georgia',
     fontWeight: '400',
     fontStyle: 'italic',
   },
-  speciesSection: {
-    marginBottom: Spacing.two,
-  },
+  speciesSection: { marginBottom: Spacing.two },
   subLabel: {
     fontSize: 9,
     fontWeight: '700',
@@ -224,9 +257,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: 'rgba(122,184,122,0.70)',
   },
-  remainingText: {
-    marginTop: 2,
-  },
+  remainingText: { marginTop: 2 },
   emptyText: {
     fontSize: 15,
     fontFamily: 'Georgia',
@@ -259,7 +290,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
   },
-  arrivalDot: {
+  dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
@@ -286,9 +317,39 @@ const styles = StyleSheet.create({
     lineHeight: 1.6,
     marginTop: Spacing.one,
   },
-  actionsSection: {
+  habitatSection: {
     marginTop: Spacing.two,
+    paddingTop: Spacing.two,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.06)',
   },
+  habitatRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  habitatLabel: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.78)',
+    lineHeight: 20,
+  },
+  habitatAffinity: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    lineHeight: 20,
+  },
+  habitatNote: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.60)',
+    lineHeight: 1.6,
+    marginTop: Spacing.one,
+  },
+  actionsSection: { marginTop: Spacing.two },
   actionText: {
     fontSize: 13,
     fontFamily: 'Georgia',
