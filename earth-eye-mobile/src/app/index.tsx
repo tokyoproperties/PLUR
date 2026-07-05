@@ -7,6 +7,7 @@ import { CorridorSummary } from '@/components/CorridorSummary';
 import { HybridFieldStateCard } from '@/components/HybridFieldState';
 import { ModeBadge } from '@/components/ModeBadge';
 import { ModeToggle } from '@/components/ModeToggle';
+import { SuitPanel } from '@/components/SuitPanel';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -92,6 +93,11 @@ export default function HomeScreen() {
             CORRIDOR
           </ThemedText>
           <CorridorSummary />
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            SUIT
+          </ThemedText>
+          <SuitPanel />
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
             SENSOR SUMMARY
