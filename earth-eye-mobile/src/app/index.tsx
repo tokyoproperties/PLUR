@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card } from '@/components/Card';
 import { CorridorSummary } from '@/components/CorridorSummary';
+import { HybridFieldStateCard } from '@/components/HybridFieldState';
 import { ModeBadge } from '@/components/ModeBadge';
 import { ModeToggle } from '@/components/ModeToggle';
 import { ThemedText } from '@/components/themed-text';
@@ -83,6 +84,16 @@ export default function HomeScreen() {
           </Card>
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            FIELD STATE
+          </ThemedText>
+          <HybridFieldStateCard />
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            CORRIDOR
+          </ThemedText>
+          <CorridorSummary />
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
             SENSOR SUMMARY
           </ThemedText>
           <Card>
@@ -96,11 +107,6 @@ export default function HomeScreen() {
               Sound: {sound.relativeDb !== null ? `${sound.relativeDb.toFixed(0)} (${sound.band})` : sound.permissionDenied ? 'mic permission denied' : 'reading…'}
             </ThemedText>
           </Card>
-
-          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-            CORRIDOR
-          </ThemedText>
-          <CorridorSummary />
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
             QUICK LAUNCH
