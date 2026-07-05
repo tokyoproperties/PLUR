@@ -1,9 +1,10 @@
 /**
  * MicroEcosystemPanel.tsx
  *
- * The "heart" card — shows invited species, seasonal context,
- * species arrivals (XIV), habitat zones (XV), field memory (XVI),
- * and continuity markers (XVII).
+ * The "heart" card — all ecosystem layers:
+ * Invited species, seasonal context, arrivals (XIV),
+ * habitat zones (XV), field memory (XVI), continuity (XVII),
+ * and mythology (XVIII).
  */
 
 import { StyleSheet, View } from 'react-native';
@@ -17,6 +18,7 @@ import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
 import { useHabitatZones } from '@/ecosystem/useHabitatZones';
 import { useFieldMemory } from '@/atlas/useFieldMemory';
 import { useFieldContinuity } from '@/atlas/useFieldContinuity';
+import { useFieldMythology } from '@/atlas/useFieldMythology';
 import type { SuggestedAction } from '@/ecosystem/ecosystem-engine';
 import type { ArrivalLikelihood } from '@/ecosystem/speciesArrival';
 import type { HabitatConfidence } from '@/ecosystem/habitatZones';
@@ -48,6 +50,7 @@ export function MicroEcosystemPanel() {
   const habitats = useHabitatZones();
   const memory = useFieldMemory();
   const continuity = useFieldContinuity();
+  const mythology = useFieldMythology();
   const conditionsColor = CONDITIONS_COLORS[ecosystem.conditionsScore] ?? Accents.sage;
 
   const visibleSpecies = ecosystem.invitedSpecies.slice(0, 3);
@@ -58,17 +61,19 @@ export function MicroEcosystemPanel() {
   const visibleArrivals = arrivals.species.filter((s) => s.likelihood !== 'dormant').slice(0, 5);
   const visibleHabitats = habitats.zones.slice(0, 5);
 
-  // Build lookups from memory and continuity
+  // Build lookups
   const frequencyLookup: Record<string, string> = {};
   if (memory.isEstablished) {
-    for (const sf of memory.speciesHistory) {
-      frequencyLookup[sf.name] = sf.frequencyLabel;
-    }
+    for (const sf of memory.speciesHistory) frequencyLookup[sf.name] = sf.frequencyLabel;
   }
   const continuityLookup: Record<string, string> = {};
   if (continuity.isEstablished) {
-    for (const sc of continuity.speciesContinuity) {
-      continuityLookup[sc.name] = sc.continuityLabel;
+    for (const sc of continuity.speciesContinuity) continuityLookup[sc.name] = sc.continuityLabel;
+  }
+  const mythicRoleLookup: Record<string, string> = {};
+  if (mythology.isEstablished) {
+    for (const sr of mythology.speciesRoles) {
+      if (sr.isEarned) mythicRoleLookup[sr.name] = sr.roleLabel;
     }
   }
 
@@ -89,12 +94,14 @@ export function MicroEcosystemPanel() {
             const isPeak = seasonal.likelySpecies.includes(inv.species.name);
             const freq = frequencyLookup[inv.species.name];
             const cont = continuityLookup[inv.species.name];
+            const myth = mythicRoleLookup[inv.species.name];
             return (
               <ThemedText key={i} style={styles.speciesName}>
                 {inv.species.name}
-                {isPeak && <ThemedText style={styles.peakNote}> — peak season</ThemedText>}
-                {!isPeak && cont && <ThemedText style={styles.contNote}> — {cont}</ThemedText>}
-                {!isPeak && !cont && freq && <ThemedText style={styles.freqNote}> — {freq}</ThemedText>}
+                {myth && <ThemedText style={styles.mythNote}> — {myth}</ThemedText>}
+                {!myth && isPeak && <ThemedText style={styles.peakNote}> — peak season</ThemedText>}
+                {!myth && !isPeak && cont && <ThemedText style={styles.contNote}> — {cont}</ThemedText>}
+                {!myth && !isPeak && !cont && freq && <ThemedText style={styles.freqNote}> — {freq}</ThemedText>}
               </ThemedText>
             );
           })}
@@ -119,7 +126,8 @@ export function MicroEcosystemPanel() {
           {visibleArrivals.map((arrival, i) => {
             const freq = frequencyLookup[arrival.name];
             const cont = continuityLookup[arrival.name];
-            const suffix = cont || freq;
+            const myth = mythicRoleLookup[arrival.name];
+            const suffix = myth || cont || freq;
             return (
               <View key={i} style={styles.arrivalRow}>
                 <View style={[styles.dot, { backgroundColor: ARRIVAL_COLORS[arrival.likelihood] }]} />
@@ -158,20 +166,34 @@ export function MicroEcosystemPanel() {
           <ThemedText style={styles.memoryText}>{memory.memoryLine}</ThemedText>
           {memory.chapters.length > 1 && (
             <ThemedText type="small" themeColor="textSecondary" style={styles.chapterCount}>
-              {memory.chapters.length} chapters in memory · {memory.totalMoments} moments recorded
+              {memory.chapters.length} chapters · {memory.totalMoments} moments
             </ThemedText>
           )}
         </View>
       )}
 
-      {/* Field Continuity — Phase XVII */}
       {continuity.isEstablished && (
         <View style={styles.continuitySection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>FIELD CONTINUITY</ThemedText>
           <ThemedText style={styles.continuityArc}>{continuity.arcLabel}</ThemedText>
           <ThemedText style={styles.continuityText}>{continuity.continuityLine}</ThemedText>
-          {continuity.driftContinuity.isConsistent && (
-            <ThemedText style={styles.driftContText}>{continuity.driftContinuity.description}</ThemedText>
+        </View>
+      )}
+
+      {/* Field Mythology — Phase XVIII */}
+      {mythology.isEstablished && (
+        <View style={styles.mythologySection}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>FIELD MYTHOLOGY</ThemedText>
+          <ThemedText style={styles.mythArc}>{mythology.archetype.label}</ThemedText>
+          <ThemedText style={styles.mythText}>{mythology.mythologyLine}</ThemedText>
+          {mythology.speciesRoles.filter(r => r.isEarned).length > 0 && (
+            <View style={styles.rolesRow}>
+              {mythology.speciesRoles.filter(r => r.isEarned).slice(0, 3).map((role, i) => (
+                <ThemedText key={i} style={styles.roleChip}>
+                  {role.roleLabel}
+                </ThemedText>
+              ))}
+            </View>
           )}
         </View>
       )}
@@ -200,6 +222,7 @@ const styles = StyleSheet.create({
   peakNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(122,184,122,0.70)' },
   freqNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.60)' },
   contNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.60)' },
+  mythNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.55)' },
   remainingText: { marginTop: 2 },
   emptyText: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: Spacing.two },
   seasonalSection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
@@ -221,7 +244,11 @@ const styles = StyleSheet.create({
   continuitySection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
   continuityArc: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, marginBottom: 4 },
   continuityText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.55)', lineHeight: 1.6 },
-  driftContText: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, marginTop: 4 },
+  mythologySection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  mythArc: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.88)', lineHeight: 1.6, marginBottom: 4 },
+  mythText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 },
+  rolesRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
+  roleChip: { fontSize: 11, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', marginRight: 8, marginTop: 2 },
   actionsSection: { marginTop: Spacing.two },
   actionText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginTop: 4 },
 });
