@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '@/components/Card';
 import { CorridorSummary } from '@/components/CorridorSummary';
 import { HybridFieldStateCard } from '@/components/HybridFieldState';
+import { MicroEcosystemPanel } from '@/components/MicroEcosystemPanel';
 import { ModeBadge } from '@/components/ModeBadge';
 import { ModeToggle } from '@/components/ModeToggle';
 import { SuitPanel } from '@/components/SuitPanel';
@@ -98,6 +99,11 @@ export default function HomeScreen() {
             SUIT
           </ThemedText>
           <SuitPanel />
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            MICRO-ECOSYSTEM
+          </ThemedText>
+          <MicroEcosystemPanel />
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
             SENSOR SUMMARY
