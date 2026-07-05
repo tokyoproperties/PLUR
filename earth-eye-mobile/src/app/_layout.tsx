@@ -4,6 +4,7 @@ import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
+import PLUROverlay from '@/components/PLUROverlay';
 import { ModeProvider } from '@/contexts/mode-context';
 
 SplashScreen.preventAutoHideAsync();
@@ -15,6 +16,8 @@ export default function TabLayout() {
       <ModeProvider>
         <AnimatedSplashOverlay />
         <AppTabs />
+        {/* Global ambient overlay — sits above all screens, beneath interaction */}
+        <PLUROverlay />
       </ModeProvider>
     </ThemeProvider>
   );
