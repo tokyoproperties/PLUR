@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card } from '@/components/Card';
+import { CorridorSummary } from '@/components/CorridorSummary';
 import { ModeBadge } from '@/components/ModeBadge';
 import { ModeToggle } from '@/components/ModeToggle';
 import { ThemedText } from '@/components/themed-text';
@@ -95,6 +96,11 @@ export default function HomeScreen() {
               Sound: {sound.relativeDb !== null ? `${sound.relativeDb.toFixed(0)} (${sound.band})` : sound.permissionDenied ? 'mic permission denied' : 'reading…'}
             </ThemedText>
           </Card>
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            CORRIDOR
+          </ThemedText>
+          <CorridorSummary />
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
             QUICK LAUNCH
