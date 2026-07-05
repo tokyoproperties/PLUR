@@ -1,16 +1,15 @@
 /**
  * MicroEcosystemPanel.tsx
  *
- * The "heart" card — shows which species are invited to the current
- * environment and what actions could welcome more. Now includes
- * seasonal context (Phase XII) showing which canon species are in
- * their peak season.
+ * The "heart" card — shows which species are invited, what actions
+ * could welcome more, seasonal context (Phase XII), and species
+ * arrival likelihoods (Phase XIV).
  *
  * Styled to EarthEye design language:
  * - Card component (#1A1A17 surface)
- * - Whisper label 'MICRO-ECOSYSTEM' (9px, uppercase, 35% white)
- * - Georgia italic serif for species names and summary
- * - Seasonal phase as a quiet whisper label
+ * - Whisper labels (9px, uppercase, 35% white)
+ * - Georgia italic serif for species names and summaries
+ * - Arrival likelihood shown with quiet color dots
  * - No exclamation marks, no directives
  */
 
@@ -21,7 +20,9 @@ import { ThemedText } from '@/components/themed-text';
 import { Accents, Spacing } from '@/constants/theme';
 import { useEcosystem } from '@/ecosystem/useEcosystem';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
+import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
 import type { SuggestedAction } from '@/ecosystem/ecosystem-engine';
+import type { ArrivalLikelihood } from '@/ecosystem/speciesArrival';
 
 const CONDITIONS_COLORS: Record<string, string> = {
   good: Accents.sage,
@@ -39,20 +40,35 @@ const ACTION_LABELS: Record<SuggestedAction, string> = {
   'preserve-snags': 'Standing dead trees feed and shelter dozens of species.',
 };
 
+const ARRIVAL_COLORS: Record<ArrivalLikelihood, string> = {
+  high: Accents.sage,
+  moderate: Accents.amber,
+  low: 'rgba(255,255,255,0.35)',
+  dormant: 'rgba(255,255,255,0.20)',
+};
+
+const ARRIVAL_LABELS: Record<ArrivalLikelihood, string> = {
+  high: 'likely',
+  moderate: 'favorable',
+  low: 'unlikely',
+  dormant: 'dormant',
+};
+
 export function MicroEcosystemPanel() {
   const ecosystem = useEcosystem();
   const seasonal = useSeasonalProfile();
+  const arrivals = useSpeciesArrival();
   const conditionsColor = CONDITIONS_COLORS[ecosystem.conditionsScore] ?? Accents.sage;
 
-  // Show up to 3 invited species names
   const visibleSpecies = ecosystem.invitedSpecies.slice(0, 3);
   const remainingCount = ecosystem.invitedSpecies.length - visibleSpecies.length;
 
-  // Check which invited species are in their peak season
   const inPeakSeason = ecosystem.invitedSpecies.filter((inv) =>
     seasonal.likelySpecies.includes(inv.species.name)
   );
-  const peakNames = inPeakSeason.map((inv) => inv.species.name);
+
+  // Show top 5 arrival assessments (skip dormant for brevity)
+  const visibleArrivals = arrivals.species.filter((s) => s.likelihood !== 'dormant').slice(0, 5);
 
   return (
     <Card>
@@ -101,8 +117,8 @@ export function MicroEcosystemPanel() {
         </ThemedText>
       )}
 
-      {/* Seasonal context — which species belong to this time of year */}
-      {peakNames.length > 0 && (
+      {/* Seasonal context */}
+      {inPeakSeason.length > 0 && (
         <View style={styles.seasonalSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
             {seasonal.phaseLabel.toUpperCase()} CANON
@@ -110,6 +126,31 @@ export function MicroEcosystemPanel() {
           <ThemedText style={styles.seasonalText}>
             {seasonal.fieldRhythm}
           </ThemedText>
+        </View>
+      )}
+
+      {/* Species Arrival — Phase XIV */}
+      {visibleArrivals.length > 0 && (
+        <View style={styles.arrivalSection}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
+            SPECIES ARRIVAL
+          </ThemedText>
+          {visibleArrivals.map((arrival, i) => (
+            <View key={i} style={styles.arrivalRow}>
+              <View style={[styles.arrivalDot, { backgroundColor: ARRIVAL_COLORS[arrival.likelihood] }]} />
+              <ThemedText style={styles.arrivalName}>
+                {arrival.name}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary" style={styles.arrivalLikelihood}>
+                {ARRIVAL_LABELS[arrival.likelihood]}
+              </ThemedText>
+            </View>
+          ))}
+          {arrivals.imminent.length > 0 && (
+            <ThemedText style={styles.arrivalNote}>
+              {arrivals.headline}
+            </ThemedText>
+          )}
         </View>
       )}
 
@@ -206,6 +247,44 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.55)',
     lineHeight: 1.6,
+  },
+  arrivalSection: {
+    marginTop: Spacing.two,
+    paddingTop: Spacing.two,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.06)',
+  },
+  arrivalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  arrivalDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: Spacing.two,
+  },
+  arrivalName: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.78)',
+    lineHeight: 20,
+  },
+  arrivalLikelihood: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    lineHeight: 20,
+  },
+  arrivalNote: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.60)',
+    lineHeight: 1.6,
+    marginTop: Spacing.one,
   },
   actionsSection: {
     marginTop: Spacing.two,

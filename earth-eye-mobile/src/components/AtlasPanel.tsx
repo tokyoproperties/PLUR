@@ -1,16 +1,17 @@
 /**
  * AtlasPanel.tsx
  *
- * The Field Atlas card — shows the living record of the field.
- * Now includes Field Identity (Phase XI), seasonal intelligence
- * (Phase XII), and corridor drift (Phase XIII).
+ * The Field Atlas card — the layered story of the field.
+ * Includes Field Identity (XI), Seasonal Intelligence (XII),
+ * Corridor Drift (XIII), and Species Arrival (XIV).
  *
  * Layout:
  *   FIELD ATLAS (whisper label)
  *   ── Seasonal phase badge ──
- *   ── Field Identity reflection (Georgia italic) ──
- *   ── Seasonal rhythm line ──
- *   ── Corridor drift line ──
+ *   ── Field Identity reflection ──
+ *   ── Seasonal rhythm ──
+ *   ── Corridor drift ──
+ *   ── Species arrival window ──
  *   Latest moment card
  *   Summary line
  *   Recent moments log
@@ -25,6 +26,7 @@ import { useAtlas } from '@/atlas/useAtlas';
 import { useFieldIdentity } from '@/atlas/useFieldIdentity';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useCorridorDrift } from '@/corridor/useCorridorDrift';
+import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
@@ -59,8 +61,8 @@ export function AtlasPanel() {
   const identity = useFieldIdentity();
   const seasonal = useSeasonalProfile();
   const drift = useCorridorDrift();
+  const arrivals = useSpeciesArrival();
 
-  // No moments yet — quiet empty state
   if (atlas.totalMoments === 0 || !atlas.latest) {
     return (
       <Card>
@@ -86,7 +88,7 @@ export function AtlasPanel() {
         FIELD ATLAS
       </ThemedText>
 
-      {/* Seasonal phase — small whisper at top */}
+      {/* Seasonal phase */}
       <View style={styles.seasonalRow}>
         <ThemedText type="small" themeColor="textSecondary" style={styles.seasonalLabel}>
           {seasonal.phaseLabel.toUpperCase()}
@@ -98,7 +100,7 @@ export function AtlasPanel() {
         )}
       </View>
 
-      {/* Field Identity — the land speaking about itself */}
+      {/* Field Identity */}
       {identity.isEstablished && (
         <View style={styles.identitySection}>
           <ThemedText style={styles.identityText}>
@@ -107,19 +109,26 @@ export function AtlasPanel() {
         </View>
       )}
 
-      {/* Seasonal rhythm — what this season brings */}
+      {/* Seasonal rhythm */}
       <ThemedText style={styles.rhythmLine}>
         {seasonal.fieldRhythm}
       </ThemedText>
 
-      {/* Corridor drift — how the corridor is moving (Phase XIII) */}
+      {/* Corridor drift */}
       {drift.isAssessed && (
         <ThemedText style={styles.driftLine}>
           {drift.description}
         </ThemedText>
       )}
 
-      {/* Latest moment — the poetic card */}
+      {/* Species arrival window */}
+      {arrivals.imminent.length > 0 && (
+        <ThemedText style={styles.arrivalLine}>
+          {arrivals.atlasLine}
+        </ThemedText>
+      )}
+
+      {/* Latest moment */}
       <View style={styles.latestSection}>
         <View style={styles.cardTypeRow}>
           <View style={[styles.cardTypeDot, { backgroundColor: cardColor }]} />
@@ -135,12 +144,12 @@ export function AtlasPanel() {
         </ThemedText>
       </View>
 
-      {/* Summary line */}
+      {/* Summary */}
       <ThemedText style={styles.summaryLine}>
         {atlas.summary.summary}
       </ThemedText>
 
-      {/* Recent moments — quiet log */}
+      {/* Recent log */}
       {recentMoments.length > 0 && (
         <View style={styles.recentSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>
@@ -221,6 +230,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.50)',
+    lineHeight: 1.6,
+    marginBottom: 6,
+  },
+  arrivalLine: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(122,184,122,0.60)',
     lineHeight: 1.6,
     marginBottom: Spacing.two,
   },
