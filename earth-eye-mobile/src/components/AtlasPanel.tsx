@@ -15,25 +15,17 @@
  *     Memory line → Mythology
  *
  *   ZONE 4 — ESSENCE (the capstone — brightest, largest)
- *     Soul (17px, 0.90 opacity) → Spirit (15px, violet) → Lore (14px, amber)
+ *     Soul (16px, 0.92) → Spirit (15px, violet) → Lore (14px, amber)
  *     → Continuity (13px, slate)
  *
  *   ZONE 5 — CURRENT MOMENT (card + summary + recent log)
  *
- * Typography gradient:
- *   Soul → 16px Georgia italic, rgba(255,255,255,0.92)
- *   Spirit → 15px Georgia italic, rgba(154,122,184,0.82)
- *   Mythology → 14px Georgia italic, rgba(255,255,255,0.78)
- *   Lore → 14px Georgia italic, rgba(196,151,74,0.68)
- *   Continuity → 13px Georgia italic, rgba(154,122,184,0.58)
- *   Memory → 13px Georgia italic, rgba(196,151,74,0.55)
- *   Habitat → 13px Georgia italic, rgba(122,154,184,0.60)
- *   Drift → 13px Georgia italic, rgba(255,255,255,0.48)
- *   Rhythm → 13px Georgia italic, rgba(255,255,255,0.55)
- *   Identity → 15px Georgia italic, rgba(255,255,255,0.82)
+ * Each zone fades in with a staggered delay — the cosmology
+ * blooms as you scroll: perception first, essence last.
  */
 
 import { StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/themed-text';
@@ -68,9 +60,13 @@ function formatTime(ts: number): string {
   return `${h % 12 || 12}:${m} ${h >= 12 ? 'pm' : 'am'}`;
 }
 
-/**
- * SectionDivider — hairline between zones.
- */
+// Staggered fade-in durations
+const FADE_PERCEPTION = FadeIn.duration(500).delay(0);
+const FADE_ECOLOGY = FadeIn.duration(500).delay(120);
+const FADE_MEMORY = FadeIn.duration(500).delay(240);
+const FADE_ESSENCE = FadeIn.duration(600).delay(380);
+const FADE_MOMENT = FadeIn.duration(500).delay(520);
+
 function SectionDivider() {
   return <View style={styles.divider} />;
 }
@@ -103,7 +99,6 @@ export function AtlasPanel() {
   const cardLabel = CARD_TYPE_LABELS[latest.cardType] ?? 'Field';
   const recentMoments = atlas.moments.slice(-4, -1).reverse();
 
-  // Check which zones have content
   const hasPerception = identity.isEstablished || drift.isAssessed;
   const hasEcology = arrivals.imminent.length > 0 || (habitats.isAssessed && habitats.primary);
   const hasMemory = memory.isEstablished || mythology.isEstablished;
@@ -113,7 +108,6 @@ export function AtlasPanel() {
     <Card style={styles.atlasCard}>
       <ThemedText type="small" themeColor="textSecondary" style={styles.whisper}>FIELD ATLAS</ThemedText>
 
-      {/* Season badge */}
       <View style={styles.seasonalRow}>
         <ThemedText type="small" themeColor="textSecondary" style={styles.seasonalLabel}>
           {seasonal.phaseLabel.toUpperCase()}
@@ -125,18 +119,18 @@ export function AtlasPanel() {
 
       {/* ZONE 1 — PERCEPTION */}
       {hasPerception && (
-        <View style={styles.zone}>
+        <Animated.View entering={FADE_PERCEPTION} style={styles.zone}>
           {identity.isEstablished && (
             <ThemedText style={styles.identityLine}>{identity.reflection}</ThemedText>
           )}
           <ThemedText style={styles.rhythmLine}>{seasonal.fieldRhythm}</ThemedText>
           {drift.isAssessed && <ThemedText style={styles.driftLine}>{drift.description}</ThemedText>}
-        </View>
+        </Animated.View>
       )}
 
       {/* ZONE 2 — ECOLOGY */}
       {hasEcology && (
-        <View style={styles.zone}>
+        <Animated.View entering={FADE_ECOLOGY} style={styles.zone}>
           {hasPerception && <SectionDivider />}
           <ThemedText style={styles.zoneLabel}>ECOLOGY</ThemedText>
           {arrivals.imminent.length > 0 && (
@@ -145,12 +139,12 @@ export function AtlasPanel() {
           {habitats.isAssessed && habitats.primary && (
             <ThemedText style={styles.habitatLine}>{habitats.atlasLine}</ThemedText>
           )}
-        </View>
+        </Animated.View>
       )}
 
       {/* ZONE 3 — MEMORY */}
       {hasMemory && (
-        <View style={styles.zone}>
+        <Animated.View entering={FADE_MEMORY} style={styles.zone}>
           {(hasPerception || hasEcology) && <SectionDivider />}
           <ThemedText style={styles.zoneLabel}>MEMORY</ThemedText>
           {memory.isEstablished && (
@@ -159,16 +153,15 @@ export function AtlasPanel() {
           {mythology.isEstablished && (
             <ThemedText style={styles.mythologyLine}>{mythology.mythologyLine}</ThemedText>
           )}
-        </View>
+        </Animated.View>
       )}
 
       {/* ZONE 4 — ESSENCE (the capstone) */}
       {hasEssence && (
-        <View style={styles.essenceZone}>
+        <Animated.View entering={FADE_ESSENCE} style={styles.essenceZone}>
           {(hasPerception || hasEcology || hasMemory) && <SectionDivider />}
           <ThemedText style={styles.zoneLabel}>ESSENCE</ThemedText>
 
-          {/* Soul — the brightest, largest text in the panel */}
           {soul.isEstablished && (
             <View style={styles.soulBlock}>
               <ThemedText style={styles.soulName}>{soul.name}</ThemedText>
@@ -176,7 +169,6 @@ export function AtlasPanel() {
             </View>
           )}
 
-          {/* Spirit — violet, slightly smaller */}
           {spirit.isEstablished && (
             <View style={styles.spiritBlock}>
               <ThemedText style={styles.spiritName}>{spirit.name}</ThemedText>
@@ -191,23 +183,21 @@ export function AtlasPanel() {
             </View>
           )}
 
-          {/* Lore — amber, warm */}
           {lore.isEstablished && (
             <ThemedText style={styles.loreLine}>{lore.loreLine}</ThemedText>
           )}
 
-          {/* Continuity — slate, quiet */}
           {continuity.isEstablished && (
             <View style={styles.continuityBlock}>
               <ThemedText style={styles.continuityArc}>{continuity.arcLabel}</ThemedText>
               <ThemedText style={styles.continuityLine}>{continuity.continuityLine}</ThemedText>
             </View>
           )}
-        </View>
+        </Animated.View>
       )}
 
       {/* ZONE 5 — CURRENT MOMENT */}
-      <View style={styles.momentZone}>
+      <Animated.View entering={FADE_MOMENT} style={styles.momentZone}>
         {(hasPerception || hasEcology || hasMemory || hasEssence) && <SectionDivider />}
         <ThemedText style={styles.zoneLabel}>NOW</ThemedText>
 
@@ -232,7 +222,7 @@ export function AtlasPanel() {
             ))}
           </View>
         )}
-      </View>
+      </Animated.View>
     </Card>
   );
 }
@@ -358,7 +348,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.7,
   },
 
-  // Essence — the capstone (meaning gradient: brightest = deepest)
+  // Essence — the capstone
   soulBlock: {
     marginBottom: Spacing.three,
   },
