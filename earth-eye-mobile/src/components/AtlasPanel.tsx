@@ -2,13 +2,14 @@
  * AtlasPanel.tsx
  *
  * The Field Atlas card — the complete layered story of the field.
- * Phases XI-XVIII: Identity, Seasonal Intelligence, Corridor Drift,
- * Species Arrival, Habitat Zones, Field Memory, Field Continuity,
- * and Field Mythology.
+ * Phases XI-XIX: Identity, Seasonal Intelligence, Corridor Drift,
+ * Species Arrival, Habitat Zones, Field Memory, Field Mythology,
+ * Field Lore, and Field Continuity.
  *
  * Layout:
  *   FIELD ATLAS → Season → Identity → Rhythm → Drift → Arrival →
- *   Habitat → Memory → Mythology → Continuity → Moment → Summary → Log
+ *   Habitat → Memory → Mythology → Lore → Continuity → Moment →
+ *   Summary → Log
  */
 
 import { StyleSheet, View } from 'react-native';
@@ -23,8 +24,9 @@ import { useCorridorDrift } from '@/corridor/useCorridorDrift';
 import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
 import { useHabitatZones } from '@/ecosystem/useHabitatZones';
 import { useFieldMemory } from '@/atlas/useFieldMemory';
-import { useFieldContinuity } from '@/atlas/useFieldContinuity';
 import { useFieldMythology } from '@/atlas/useFieldMythology';
+import { useFieldLore } from '@/atlas/useFieldLore';
+import { useFieldContinuity } from '@/atlas/useFieldContinuity';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
@@ -51,8 +53,9 @@ export function AtlasPanel() {
   const arrivals = useSpeciesArrival();
   const habitats = useHabitatZones();
   const memory = useFieldMemory();
-  const continuity = useFieldContinuity();
   const mythology = useFieldMythology();
+  const lore = useFieldLore();
+  const continuity = useFieldContinuity();
 
   if (atlas.totalMoments === 0 || !atlas.latest) {
     return (
@@ -93,6 +96,7 @@ export function AtlasPanel() {
       {habitats.isAssessed && habitats.primary && <ThemedText style={styles.habitatLine}>{habitats.atlasLine}</ThemedText>}
       {memory.isEstablished && <ThemedText style={styles.memoryLine}>{memory.memoryLine}</ThemedText>}
       {mythology.isEstablished && <ThemedText style={styles.mythologyLine}>{mythology.mythologyLine}</ThemedText>}
+      {lore.isEstablished && <ThemedText style={styles.loreLine}>{lore.loreLine}</ThemedText>}
       {continuity.isEstablished && <ThemedText style={styles.continuityLine}>{continuity.continuityLine}</ThemedText>}
 
       <View style={styles.latestSection}>
@@ -137,6 +141,7 @@ const styles = StyleSheet.create({
   habitatLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(122,154,184,0.60)', lineHeight: 1.6, marginBottom: 6 },
   memoryLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.55)', lineHeight: 1.6, marginBottom: 6 },
   mythologyLine: { fontSize: 14, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, marginBottom: 6 },
+  loreLine: { fontSize: 14, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.65)', lineHeight: 1.7, marginBottom: 6 },
   continuityLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.55)', lineHeight: 1.6, marginBottom: Spacing.two },
   latestSection: { marginBottom: Spacing.two },
   cardTypeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },

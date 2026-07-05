@@ -4,7 +4,7 @@
  * The "heart" card — all ecosystem layers:
  * Invited species, seasonal context, arrivals (XIV),
  * habitat zones (XV), field memory (XVI), continuity (XVII),
- * and mythology (XVIII).
+ * mythology (XVIII), and lore chips (XIX).
  */
 
 import { StyleSheet, View } from 'react-native';
@@ -19,6 +19,7 @@ import { useHabitatZones } from '@/ecosystem/useHabitatZones';
 import { useFieldMemory } from '@/atlas/useFieldMemory';
 import { useFieldContinuity } from '@/atlas/useFieldContinuity';
 import { useFieldMythology } from '@/atlas/useFieldMythology';
+import { useFieldLore } from '@/atlas/useFieldLore';
 import type { SuggestedAction } from '@/ecosystem/ecosystem-engine';
 import type { ArrivalLikelihood } from '@/ecosystem/speciesArrival';
 import type { HabitatConfidence } from '@/ecosystem/habitatZones';
@@ -51,6 +52,7 @@ export function MicroEcosystemPanel() {
   const memory = useFieldMemory();
   const continuity = useFieldContinuity();
   const mythology = useFieldMythology();
+  const lore = useFieldLore();
   const conditionsColor = CONDITIONS_COLORS[ecosystem.conditionsScore] ?? Accents.sage;
 
   const visibleSpecies = ecosystem.invitedSpecies.slice(0, 3);
@@ -76,6 +78,10 @@ export function MicroEcosystemPanel() {
       if (sr.isEarned) mythicRoleLookup[sr.name] = sr.roleLabel;
     }
   }
+  const loreLookup: Record<string, string> = {};
+  if (lore.isEstablished) {
+    for (const sl of lore.speciesLore) loreLookup[sl.name] = sl.loreText;
+  }
 
   return (
     <Card>
@@ -92,17 +98,23 @@ export function MicroEcosystemPanel() {
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>INVITED</ThemedText>
           {visibleSpecies.map((inv, i) => {
             const isPeak = seasonal.likelySpecies.includes(inv.species.name);
+            const myth = mythicRoleLookup[inv.species.name];
+            const loreText = loreLookup[inv.species.name];
             const freq = frequencyLookup[inv.species.name];
             const cont = continuityLookup[inv.species.name];
-            const myth = mythicRoleLookup[inv.species.name];
             return (
-              <ThemedText key={i} style={styles.speciesName}>
-                {inv.species.name}
-                {myth && <ThemedText style={styles.mythNote}> — {myth}</ThemedText>}
-                {!myth && isPeak && <ThemedText style={styles.peakNote}> — peak season</ThemedText>}
-                {!myth && !isPeak && cont && <ThemedText style={styles.contNote}> — {cont}</ThemedText>}
-                {!myth && !isPeak && !cont && freq && <ThemedText style={styles.freqNote}> — {freq}</ThemedText>}
-              </ThemedText>
+              <View key={i}>
+                <ThemedText style={styles.speciesName}>
+                  {inv.species.name}
+                  {myth && <ThemedText style={styles.mythNote}> — {myth}</ThemedText>}
+                  {!myth && isPeak && <ThemedText style={styles.peakNote}> — peak season</ThemedText>}
+                  {!myth && !isPeak && cont && <ThemedText style={styles.contNote}> — {cont}</ThemedText>}
+                  {!myth && !isPeak && !cont && freq && <ThemedText style={styles.freqNote}> — {freq}</ThemedText>}
+                </ThemedText>
+                {loreText && (
+                  <ThemedText style={styles.loreChip}>{loreText}</ThemedText>
+                )}
+              </View>
             );
           })}
           {remainingCount > 0 && (
@@ -124,9 +136,9 @@ export function MicroEcosystemPanel() {
         <View style={styles.arrivalSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>SPECIES ARRIVAL</ThemedText>
           {visibleArrivals.map((arrival, i) => {
-            const freq = frequencyLookup[arrival.name];
-            const cont = continuityLookup[arrival.name];
             const myth = mythicRoleLookup[arrival.name];
+            const cont = continuityLookup[arrival.name];
+            const freq = frequencyLookup[arrival.name];
             const suffix = myth || cont || freq;
             return (
               <View key={i} style={styles.arrivalRow}>
@@ -180,21 +192,19 @@ export function MicroEcosystemPanel() {
         </View>
       )}
 
-      {/* Field Mythology — Phase XVIII */}
       {mythology.isEstablished && (
         <View style={styles.mythologySection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>FIELD MYTHOLOGY</ThemedText>
           <ThemedText style={styles.mythArc}>{mythology.archetype.label}</ThemedText>
           <ThemedText style={styles.mythText}>{mythology.mythologyLine}</ThemedText>
-          {mythology.speciesRoles.filter(r => r.isEarned).length > 0 && (
-            <View style={styles.rolesRow}>
-              {mythology.speciesRoles.filter(r => r.isEarned).slice(0, 3).map((role, i) => (
-                <ThemedText key={i} style={styles.roleChip}>
-                  {role.roleLabel}
-                </ThemedText>
-              ))}
-            </View>
-          )}
+        </View>
+      )}
+
+      {/* Field Lore — Phase XIX */}
+      {lore.isEstablished && (
+        <View style={styles.loreSection}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>FIELD LORE</ThemedText>
+          <ThemedText style={styles.loreText}>{lore.loreLine}</ThemedText>
         </View>
       )}
 
@@ -223,6 +233,7 @@ const styles = StyleSheet.create({
   freqNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.60)' },
   contNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.60)' },
   mythNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.55)' },
+  loreChip: { fontSize: 11, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.50)', lineHeight: 1.5, marginLeft: 4, marginBottom: 4 },
   remainingText: { marginTop: 2 },
   emptyText: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: Spacing.two },
   seasonalSection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
@@ -247,8 +258,8 @@ const styles = StyleSheet.create({
   mythologySection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
   mythArc: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.88)', lineHeight: 1.6, marginBottom: 4 },
   mythText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 },
-  rolesRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
-  roleChip: { fontSize: 11, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', marginRight: 8, marginTop: 2 },
+  loreSection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  loreText: { fontSize: 14, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.65)', lineHeight: 1.7 },
   actionsSection: { marginTop: Spacing.two },
   actionText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginTop: 4 },
 });
