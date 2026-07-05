@@ -16,6 +16,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useCorridor } from '@/corridor/useCorridor';
 import { useSymbolicMode } from '@/contexts/mode-context';
+import { useEmergency } from '@/emergency/useEmergency';
 import { useCorridors } from '@/hooks/useCorridors';
 import { useLocation } from '@/hooks/useLocation';
 import { useSensors } from '@/hooks/useSensors';
@@ -24,16 +25,21 @@ import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
 
 /**
- * Map screen — Phase V: full overlay stack.
+ * Map screen — Phase V + IX: full overlay stack with fallback.
  *
- * Layer order (bottom to top):
+ * Normal mode layer order (bottom to top):
  *   1. SensorGradientLayer  (D) — radial gradient at user position
  *   2. YardCorridorRadius   (C) — yard zone circle
  *   3. TrailProximityRing   (B) — nearest trail ring
  *   4. CorridorLayer        — 74 trail markers
  *   5. YardStripLayer       — yard marker
  *   6. FireworkWindowOverlay — July 4th ring (LOVE + firework window only)
- *   7. CorridorShading      (A+E) — tone + mode tint (View overlay, above map)
+ *   7. CorridorShading      (A+E) — tone + mode tint (View overlay)
+ *
+ * Fallback mode (emergency):
+ *   - Only tone shading + yard radius + trail markers
+ *   - No sensor gradient, no proximity rings (less computation)
+ *   - CorridorShading still runs (cheap, just opacity)
  *
  * All overlays degrade gracefully when GPS is unavailable.
  */
@@ -45,6 +51,7 @@ export default function MapScreen() {
   const { location } = useLocation();
 
   const corridor = useCorridor();
+  const emergency = useEmergency();
   const lite = evaluateLiteMode(snapshot);
   const yardEval = evaluateYardMode(snapshot);
   const sensorSummary = mode === 'plur' ? lite.summary : yardEval.summary;
@@ -61,11 +68,12 @@ export default function MapScreen() {
   const userLat = location?.latitude ?? null;
   const userLng = location?.longitude ?? null;
 
-  // Find the nearest trail object for the proximity ring
   const nearestTrail = useMemo(() => {
     if (!hasGPS || corridor.nearestTrailName === null) return null;
     return trails.find((t) => t.name === corridor.nearestTrailName) ?? null;
   }, [hasGPS, corridor.nearestTrailName, trails]);
+
+  const inFallback = emergency.fallbackMode;
 
   return (
     <ThemedView style={styles.container}>
@@ -76,41 +84,45 @@ export default function MapScreen() {
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}>
 
-          {/* D: Sensor gradient at user location */}
-          <SensorGradientLayer
-            userLat={userLat}
-            userLng={userLng}
-            snapshot={snapshot}
-          />
+          {/* D: Sensor gradient — skipped in fallback (computationally heavier) */}
+          {!inFallback && (
+            <SensorGradientLayer
+              userLat={userLat}
+              userLng={userLng}
+              snapshot={snapshot}
+            />
+          )}
 
-          {/* C: Yard corridor radius */}
+          {/* C: Yard corridor radius — always shown (cheap Circle) */}
           <YardCorridorRadius
             yard={yard}
             proximity={corridor.proximity}
             isFireworkWindow={yardEval.isFireworkWindow}
           />
 
-          {/* B: Trail proximity ring (nearest trail) */}
-          <TrailProximityRing
-            nearestTrail={nearestTrail}
-            distanceMeters={corridor.nearestTrailDistanceMeters}
-            tone={corridor.tone}
-            hasGPS={hasGPS}
-          />
+          {/* B: Trail proximity ring — skipped in fallback */}
+          {!inFallback && (
+            <TrailProximityRing
+              nearestTrail={nearestTrail}
+              distanceMeters={corridor.nearestTrailDistanceMeters}
+              tone={corridor.tone}
+              hasGPS={hasGPS}
+            />
+          )}
 
-          {/* Existing: 74 trail markers */}
+          {/* 74 trail markers — always shown */}
           <CorridorLayer trails={trails} mode={mode} />
 
-          {/* Existing: yard marker */}
+          {/* Yard marker — always shown */}
           <YardStripLayer yard={yard} mode={mode} sensorSummary={sensorSummary} />
 
-          {/* Existing: firework window ring (LOVE mode + active window only) */}
-          {mode === 'love' && yardEval.isFireworkWindow && (
+          {/* Firework ring — LOVE mode + active window only, not in fallback */}
+          {mode === 'love' && yardEval.isFireworkWindow && !inFallback && (
             <FireworkWindowOverlay yard={yard} />
           )}
         </MapView>
 
-        {/* A + E: Corridor tone + mode tint (View overlay, above map) */}
+        {/* A + E: Corridor tone + mode tint — always shown (cheap opacity overlay) */}
         <CorridorShading />
 
         <ThemedView style={styles.badgeCorner} type="background">

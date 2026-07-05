@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card } from '@/components/Card';
 import { CorridorSummary } from '@/components/CorridorSummary';
+import { EmergencyBanner } from '@/components/EmergencyBanner';
 import { HybridFieldStateCard } from '@/components/HybridFieldState';
 import { MicroEcosystemPanel } from '@/components/MicroEcosystemPanel';
 import { ModeBadge } from '@/components/ModeBadge';
@@ -49,6 +50,9 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}>
+          {/* Emergency fallback banner — only visible when in fallback mode */}
+          <EmergencyBanner />
+
           <ThemedText type="title" style={styles.title}>
             EarthEye
           </ThemedText>
