@@ -1,42 +1,145 @@
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
-import { useColorScheme } from 'react-native';
+import { Tabs } from 'expo-router';
+import { Platform, StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 
+/**
+ * AppTabs — the bottom navigation bar.
+ *
+ * 5 tabs: Home, Map, Atlas, Field, Suit
+ *
+ * Styled to match the EarthEye dark design language:
+ * - bg #0F0F0D (page background)
+ * - border rgba(255,255,255,0.07) (hairline)
+ * - active icon rgba(255,255,255,0.90)
+ * - inactive icon rgba(255,255,255,0.30)
+ * - labels only on active tab (whisper weight)
+ */
+
+const INACTIVE = 'rgba(255,255,255,0.30)';
+const ACTIVE = 'rgba(255,255,255,0.90)';
+
 export default function AppTabs() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
-
   return (
-    <NativeTabs
-      backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}>
-      <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/home.png')}
-          renderingMode="template"
-        />
-      </NativeTabs.Trigger>
-
-      <NativeTabs.Trigger name="map">
-        <NativeTabs.Trigger.Label>Map</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="map.fill" />
-      </NativeTabs.Trigger>
-
-      <NativeTabs.Trigger name="sensors">
-        <NativeTabs.Trigger.Label>Sensors</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="waveform" />
-      </NativeTabs.Trigger>
-
-      <NativeTabs.Trigger name="explore">
-        <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/explore.png')}
-          renderingMode="template"
-        />
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: ACTIVE,
+        tabBarInactiveTintColor: INACTIVE,
+        tabBarStyle: {
+          backgroundColor: '#0F0F0D',
+          borderTopColor: 'rgba(255,255,255,0.07)',
+          borderTopWidth: 1,
+          height: Platform.select({ ios: 84, android: 60 }),
+          paddingBottom: Platform.select({ ios: 30, android: 8 }),
+          paddingTop: Platform.select({ ios: 8, android: 6 }),
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        tabBarLabelStyle: {
+          fontSize: 9,
+          fontWeight: '700',
+          textTransform: 'uppercase',
+          letterSpacing: 1.2,
+          fontFamily: 'system-ui',
+        },
+        tabBarIconStyle: {
+          marginBottom: 2,
+        },
+        tabBarShowLabel: true,
+        lazy: true,
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <TabGlyph name="home" color={color as string} />,
+        }}
+      />
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: 'Map',
+          tabBarIcon: ({ color }) => <TabGlyph name="map" color={color as string} />,
+        }}
+      />
+      <Tabs.Screen
+        name="atlas"
+        options={{
+          title: 'Atlas',
+          tabBarIcon: ({ color }) => <TabGlyph name="atlas" color={color as string} />,
+        }}
+      />
+      <Tabs.Screen
+        name="ecosystem"
+        options={{
+          title: 'Field',
+          tabBarIcon: ({ color }) => <TabGlyph name="ecosystem" color={color as string} />,
+        }}
+      />
+      <Tabs.Screen
+        name="suit"
+        options={{
+          title: 'Suit',
+          tabBarIcon: ({ color }) => <TabGlyph name="suit" color={color as string} />,
+        }}
+      />
+      {/* Hidden routes — accessible from Home quick-launch */}
+      <Tabs.Screen name="sensors" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="explore" options={{ href: null, headerShown: false }} />
+    </Tabs>
   );
+}
+
+/**
+ * TabGlyph — inline SVG glyphs matching the EarthEye glyph system.
+ * Rounded, organic, naturalist sketchbook energy.
+ */
+function TabGlyph({ name, color }: { name: string; color: string }) {
+  const isActive = color === ACTIVE;
+  const stroke = isActive ? 1.8 : 1.5;
+  const size = 24;
+
+  switch (name) {
+    case 'home':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M4 11.5 L12 5 L20 11.5 L20 19 Q20 20 19 20 L5 20 Q4 20 4 19 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M10 20 L10 15 Q10 14.5 10.5 14.5 L13.5 14.5 Q14 14.5 14 15 L14 20" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case 'map':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M9 4 L4.5 6 L4.5 20 L9 18 L15 20 L19.5 18 L19.5 4 L15 6 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M9 4 L9 18" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
+          <path d="M15 6 L15 20" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
+        </svg>
+      );
+    case 'atlas':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M12 6 Q8 4 4 5 L4 18 Q8 17 12 19 Q16 17 20 18 L20 5 Q16 4 12 6 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M12 6 L12 19" stroke={color} strokeWidth={stroke} strokeLinecap="round" />
+        </svg>
+      );
+    case 'ecosystem':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M5 19 Q5 10 12 5 Q19 10 19 19 Q12 17 5 19 Z" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M9 16 Q12 13 16 10" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case 'suit':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M4 16 Q4 8 12 8 Q20 8 20 16" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M12 16 L16 11" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="12" cy="16" r="1.5" fill={color} />
+        </svg>
+      );
+    default:
+      return null;
+  }
 }

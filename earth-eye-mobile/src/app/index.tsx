@@ -19,7 +19,9 @@ import { useSensors } from '@/hooks/useSensors';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
 
-function QuickLaunch({ href, label, hint }: { href: '/map' | '/sensors'; label: string; hint: string }) {
+type LaunchHref = '/map' | '/sensors' | '/atlas' | '/ecosystem' | '/suit';
+
+function QuickLaunch({ href, label, hint }: { href: LaunchHref; label: string; hint: string }) {
   return (
     <Link href={href} asChild>
       <ThemedView style={styles.quickLaunchRow} type="backgroundElement">
@@ -70,6 +72,25 @@ export default function HomeScreen() {
           </ThemedView>
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            FIELD STATE
+          </ThemedText>
+          <HybridFieldStateCard />
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            QUICK LAUNCH
+          </ThemedText>
+          <QuickLaunch href="/atlas" label="Atlas" hint="Full cosmology — soul, spirit, lore" />
+          <QuickLaunch href="/ecosystem" label="Micro-Ecosystem" hint="Species, habitat, memory, continuity" />
+          <QuickLaunch href="/suit" label="Field Suit" hint="Sensor bands and field tags" />
+          <QuickLaunch href="/map" label="Map" hint="Trails, corridors, yard strip" />
+          <QuickLaunch href="/sensors" label="Sensors" hint="Full live readings + mode detail" />
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
+            CORRIDOR
+          </ThemedText>
+          <CorridorSummary />
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
             ENVIRONMENTAL DETAIL
           </ThemedText>
           <Card>
@@ -89,16 +110,6 @@ export default function HomeScreen() {
               </ThemedText>
             )}
           </Card>
-
-          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-            FIELD STATE
-          </ThemedText>
-          <HybridFieldStateCard />
-
-          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-            CORRIDOR
-          </ThemedText>
-          <CorridorSummary />
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
             SUIT
@@ -129,12 +140,6 @@ export default function HomeScreen() {
             FIELD ATLAS
           </ThemedText>
           <AtlasPanel />
-
-          <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-            QUICK LAUNCH
-          </ThemedText>
-          <QuickLaunch href="/sensors" label="Sensors" hint="Full live readings + mode detail" />
-          <QuickLaunch href="/map" label="Map" hint="Trail + corridor view" />
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
             WEATHER
