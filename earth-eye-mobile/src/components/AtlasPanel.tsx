@@ -2,12 +2,12 @@
  * AtlasPanel.tsx
  *
  * The Field Atlas card — the layered story of the field.
- * Phases XI-XVI: Identity, Seasonal Intelligence, Corridor Drift,
- * Species Arrival, Habitat Zones, and Field Memory.
+ * Phases XI-XVII: Identity, Seasonal Intelligence, Corridor Drift,
+ * Species Arrival, Habitat Zones, Field Memory, and Field Continuity.
  *
  * Layout:
  *   FIELD ATLAS → Season → Identity → Rhythm → Drift → Arrival →
- *   Habitat → Memory → Moment → Summary → Log
+ *   Habitat → Memory → Continuity → Moment → Summary → Log
  */
 
 import { StyleSheet, View } from 'react-native';
@@ -22,6 +22,7 @@ import { useCorridorDrift } from '@/corridor/useCorridorDrift';
 import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
 import { useHabitatZones } from '@/ecosystem/useHabitatZones';
 import { useFieldMemory } from '@/atlas/useFieldMemory';
+import { useFieldContinuity } from '@/atlas/useFieldContinuity';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
@@ -48,6 +49,7 @@ export function AtlasPanel() {
   const arrivals = useSpeciesArrival();
   const habitats = useHabitatZones();
   const memory = useFieldMemory();
+  const continuity = useFieldContinuity();
 
   if (atlas.totalMoments === 0 || !atlas.latest) {
     return (
@@ -67,7 +69,6 @@ export function AtlasPanel() {
     <Card>
       <ThemedText type="small" themeColor="textSecondary" style={styles.label}>FIELD ATLAS</ThemedText>
 
-      {/* Seasonal phase */}
       <View style={styles.seasonalRow}>
         <ThemedText type="small" themeColor="textSecondary" style={styles.seasonalLabel}>
           {seasonal.phaseLabel.toUpperCase()}
@@ -77,33 +78,19 @@ export function AtlasPanel() {
         )}
       </View>
 
-      {/* Field Identity */}
       {identity.isEstablished && (
         <View style={styles.identitySection}>
           <ThemedText style={styles.identityText}>{identity.reflection}</ThemedText>
         </View>
       )}
 
-      {/* Seasonal rhythm */}
       <ThemedText style={styles.rhythmLine}>{seasonal.fieldRhythm}</ThemedText>
-
-      {/* Corridor drift */}
       {drift.isAssessed && <ThemedText style={styles.driftLine}>{drift.description}</ThemedText>}
-
-      {/* Species arrival */}
       {arrivals.imminent.length > 0 && <ThemedText style={styles.arrivalLine}>{arrivals.atlasLine}</ThemedText>}
+      {habitats.isAssessed && habitats.primary && <ThemedText style={styles.habitatLine}>{habitats.atlasLine}</ThemedText>}
+      {memory.isEstablished && <ThemedText style={styles.memoryLine}>{memory.memoryLine}</ThemedText>}
+      {continuity.isEstablished && <ThemedText style={styles.continuityLine}>{continuity.continuityLine}</ThemedText>}
 
-      {/* Habitat zones */}
-      {habitats.isAssessed && habitats.primary && (
-        <ThemedText style={styles.habitatLine}>{habitats.atlasLine}</ThemedText>
-      )}
-
-      {/* Field Memory — Phase XVI */}
-      {memory.isEstablished && (
-        <ThemedText style={styles.memoryLine}>{memory.memoryLine}</ThemedText>
-      )}
-
-      {/* Latest moment */}
       <View style={styles.latestSection}>
         <View style={styles.cardTypeRow}>
           <View style={[styles.cardTypeDot, { backgroundColor: cardColor }]} />
@@ -113,10 +100,8 @@ export function AtlasPanel() {
         <ThemedText style={styles.cardText}>{latest.cardText}</ThemedText>
       </View>
 
-      {/* Summary */}
       <ThemedText style={styles.summaryLine}>{atlas.summary.summary}</ThemedText>
 
-      {/* Recent log */}
       {recentMoments.length > 0 && (
         <View style={styles.recentSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>RECENT</ThemedText>
@@ -146,7 +131,8 @@ const styles = StyleSheet.create({
   driftLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.50)', lineHeight: 1.6, marginBottom: 6 },
   arrivalLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(122,184,122,0.60)', lineHeight: 1.6, marginBottom: 6 },
   habitatLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(122,154,184,0.60)', lineHeight: 1.6, marginBottom: 6 },
-  memoryLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.55)', lineHeight: 1.6, marginBottom: Spacing.two },
+  memoryLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.55)', lineHeight: 1.6, marginBottom: 6 },
+  continuityLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.55)', lineHeight: 1.6, marginBottom: Spacing.two },
   latestSection: { marginBottom: Spacing.two },
   cardTypeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
   cardTypeDot: { width: 6, height: 6, borderRadius: 3, marginRight: Spacing.two },

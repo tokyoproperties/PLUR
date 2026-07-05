@@ -2,8 +2,8 @@
  * MicroEcosystemPanel.tsx
  *
  * The "heart" card — shows invited species, seasonal context,
- * species arrivals (XIV), habitat zones (XV), and continuity
- * markers from field memory (XVI).
+ * species arrivals (XIV), habitat zones (XV), field memory (XVI),
+ * and continuity markers (XVII).
  */
 
 import { StyleSheet, View } from 'react-native';
@@ -16,6 +16,7 @@ import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
 import { useHabitatZones } from '@/ecosystem/useHabitatZones';
 import { useFieldMemory } from '@/atlas/useFieldMemory';
+import { useFieldContinuity } from '@/atlas/useFieldContinuity';
 import type { SuggestedAction } from '@/ecosystem/ecosystem-engine';
 import type { ArrivalLikelihood } from '@/ecosystem/speciesArrival';
 import type { HabitatConfidence } from '@/ecosystem/habitatZones';
@@ -46,6 +47,7 @@ export function MicroEcosystemPanel() {
   const arrivals = useSpeciesArrival();
   const habitats = useHabitatZones();
   const memory = useFieldMemory();
+  const continuity = useFieldContinuity();
   const conditionsColor = CONDITIONS_COLORS[ecosystem.conditionsScore] ?? Accents.sage;
 
   const visibleSpecies = ecosystem.invitedSpecies.slice(0, 3);
@@ -56,11 +58,17 @@ export function MicroEcosystemPanel() {
   const visibleArrivals = arrivals.species.filter((s) => s.likelihood !== 'dormant').slice(0, 5);
   const visibleHabitats = habitats.zones.slice(0, 5);
 
-  // Build a lookup of species frequency from field memory
+  // Build lookups from memory and continuity
   const frequencyLookup: Record<string, string> = {};
   if (memory.isEstablished) {
     for (const sf of memory.speciesHistory) {
       frequencyLookup[sf.name] = sf.frequencyLabel;
+    }
+  }
+  const continuityLookup: Record<string, string> = {};
+  if (continuity.isEstablished) {
+    for (const sc of continuity.speciesContinuity) {
+      continuityLookup[sc.name] = sc.continuityLabel;
     }
   }
 
@@ -74,18 +82,19 @@ export function MicroEcosystemPanel() {
         <ThemedText style={[styles.conditionsValue, { color: conditionsColor }]}>{ecosystem.conditionsScore}</ThemedText>
       </View>
 
-      {/* Invited species */}
       {visibleSpecies.length > 0 ? (
         <View style={styles.speciesSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>INVITED</ThemedText>
           {visibleSpecies.map((inv, i) => {
             const isPeak = seasonal.likelySpecies.includes(inv.species.name);
             const freq = frequencyLookup[inv.species.name];
+            const cont = continuityLookup[inv.species.name];
             return (
               <ThemedText key={i} style={styles.speciesName}>
                 {inv.species.name}
                 {isPeak && <ThemedText style={styles.peakNote}> — peak season</ThemedText>}
-                {freq && !isPeak && <ThemedText style={styles.freqNote}> — {freq}</ThemedText>}
+                {!isPeak && cont && <ThemedText style={styles.contNote}> — {cont}</ThemedText>}
+                {!isPeak && !cont && freq && <ThemedText style={styles.freqNote}> — {freq}</ThemedText>}
               </ThemedText>
             );
           })}
@@ -97,7 +106,6 @@ export function MicroEcosystemPanel() {
         <ThemedText style={styles.emptyText}>No species invited at current conditions.</ThemedText>
       )}
 
-      {/* Seasonal context */}
       {inPeakSeason.length > 0 && (
         <View style={styles.seasonalSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>{seasonal.phaseLabel.toUpperCase()} CANON</ThemedText>
@@ -105,18 +113,19 @@ export function MicroEcosystemPanel() {
         </View>
       )}
 
-      {/* Species Arrival — Phase XIV */}
       {visibleArrivals.length > 0 && (
         <View style={styles.arrivalSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>SPECIES ARRIVAL</ThemedText>
           {visibleArrivals.map((arrival, i) => {
             const freq = frequencyLookup[arrival.name];
+            const cont = continuityLookup[arrival.name];
+            const suffix = cont || freq;
             return (
               <View key={i} style={styles.arrivalRow}>
                 <View style={[styles.dot, { backgroundColor: ARRIVAL_COLORS[arrival.likelihood] }]} />
                 <ThemedText style={styles.arrivalName}>{arrival.name}</ThemedText>
                 <ThemedText type="small" themeColor="textSecondary" style={styles.arrivalLikelihood}>
-                  {ARRIVAL_LABELS[arrival.likelihood]}{freq ? ` · ${freq}` : ''}
+                  {ARRIVAL_LABELS[arrival.likelihood]}{suffix ? ` · ${suffix}` : ''}
                 </ThemedText>
               </View>
             );
@@ -127,7 +136,6 @@ export function MicroEcosystemPanel() {
         </View>
       )}
 
-      {/* Habitat Zones — Phase XV */}
       {visibleHabitats.length > 0 && (
         <View style={styles.habitatSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>HABITAT ZONES</ThemedText>
@@ -140,13 +148,10 @@ export function MicroEcosystemPanel() {
               </ThemedText>
             </View>
           ))}
-          {habitats.primary && (
-            <ThemedText style={styles.habitatNote}>{habitats.primary.description}</ThemedText>
-          )}
+          {habitats.primary && <ThemedText style={styles.habitatNote}>{habitats.primary.description}</ThemedText>}
         </View>
       )}
 
-      {/* Field Memory continuity — Phase XVI */}
       {memory.isEstablished && memory.currentChapter && (
         <View style={styles.memorySection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>FIELD MEMORY</ThemedText>
@@ -159,7 +164,18 @@ export function MicroEcosystemPanel() {
         </View>
       )}
 
-      {/* Suggested actions */}
+      {/* Field Continuity — Phase XVII */}
+      {continuity.isEstablished && (
+        <View style={styles.continuitySection}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>FIELD CONTINUITY</ThemedText>
+          <ThemedText style={styles.continuityArc}>{continuity.arcLabel}</ThemedText>
+          <ThemedText style={styles.continuityText}>{continuity.continuityLine}</ThemedText>
+          {continuity.driftContinuity.isConsistent && (
+            <ThemedText style={styles.driftContText}>{continuity.driftContinuity.description}</ThemedText>
+          )}
+        </View>
+      )}
+
       {ecosystem.suggestedActions.length > 0 && (
         <View style={styles.actionsSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>WHAT WOULD HELP</ThemedText>
@@ -183,6 +199,7 @@ const styles = StyleSheet.create({
   speciesName: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.88)', lineHeight: 1.7 },
   peakNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(122,184,122,0.70)' },
   freqNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.60)' },
+  contNote: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.60)' },
   remainingText: { marginTop: 2 },
   emptyText: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: Spacing.two },
   seasonalSection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
@@ -201,6 +218,10 @@ const styles = StyleSheet.create({
   memorySection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
   memoryText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.55)', lineHeight: 1.6 },
   chapterCount: { fontSize: 11, fontStyle: 'italic', marginTop: 4, opacity: 0.7 },
+  continuitySection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  continuityArc: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, marginBottom: 4 },
+  continuityText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.55)', lineHeight: 1.6 },
+  driftContText: { fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, marginTop: 4 },
   actionsSection: { marginTop: Spacing.two },
   actionText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginTop: 4 },
 });
