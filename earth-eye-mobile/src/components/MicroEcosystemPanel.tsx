@@ -1,10 +1,10 @@
 /**
  * MicroEcosystemPanel.tsx
  *
- * The "heart" card — all ecosystem layers:
+ * The "heart" card — the complete ecosystem stack:
  * Invited species, seasonal context, arrivals (XIV),
  * habitat zones (XV), field memory (XVI), continuity (XVII),
- * mythology (XVIII), and lore chips (XIX).
+ * mythology (XVIII), lore (XIX), and spirit (XX).
  */
 
 import { StyleSheet, View } from 'react-native';
@@ -20,6 +20,7 @@ import { useFieldMemory } from '@/atlas/useFieldMemory';
 import { useFieldContinuity } from '@/atlas/useFieldContinuity';
 import { useFieldMythology } from '@/atlas/useFieldMythology';
 import { useFieldLore } from '@/atlas/useFieldLore';
+import { useFieldSpirit } from '@/atlas/useFieldSpirit';
 import type { SuggestedAction } from '@/ecosystem/ecosystem-engine';
 import type { ArrivalLikelihood } from '@/ecosystem/speciesArrival';
 import type { HabitatConfidence } from '@/ecosystem/habitatZones';
@@ -53,6 +54,7 @@ export function MicroEcosystemPanel() {
   const continuity = useFieldContinuity();
   const mythology = useFieldMythology();
   const lore = useFieldLore();
+  const spirit = useFieldSpirit();
   const conditionsColor = CONDITIONS_COLORS[ecosystem.conditionsScore] ?? Accents.sage;
 
   const visibleSpecies = ecosystem.invitedSpecies.slice(0, 3);
@@ -111,9 +113,7 @@ export function MicroEcosystemPanel() {
                   {!myth && !isPeak && cont && <ThemedText style={styles.contNote}> — {cont}</ThemedText>}
                   {!myth && !isPeak && !cont && freq && <ThemedText style={styles.freqNote}> — {freq}</ThemedText>}
                 </ThemedText>
-                {loreText && (
-                  <ThemedText style={styles.loreChip}>{loreText}</ThemedText>
-                )}
+                {loreText && <ThemedText style={styles.loreChip}>{loreText}</ThemedText>}
               </View>
             );
           })}
@@ -150,9 +150,7 @@ export function MicroEcosystemPanel() {
               </View>
             );
           })}
-          {arrivals.imminent.length > 0 && (
-            <ThemedText style={styles.arrivalNote}>{arrivals.headline}</ThemedText>
-          )}
+          {arrivals.imminent.length > 0 && <ThemedText style={styles.arrivalNote}>{arrivals.headline}</ThemedText>}
         </View>
       )}
 
@@ -200,7 +198,28 @@ export function MicroEcosystemPanel() {
         </View>
       )}
 
-      {/* Field Lore — Phase XIX */}
+      {/* Field Spirit — Phase XX */}
+      {spirit.isEstablished && (
+        <View style={styles.spiritSection}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>FIELD SPIRIT</ThemedText>
+          <ThemedText style={styles.spiritName}>{spirit.name}</ThemedText>
+          <ThemedText style={styles.spiritText}>{spirit.spiritLine}</ThemedText>
+          <View style={styles.traitsRow}>
+            <ThemedText style={styles.traitChip}>{spirit.traits.temperament}</ThemedText>
+            <ThemedText style={styles.traitChip}>{spirit.traits.movement}</ThemedText>
+            <ThemedText style={styles.traitChip}>{spirit.traits.voice}</ThemedText>
+            <ThemedText style={styles.traitChip}>{spirit.traits.seasonalStrengthLabel}</ThemedText>
+          </View>
+          {spirit.speciesAnchors.length > 0 && (
+            <View style={styles.anchorsRow}>
+              {spirit.speciesAnchors.slice(0, 4).map((anchor, i) => (
+                <ThemedText key={i} style={styles.anchorChip}>{anchor}</ThemedText>
+              ))}
+            </View>
+          )}
+        </View>
+      )}
+
       {lore.isEstablished && (
         <View style={styles.loreSection}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.subLabel}>FIELD LORE</ThemedText>
@@ -258,6 +277,13 @@ const styles = StyleSheet.create({
   mythologySection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
   mythArc: { fontSize: 15, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.88)', lineHeight: 1.6, marginBottom: 4 },
   mythText: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 },
+  spiritSection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  spiritName: { fontSize: 16, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.85)', lineHeight: 1.6, marginBottom: 4 },
+  spiritText: { fontSize: 14, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.70)', lineHeight: 1.7 },
+  traitsRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
+  traitChip: { fontSize: 10, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.40)', marginRight: 10, marginTop: 2 },
+  anchorsRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
+  anchorChip: { fontSize: 10, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(154,122,184,0.40)', marginRight: 8, marginTop: 2 },
   loreSection: { marginTop: Spacing.two, paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
   loreText: { fontSize: 14, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.65)', lineHeight: 1.7 },
   actionsSection: { marginTop: Spacing.two },
