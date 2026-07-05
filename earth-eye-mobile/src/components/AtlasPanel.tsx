@@ -2,12 +2,12 @@
  * AtlasPanel.tsx
  *
  * The Field Atlas card — the layered story of the field.
- * Phases XI-XV: Identity, Seasonal Intelligence, Corridor Drift,
- * Species Arrival, and Habitat Zones.
+ * Phases XI-XVI: Identity, Seasonal Intelligence, Corridor Drift,
+ * Species Arrival, Habitat Zones, and Field Memory.
  *
  * Layout:
  *   FIELD ATLAS → Season → Identity → Rhythm → Drift → Arrival →
- *   Habitat → Moment → Summary → Log
+ *   Habitat → Memory → Moment → Summary → Log
  */
 
 import { StyleSheet, View } from 'react-native';
@@ -21,28 +21,23 @@ import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useCorridorDrift } from '@/corridor/useCorridorDrift';
 import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
 import { useHabitatZones } from '@/ecosystem/useHabitatZones';
+import { useFieldMemory } from '@/atlas/useFieldMemory';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
-  yard:     Accents.sage,
-  trail:    Accents.sage,
-  coastal:  Accents.blue,
-  night:    Accents.lavender,
-  fallback: Accents.amber,
-  field:    'rgba(255,255,255,0.45)',
+  yard: Accents.sage, trail: Accents.sage, coastal: Accents.blue,
+  night: Accents.lavender, fallback: Accents.amber, field: 'rgba(255,255,255,0.45)',
 };
-
 const CARD_TYPE_LABELS: Partial<Record<AtlasCardType, string>> = {
   yard: 'Yard', trail: 'Trail', coastal: 'Coastal',
   night: 'Night', fallback: 'Fallback', field: 'Field',
 };
 
-function formatTime(timestamp: number): string {
-  const d = new Date(timestamp);
+function formatTime(ts: number): string {
+  const d = new Date(ts);
   const h = d.getHours();
   const m = d.getMinutes().toString().padStart(2, '0');
-  const ampm = h >= 12 ? 'pm' : 'am';
-  return `${h % 12 || 12}:${m} ${ampm}`;
+  return `${h % 12 || 12}:${m} ${h >= 12 ? 'pm' : 'am'}`;
 }
 
 export function AtlasPanel() {
@@ -52,6 +47,7 @@ export function AtlasPanel() {
   const drift = useCorridorDrift();
   const arrivals = useSpeciesArrival();
   const habitats = useHabitatZones();
+  const memory = useFieldMemory();
 
   if (atlas.totalMoments === 0 || !atlas.latest) {
     return (
@@ -102,6 +98,11 @@ export function AtlasPanel() {
         <ThemedText style={styles.habitatLine}>{habitats.atlasLine}</ThemedText>
       )}
 
+      {/* Field Memory — Phase XVI */}
+      {memory.isEstablished && (
+        <ThemedText style={styles.memoryLine}>{memory.memoryLine}</ThemedText>
+      )}
+
       {/* Latest moment */}
       <View style={styles.latestSection}>
         <View style={styles.cardTypeRow}>
@@ -144,7 +145,8 @@ const styles = StyleSheet.create({
   rhythmLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: 6 },
   driftLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(255,255,255,0.50)', lineHeight: 1.6, marginBottom: 6 },
   arrivalLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(122,184,122,0.60)', lineHeight: 1.6, marginBottom: 6 },
-  habitatLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(122,154,184,0.60)', lineHeight: 1.6, marginBottom: Spacing.two },
+  habitatLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(122,154,184,0.60)', lineHeight: 1.6, marginBottom: 6 },
+  memoryLine: { fontSize: 13, fontFamily: 'Georgia', fontStyle: 'italic', color: 'rgba(196,151,74,0.55)', lineHeight: 1.6, marginBottom: Spacing.two },
   latestSection: { marginBottom: Spacing.two },
   cardTypeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
   cardTypeDot: { width: 6, height: 6, borderRadius: 3, marginRight: Spacing.two },
