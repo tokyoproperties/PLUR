@@ -44,7 +44,7 @@ export interface UseMotionOptions {
 }
 
 const DEFAULT_OPTIONS: Required<UseMotionOptions> = {
-  updateInterval: 200,
+  updateInterval: 2000,
   smoothing: 0.85,
   enabled: true,
 };
