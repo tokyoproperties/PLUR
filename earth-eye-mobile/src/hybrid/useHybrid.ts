@@ -1,31 +1,29 @@
 /**
  * useHybrid.ts
  *
- * Wraps the hybrid engine with real data from existing hooks:
- * - useSensors() → live sensor snapshot
- * - useCorridor() → corridor state (already fuses location + trails + yard)
- * - useSymbolicMode() → PLUR/LOVE mode
- * - evaluateLiteMode / evaluateYardMode → mode evaluations
- *
- * Returns a memoized HybridState — the "one sentence summary" of
- * the world around you.
+ * PERFORMANCE: Split into internal (state-bearing) + consumer (context).
+ * The internal version accepts deps as arguments (doesn't read context).
  */
 
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
-import type { HybridState } from '@/hybrid/hybrid-engine';
-import { evaluateHybrid } from '@/hybrid/hybrid-engine';
-import { useCorridor } from '@/corridor/useCorridor';
+import { evaluateHybrid, type HybridState } from '@/hybrid/hybrid-engine';
+import { HybridContext } from '@/contexts/field-data-context';
 import { useSymbolicMode } from '@/contexts/mode-context';
-import { useSensors } from '@/hooks/useSensors';
+import type { UseSensorsResult } from '@/hooks/useSensors';
+import type { CorridorState } from '@/corridor/corridor-engine';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
 
 export type { HybridState } from '@/hybrid/hybrid-engine';
 
-export function useHybrid(): HybridState {
-  const { snapshot } = useSensors();
-  const corridor = useCorridor();
+// Internal — called by FieldDataProvider with deps passed directly
+export function useHybridInternal(args: {
+  sensors: UseSensorsResult;
+  corridor: CorridorState;
+}): HybridState {
+  const { sensors, corridor } = args;
+  const { snapshot } = sensors;
   const { mode } = useSymbolicMode();
 
   const lite = evaluateLiteMode(snapshot);
@@ -33,6 +31,13 @@ export function useHybrid(): HybridState {
 
   return useMemo(
     () => evaluateHybrid({ snapshot, corridor, mode, lite, yard }),
-    [snapshot, corridor, mode, lite, yard]
+    [snapshot, corridor, mode, lite, yard],
   );
+}
+
+// Consumer — reads from context
+export function useHybrid(): HybridState {
+  const ctx = useContext(HybridContext);
+  if (!ctx) throw new Error('useHybrid must be used within FieldDataProvider');
+  return ctx;
 }

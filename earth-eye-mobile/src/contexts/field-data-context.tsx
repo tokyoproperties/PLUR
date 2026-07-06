@@ -1,73 +1,93 @@
 /**
  * contexts/field-data-context.tsx
  *
- * Global provider for the 4 state-bearing hooks.
+ * Global provider for ALL state-bearing hooks.
  *
- * PERFORMANCE NOTES:
- * - Context values are memoized so consumers only re-render when
- *   the underlying data actually changes, not on every provider render.
- * - AtlasContext is the critical one: it only changes when the ring
- *   buffer updates (new moment captured). This prevents the deep
- *   derived hook chain (useFieldMemory → useFieldContinuity →
- *   useFieldMythology → useFieldLore → useFieldSpirit → useFieldSoul)
- *   from re-rendering on sensor ticks.
- * - SensorsContext changes every ~2s (motion) — only hooks that
- *   directly use sensor data (useHybrid, useCorridor, useEcosystem)
- *   re-render. The deep chain is insulated by the stable AtlasContext.
+ * ARCHITECTURE:
+ * - Base hooks (sensors, corridors, location) instantiated first
+ * - Derived hooks (corridor, hybrid, ecosystem, emergency, suit) 
+ *   computed next, receiving deps as direct arguments
+ * - Atlas computed last, receiving all derived state
+ * - Everything wrapped in memoized context providers
+ * - Screens read from context — zero duplicate hook instances
+ *
+ * PERFORMANCE:
+ * - Only the provider re-computes on sensor ticks (~2s)
+ * - Screens that don't use sensor-derived data don't re-render
+ * - AtlasContext only changes when ring buffer updates (~5 min)
+ * - With lazy:true + freezeOnBlur, only the active screen's
+ *   components render. Inactive screens are frozen.
  */
 
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
+// Types
 import type { UseSensorsResult } from '@/hooks/useSensors';
 import type { UseCorridorsResult } from '@/hooks/useCorridors';
 import type { UseLocationResult } from '@/hooks/useLocation';
 import type { AtlasResult } from '@/atlas/useAtlas';
+import type { HybridState } from '@/hybrid/hybrid-engine';
+import type { CorridorState } from '@/corridor/corridor-engine';
+import type { EcosystemState } from '@/ecosystem/ecosystem-engine';
+import type { EmergencyState } from '@/emergency/state';
+import type { SuitState } from '@/suit/types';
 
 // Contexts
 export const SensorsContext = createContext<UseSensorsResult | null>(null);
 export const CorridorsContext = createContext<UseCorridorsResult | null>(null);
 export const LocationContext = createContext<UseLocationResult | null>(null);
 export const AtlasContext = createContext<AtlasResult | null>(null);
+export const HybridContext = createContext<HybridState | null>(null);
+export const CorridorContext = createContext<CorridorState | null>(null);
+export const EcosystemContext = createContext<EcosystemState | null>(null);
+export const EmergencyContext = createContext<EmergencyState | null>(null);
+export const SuitContext = createContext<SuitState | null>(null);
 
-// Provider — instantiates each hook once via the internal versions
+// Internal hooks
 import { useSensorsInternal } from '@/hooks/useSensors';
 import { useCorridorsInternal } from '@/hooks/useCorridors';
 import { useLocationInternal } from '@/hooks/useLocation';
+import { useCorridorInternal } from '@/corridor/useCorridor';
+import { useHybridInternal } from '@/hybrid/useHybrid';
+import { useEcosystemInternal } from '@/ecosystem/useEcosystem';
+import { useEmergencyInternal } from '@/emergency/useEmergency';
+import { useSuitDevicesInternal } from '@/suit/useSuitDevices';
 import { useAtlasInternal } from '@/atlas/useAtlas';
+import { useYardStrip } from '@/hooks/useYardStrip';
 
 export function FieldDataProvider({ children }: { children: ReactNode }) {
+  // 1. Base hooks — raw data sources (no context deps)
   const sensors = useSensorsInternal();
   const corridors = useCorridorsInternal();
   const location = useLocationInternal();
-  const atlas = useAtlasInternal();
+  const yard = useYardStrip();
 
-  // Memoize each context value so the reference is stable
-  // unless the underlying data actually changed.
-  //
-  // sensors: changes every ~2s (motion) — consumers that use
-  //   sensor data will re-render, but the deep atlas chain won't
-  //   because it depends on AtlasContext, not SensorsContext.
+  // 2. Derived hooks — receive base values as direct arguments
+  const corridor = useCorridorInternal({ corridors, location, sensors, yard });
+  const hybrid = useHybridInternal({ sensors, corridor });
+  const suit = useSuitDevicesInternal();
+  const ecosystem = useEcosystemInternal({ sensors, hybrid, corridor, suit });
+  const emergency = useEmergencyInternal({ sensors, hybrid });
+
+  // 3. Atlas — depends on all derived state
+  const atlas = useAtlasInternal({ sensors, location, hybrid, corridor, ecosystem, emergency, suit });
+
+  // 4. Memoize context values — reference only changes when data changes
   const sensorsValue = useMemo(
     () => sensors,
     [sensors.light, sensors.motion, sensors.sound, sensors.snapshot],
   );
 
-  // corridors: stable after initial fetch — only changes when
-  //   trails array, loading state, or error changes
   const corridorsValue = useMemo(
     () => corridors,
     [corridors.trails, corridors.isLoading, corridors.error],
   );
 
-  // location: changes on GPS update (~10s interval)
   const locationValue = useMemo(
     () => location,
     [location.location, location.permissionStatus, location.isLoading],
   );
 
-  // atlas: THE CRITICAL ONE — only changes when ring buffer updates
-  //   (new moment captured, at most every 5 minutes). This insulates
-  //   the deep derived hook chain from sensor ticks.
   const atlasValue = useMemo(
     () => ({
       moments: atlas.moments,
@@ -79,13 +99,30 @@ export function FieldDataProvider({ children }: { children: ReactNode }) {
     [atlas.moments, atlas.summary, atlas.isHydrated],
   );
 
+  // Derived values — internal hooks already use useMemo, so stable references
+  const corridorValue = useMemo(() => corridor, [corridor]);
+  const hybridValue = useMemo(() => hybrid, [hybrid]);
+  const ecosystemValue = useMemo(() => ecosystem, [ecosystem]);
+  const emergencyValue = useMemo(() => emergency, [emergency]);
+  const suitValue = useMemo(() => suit, [suit]);
+
   return (
     <SensorsContext.Provider value={sensorsValue}>
       <CorridorsContext.Provider value={corridorsValue}>
         <LocationContext.Provider value={locationValue}>
-          <AtlasContext.Provider value={atlasValue}>
-            {children}
-          </AtlasContext.Provider>
+          <HybridContext.Provider value={hybridValue}>
+            <CorridorContext.Provider value={corridorValue}>
+              <EcosystemContext.Provider value={ecosystemValue}>
+                <EmergencyContext.Provider value={emergencyValue}>
+                  <SuitContext.Provider value={suitValue}>
+                    <AtlasContext.Provider value={atlasValue}>
+                      {children}
+                    </AtlasContext.Provider>
+                  </SuitContext.Provider>
+                </EmergencyContext.Provider>
+              </EcosystemContext.Provider>
+            </CorridorContext.Provider>
+          </HybridContext.Provider>
         </LocationContext.Provider>
       </CorridorsContext.Provider>
     </SensorsContext.Provider>

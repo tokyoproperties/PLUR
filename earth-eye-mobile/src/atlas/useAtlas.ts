@@ -5,14 +5,7 @@
  * environmental state and stores them in a ring buffer.
  *
  * PERFORMANCE: Split into internal (state-bearing) + consumer (context).
- * The FieldDataProvider instantiates the internal version once.
- * All consumers read from context, eliminating ~10 duplicate ring
- * buffer instances, each with its own AsyncStorage hydration,
- * sensor subscriptions, and trail fetch.
- *
- * Persistence:
- * - Ring buffer is saved to AsyncStorage on every capture
- * - Hydrated from AsyncStorage on mount
+ * The internal version accepts deps as direct arguments.
  */
 
 import { useContext, useEffect, useRef, useState, useMemo, useCallback } from 'react';
@@ -28,14 +21,14 @@ import {
   type FieldMoment,
 } from '@/atlas/fieldMoment';
 import { AtlasContext } from '@/contexts/field-data-context';
-import { useCorridor } from '@/corridor/useCorridor';
-import { useEcosystem } from '@/ecosystem/useEcosystem';
-import { useEmergency } from '@/emergency/useEmergency';
-import { useHybrid } from '@/hybrid/useHybrid';
-import { useLocation } from '@/hooks/useLocation';
-import { useSensors } from '@/hooks/useSensors';
-import { useSuitDevices } from '@/suit/useSuitDevices';
-import { useYardStrip } from '@/hooks/useYardStrip';
+import type { UseSensorsResult } from '@/hooks/useSensors';
+import type { UseLocationResult } from '@/hooks/useLocation';
+import type { HybridState } from '@/hybrid/hybrid-engine';
+import type { CorridorState } from '@/corridor/corridor-engine';
+import type { EcosystemState } from '@/ecosystem/ecosystem-engine';
+import type { EmergencyState } from '@/emergency/state';
+import type { SuitState } from '@/suit/types';
+import type { YardStripPoint } from '@/hooks/useYardStrip';
 import { evaluateYardMode } from '@/modes/yard';
 
 export type { AtlasSummary, FieldMoment } from '@/atlas/fieldMoment';
@@ -50,17 +43,19 @@ export type AtlasResult = {
 
 const STORAGE_KEY = 'earthEye.atlas.ring';
 
-// Internal — only called by FieldDataProvider
-export function useAtlasInternal(): AtlasResult {
-  const hybrid = useHybrid();
-  const corridor = useCorridor();
-  const ecosystem = useEcosystem();
-  const emergency = useEmergency();
-  const suit = useSuitDevices();
-  const { snapshot } = useSensors();
-  const { location } = useLocation();
+// Internal — called by FieldDataProvider with deps passed directly
+export function useAtlasInternal(args: {
+  sensors: UseSensorsResult;
+  location: UseLocationResult;
+  hybrid: HybridState;
+  corridor: CorridorState;
+  ecosystem: EcosystemState;
+  emergency: EmergencyState;
+  suit: SuitState;
+}): AtlasResult {
+  const { sensors, location, hybrid, corridor, ecosystem, emergency, suit } = args;
+  const { snapshot } = sensors;
 
-  const yard = useYardStrip();
   const yardEval = evaluateYardMode(snapshot);
   const fireworkWindow = yardEval.isFireworkWindow;
 
@@ -118,7 +113,7 @@ export function useAtlasInternal(): AtlasResult {
       emergency,
       suit,
       snapshot,
-      location,
+      location: location.location,
       fireworkWindow,
       now: new Date(now),
     });

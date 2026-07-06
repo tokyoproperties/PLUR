@@ -1,37 +1,42 @@
 /**
  * useEcosystem.ts
  *
- * Wraps the ecosystem engine with real data from existing hooks:
- * - useHybrid() → unified field state
- * - useCorridor() → corridor state (proximity, tone)
- * - useSensors() → phone sensor snapshot (fallback for suit devices)
- * - evaluateYardMode() → yard mode evaluation
- * - useSuitDevices() → suit device readings (mock for now)
- *
- * Returns a memoized EcosystemState.
+ * PERFORMANCE: Split into internal (state-bearing) + consumer (context).
+ * The internal version accepts deps as arguments (doesn't read context).
  */
 
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { evaluateEcosystem, type EcosystemState } from '@/ecosystem/ecosystem-engine';
-import { useCorridor } from '@/corridor/useCorridor';
-import { useHybrid } from '@/hybrid/useHybrid';
-import { useSensors } from '@/hooks/useSensors';
-import { useSuitDevices } from '@/suit/useSuitDevices';
+import { EcosystemContext } from '@/contexts/field-data-context';
+import type { UseSensorsResult } from '@/hooks/useSensors';
+import type { HybridState } from '@/hybrid/hybrid-engine';
+import type { CorridorState } from '@/corridor/corridor-engine';
+import type { SuitState } from '@/suit/types';
 import { evaluateYardMode } from '@/modes/yard';
 
 export type { EcosystemState } from '@/ecosystem/ecosystem-engine';
-export type { InvitedSpecies } from '@/ecosystem/ecosystem-engine';
 
-export function useEcosystem(): EcosystemState {
-  const hybrid = useHybrid();
-  const corridor = useCorridor();
-  const { snapshot } = useSensors();
-  const suit = useSuitDevices();
+// Internal — called by FieldDataProvider with deps passed directly
+export function useEcosystemInternal(args: {
+  sensors: UseSensorsResult;
+  hybrid: HybridState;
+  corridor: CorridorState;
+  suit: SuitState;
+}): EcosystemState {
+  const { sensors, hybrid, corridor, suit } = args;
+  const { snapshot } = sensors;
   const yard = evaluateYardMode(snapshot);
 
   return useMemo(
     () => evaluateEcosystem({ hybrid, corridor, snapshot, yard, suit }),
-    [hybrid, corridor, snapshot, yard, suit]
+    [hybrid, corridor, snapshot, yard, suit],
   );
+}
+
+// Consumer — reads from context
+export function useEcosystem(): EcosystemState {
+  const ctx = useContext(EcosystemContext);
+  if (!ctx) throw new Error('useEcosystem must be used within FieldDataProvider');
+  return ctx;
 }
