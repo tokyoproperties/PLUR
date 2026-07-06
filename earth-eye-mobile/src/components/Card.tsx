@@ -68,6 +68,8 @@ const styles = StyleSheet.create({
   // hairline border was added — it read as the card being
   // "off-center" relative to everything around it.
   card: {
+    width: '100%',
+    alignSelf: 'stretch',
     borderRadius: 12,
     padding: Spacing.three,
     marginBottom: Spacing.two,

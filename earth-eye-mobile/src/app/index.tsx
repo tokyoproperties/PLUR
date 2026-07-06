@@ -59,7 +59,7 @@ function QuickLaunchTile({ item, index }: { item: LaunchItem; index: number }) {
           <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
             {item.label}
           </ThemedText>
-          <ThemedText style={styles.tileHint} numberOfLines={1} allowFontScaling={false}>
+          <ThemedText style={styles.tileHint} numberOfLines={2} allowFontScaling={false}>
             {item.hint}
           </ThemedText>
         </Animated.View>
@@ -132,7 +132,7 @@ export default function HomeScreen() {
           </Animated.View>
 
           {/* Mode */}
-          <Animated.View entering={FADE_MODE} style={styles.modeSection}>
+          <Animated.View entering={FADE_MODE} style={[styles.modeSection, styles.fullWidth]}>
             <ModeToggle />
             <View style={styles.badgeSpacer}>
               <ModeBadge mode={mode} statusText={activeSummary} />
@@ -140,7 +140,7 @@ export default function HomeScreen() {
           </Animated.View>
 
           {/* Field State */}
-          <Animated.View entering={FADE_STATE}>
+          <Animated.View entering={FADE_STATE} style={styles.fullWidth}>
             <HybridFieldStateCard />
           </Animated.View>
 
@@ -254,6 +254,14 @@ const styles = StyleSheet.create({
   modeSection: {
     marginBottom: Spacing.two,
   },
+  // Belt-and-suspenders: Animated.View entrance wrappers don't always
+  // reliably inherit the parent's flex-stretch width, which let
+  // ModeToggle and HybridFieldStateCard size to their own (sometimes
+  // wider-than-screen) content instead of the page width.
+  fullWidth: {
+    width: '100%',
+    alignSelf: 'stretch',
+  },
   badgeSpacer: {
     marginTop: Spacing.two,
   },
@@ -293,6 +301,7 @@ const styles = StyleSheet.create({
   },
   tileHint: {
     fontSize: 11,
+    lineHeight: 15,
     color: 'rgba(255,255,255,0.40)',
   },
 });
