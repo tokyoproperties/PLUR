@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.45)',
-    lineHeight: 1.6,
+    lineHeight: 21,
     marginBottom: Spacing.two,
   },
   rowLine: {

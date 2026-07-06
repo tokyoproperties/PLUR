@@ -93,6 +93,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.70)',
-    lineHeight: 1.5,
+    lineHeight: 20,
   },
 });

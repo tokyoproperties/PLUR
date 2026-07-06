@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.72)',
-    lineHeight: 1.6,
+    lineHeight: 24,
   },
   confidenceLine: {
     fontSize: 11,

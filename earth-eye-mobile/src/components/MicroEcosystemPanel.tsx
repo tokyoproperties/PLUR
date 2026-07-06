@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.72)',
-    lineHeight: 1.6,
+    lineHeight: 24,
     marginBottom: Spacing.two,
   },
   conditionsRow: {
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.88)',
-    lineHeight: 1.7,
+    lineHeight: 26,
   },
   speciesLatin: {
     fontSize: 12,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
   speciesReason: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.50)',
-    lineHeight: 1.5,
+    lineHeight: 18,
     marginBottom: 6,
   },
   peakNote: {
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(196,151,74,0.50)',
-    lineHeight: 1.5,
+    lineHeight: 16,
     marginLeft: 4,
     marginBottom: 8,
   },
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.45)',
-    lineHeight: 1.6,
+    lineHeight: 24,
   },
 
   // Seasonal
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.55)',
-    lineHeight: 1.6,
+    lineHeight: 21,
   },
 
   // Arrivals
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.60)',
-    lineHeight: 1.6,
+    lineHeight: 21,
     marginTop: Spacing.one,
   },
 
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.60)',
-    lineHeight: 1.6,
+    lineHeight: 21,
     marginTop: Spacing.one,
   },
 
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(196,151,74,0.55)',
-    lineHeight: 1.6,
+    lineHeight: 21,
   },
   chapterCount: {
     fontSize: 11,
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.85)',
-    lineHeight: 1.6,
+    lineHeight: 24,
     marginBottom: 4,
   },
   continuityText: {
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(154,122,184,0.55)',
-    lineHeight: 1.6,
+    lineHeight: 21,
   },
 
   // Mythology
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.88)',
-    lineHeight: 1.6,
+    lineHeight: 24,
     marginBottom: 4,
   },
   mythText: {
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.65)',
-    lineHeight: 1.7,
+    lineHeight: 22,
   },
 
   // Soul — the capstone (largest, brightest)
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.92)',
-    lineHeight: 1.6,
+    lineHeight: 27,
     marginBottom: 4,
   },
   soulText: {
@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.82)',
-    lineHeight: 1.7,
+    lineHeight: 26,
   },
   rootTraitsRow: {
     flexDirection: 'row',
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(154,122,184,0.85)',
-    lineHeight: 1.6,
+    lineHeight: 26,
     marginBottom: 4,
   },
   spiritText: {
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(154,122,184,0.72)',
-    lineHeight: 1.7,
+    lineHeight: 24,
   },
   traitsRow: {
     flexDirection: 'row',
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(196,151,74,0.65)',
-    lineHeight: 1.7,
+    lineHeight: 24,
   },
 
   // Actions
@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.65)',
-    lineHeight: 1.7,
+    lineHeight: 22,
     marginTop: 4,
   },
 });

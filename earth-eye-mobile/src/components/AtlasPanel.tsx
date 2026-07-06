@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.45)',
-    lineHeight: 1.6,
+    lineHeight: 24,
   },
   seasonalRow: {
     flexDirection: 'row',
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.82)',
-    lineHeight: 1.7,
+    lineHeight: 26,
     marginBottom: Spacing.two,
   },
   rhythmLine: {
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.55)',
-    lineHeight: 1.6,
+    lineHeight: 21,
     marginBottom: 6,
   },
   driftLine: {
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.48)',
-    lineHeight: 1.6,
+    lineHeight: 21,
   },
 
   // Ecology lines
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(122,184,122,0.60)',
-    lineHeight: 1.6,
+    lineHeight: 21,
     marginBottom: 6,
   },
   habitatLine: {
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(122,154,184,0.60)',
-    lineHeight: 1.6,
+    lineHeight: 21,
   },
 
   // Memory lines
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(196,151,74,0.55)',
-    lineHeight: 1.6,
+    lineHeight: 21,
     marginBottom: 6,
   },
   mythologyLine: {
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.78)',
-    lineHeight: 1.7,
+    lineHeight: 24,
   },
 
   // Essence — the capstone
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.92)',
-    lineHeight: 1.6,
+    lineHeight: 26,
     marginBottom: 4,
   },
   soulLine: {
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.88)',
-    lineHeight: 1.7,
+    lineHeight: 26,
   },
 
   spiritBlock: {
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(154,122,184,0.85)',
-    lineHeight: 1.6,
+    lineHeight: 24,
     marginBottom: 4,
   },
   spiritLine: {
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(154,122,184,0.72)',
-    lineHeight: 1.7,
+    lineHeight: 24,
   },
   anchorRow: {
     flexDirection: 'row',
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(196,151,74,0.68)',
-    lineHeight: 1.7,
+    lineHeight: 24,
     marginBottom: Spacing.two,
   },
 
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(154,122,184,0.60)',
-    lineHeight: 1.6,
+    lineHeight: 21,
     marginBottom: 4,
   },
   continuityLine: {
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(154,122,184,0.50)',
-    lineHeight: 1.6,
+    lineHeight: 21,
   },
 
   // Current moment
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.82)',
-    lineHeight: 1.7,
+    lineHeight: 26,
     marginBottom: Spacing.two,
   },
   summaryLine: {
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.50)',
-    lineHeight: 1.6,
+    lineHeight: 21,
   },
   recentSection: {
     marginTop: Spacing.three,

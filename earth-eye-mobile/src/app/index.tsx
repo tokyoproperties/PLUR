@@ -56,8 +56,12 @@ function QuickLaunchTile({ item, index }: { item: LaunchItem; index: number }) {
     <Link href={item.href} asChild>
       <Pressable onPressIn={handlePressIn} style={({ pressed }) => pressed ? styles.tilePressed : null}>
         <Animated.View entering={tileEntering} style={styles.tile}>
-          <ThemedText style={styles.tileLabel}>{item.label}</ThemedText>
-          <ThemedText style={styles.tileHint}>{item.hint}</ThemedText>
+          <ThemedText style={styles.tileLabel} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+            {item.label}
+          </ThemedText>
+          <ThemedText style={styles.tileHint} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+            {item.hint}
+          </ThemedText>
         </Animated.View>
       </Pressable>
     </Link>
@@ -220,7 +224,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.88)',
-    lineHeight: 1.7,
+    lineHeight: 27,
     marginBottom: 6,
   },
   spiritPreview: {
@@ -228,14 +232,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(154,122,184,0.72)',
-    lineHeight: 1.6,
+    lineHeight: 22,
   },
   identityPlaceholder: {
     fontSize: 15,
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.40)',
-    lineHeight: 1.6,
+    lineHeight: 24,
     marginBottom: 6,
   },
   spiritPlaceholder: {
@@ -243,7 +247,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.30)',
-    lineHeight: 1.6,
+    lineHeight: 21,
   },
 
   // Mode
@@ -271,6 +275,7 @@ const styles = StyleSheet.create({
   },
   tile: {
     width: '48%',
+    minHeight: 76,
     borderRadius: 12,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.three,
