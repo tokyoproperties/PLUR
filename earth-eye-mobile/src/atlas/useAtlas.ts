@@ -4,31 +4,18 @@
  * The Field Atlas hook — collects Field Moments from the unified
  * environmental state and stores them in a ring buffer.
  *
+ * PERFORMANCE: Split into internal (state-bearing) + consumer (context).
+ * The FieldDataProvider instantiates the internal version once.
+ * All consumers read from context, eliminating ~10 duplicate ring
+ * buffer instances, each with its own AsyncStorage hydration,
+ * sensor subscriptions, and trail fetch.
+ *
  * Persistence:
  * - Ring buffer is saved to AsyncStorage on every capture
  * - Hydrated from AsyncStorage on mount
- * - This allows the soul/spirit/memory/continuity engines to
- *   derive meaning across app restarts
- *
- * Uses every hook from Phases III–IX:
- * - useHybrid → unified field state
- * - useCorridor → spatial context
- * - useEcosystem → species context
- * - useEmergency → resilience context
- * - useSuitDevices → device context
- * - useSensors → sensor snapshot
- * - useLocation → GPS coordinates
- *
- * Capture logic:
- * - On field state change
- * - On proximity change
- * - On fallback change
- * - On firework window change
- * - Every 5 minutes as a baseline
- * - Ring buffer holds last 200 moments
  */
 
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { useContext, useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
@@ -40,6 +27,7 @@ import {
   type AtlasSummary,
   type FieldMoment,
 } from '@/atlas/fieldMoment';
+import { AtlasContext } from '@/contexts/field-data-context';
 import { useCorridor } from '@/corridor/useCorridor';
 import { useEcosystem } from '@/ecosystem/useEcosystem';
 import { useEmergency } from '@/emergency/useEmergency';
@@ -52,9 +40,18 @@ import { evaluateYardMode } from '@/modes/yard';
 
 export type { AtlasSummary, FieldMoment } from '@/atlas/fieldMoment';
 
+export type AtlasResult = {
+  moments: FieldMoment[];
+  summary: AtlasSummary;
+  latest: FieldMoment | null;
+  totalMoments: number;
+  isHydrated: boolean;
+};
+
 const STORAGE_KEY = 'earthEye.atlas.ring';
 
-export function useAtlas() {
+// Internal — only called by FieldDataProvider
+export function useAtlasInternal(): AtlasResult {
   const hybrid = useHybrid();
   const corridor = useCorridor();
   const ecosystem = useEcosystem();
@@ -91,20 +88,14 @@ export function useAtlas() {
         setIsHydrated(true);
       })
       .catch(() => {
-        // AsyncStorage error — start fresh
         setIsHydrated(true);
       });
   }, []);
 
-  // Persist to AsyncStorage whenever ring changes
   const persistRing = useCallback((next: FieldMoment[]) => {
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {
-      // Silent fail — persistence is best-effort
-    });
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
   }, []);
 
-  // Capture check — runs on every render but only captures when needed
-  // Only after hydration to avoid overwriting stored data with a fresh capture
   useEffect(() => {
     if (!isHydrated) return;
 
@@ -150,4 +141,11 @@ export function useAtlas() {
     totalMoments: ring.length,
     isHydrated,
   };
+}
+
+// Consumer — reads from context
+export function useAtlas(): AtlasResult {
+  const ctx = useContext(AtlasContext);
+  if (!ctx) throw new Error('useAtlas must be used within FieldDataProvider');
+  return ctx;
 }

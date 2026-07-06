@@ -1,21 +1,14 @@
 /**
  * useLocation.ts
- * User device location hook for future map integration.
+ * User device location hook.
  *
- * Wraps expo-location with permission handling. Returns null coords
- * until permission is granted — screens should handle the null case
- * gracefully (the map already centers on the yard or trail cluster
- * as fallback).
- *
- * NOT YET INTEGRATED into map.tsx — this is prep for Phase III when
- * we want a "you are here" blue dot. Safe to import; won't request
- * permission until called.
- *
- * NOTE: expo-location is in package.json but may not be installed in
- * all environments. The dynamic import guards against this.
+ * PERFORMANCE: Split into internal (state-bearing) + consumer (context).
+ * The FieldDataProvider instantiates the internal version once.
  */
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+import { LocationContext } from '@/contexts/field-data-context';
 
 export interface UserLocation {
   latitude: number;
@@ -29,7 +22,8 @@ export interface UseLocationResult {
   isLoading: boolean;
 }
 
-export function useLocation(): UseLocationResult {
+// Internal — only called by FieldDataProvider
+export function useLocationInternal(): UseLocationResult {
   const [location, setLocation] = useState<UserLocation | null>(null);
   const [permissionStatus, setPermissionStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,4 +78,11 @@ export function useLocation(): UseLocationResult {
   }, []);
 
   return { location, permissionStatus, isLoading };
+}
+
+// Consumer — reads from context
+export function useLocation(): UseLocationResult {
+  const ctx = useContext(LocationContext);
+  if (!ctx) throw new Error('useLocation must be used within FieldDataProvider');
+  return ctx;
 }

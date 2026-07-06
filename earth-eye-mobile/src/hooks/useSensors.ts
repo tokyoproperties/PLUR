@@ -6,10 +6,18 @@
  *
  * Returns a unified snapshot plus the raw sub-hook states for screens
  * that need per-sensor detail (like isAvailable flags).
+ *
+ * PERFORMANCE: This hook is now split into:
+ *   useSensorsInternal() — creates the actual sensor subscriptions
+ *   useSensors()         — reads from FieldDataProvider context
+ *
+ * The provider instantiates the internal version once at the app root.
+ * All consumers read from context, eliminating duplicate subscriptions.
  */
 
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
+import { SensorsContext } from '@/contexts/field-data-context';
 import { useAmbientLight } from '@/sensors/useAmbientLight';
 import { useMotion } from '@/sensors/useMotion';
 import { useSound } from '@/sensors/useSound';
@@ -27,7 +35,8 @@ export interface UseSensorsResult {
   snapshot: SensorSnapshot;
 }
 
-export function useSensors(): UseSensorsResult {
+// Internal — only called by FieldDataProvider
+export function useSensorsInternal(): UseSensorsResult {
   const light = useAmbientLight();
   const motion = useMotion();
   const sound = useSound();
@@ -42,4 +51,11 @@ export function useSensors(): UseSensorsResult {
   );
 
   return { light, motion, sound, snapshot };
+}
+
+// Consumer — reads from context
+export function useSensors(): UseSensorsResult {
+  const ctx = useContext(SensorsContext);
+  if (!ctx) throw new Error('useSensors must be used within FieldDataProvider');
+  return ctx;
 }

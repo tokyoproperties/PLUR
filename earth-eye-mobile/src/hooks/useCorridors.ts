@@ -1,19 +1,14 @@
 /**
  * useCorridors.ts
- * Fetches REAL trail data from the live EarthEye backend — the same
- * getAtlasData endpoint the web app (PLUR) uses. This is not stub
- * geometry: it's the actual 74 active trails from the production
- * database, each with a real single-point lat/lng (trailhead
- * location, not a full path).
+ * Fetches REAL trail data from the live EarthEye backend.
  *
- * NOTE ON SCOPE: the DB currently stores one coordinate per trail,
- * not a walked GPS path. So "corridors" render as markers, not
- * polylines, until real path-tracing data exists. Calling this
- * "Trail" data rather than "Corridor" polylines is the honest name
- * for what's actually there.
+ * PERFORMANCE: Split into internal (state-bearing) + consumer (context).
+ * The FieldDataProvider instantiates the internal version once.
  */
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+import { CorridorsContext } from '@/contexts/field-data-context';
 
 const API_BASE = 'https://special-agent-44-342f8e58.base44.app/functions/getAtlasData';
 
@@ -27,13 +22,14 @@ export interface TrailMarker {
   archived?: boolean;
 }
 
-interface UseCorridorsResult {
+export interface UseCorridorsResult {
   trails: TrailMarker[];
   isLoading: boolean;
   error: string | null;
 }
 
-export function useCorridors(): UseCorridorsResult {
+// Internal — only called by FieldDataProvider
+export function useCorridorsInternal(): UseCorridorsResult {
   const [trails, setTrails] = useState<TrailMarker[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,4 +74,11 @@ export function useCorridors(): UseCorridorsResult {
   }, []);
 
   return { trails, isLoading, error };
+}
+
+// Consumer — reads from context
+export function useCorridors(): UseCorridorsResult {
+  const ctx = useContext(CorridorsContext);
+  if (!ctx) throw new Error('useCorridors must be used within FieldDataProvider');
+  return ctx;
 }
