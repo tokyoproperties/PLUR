@@ -83,11 +83,15 @@ export default function HomeScreen() {
               <ThemedText style={styles.soulPreview}>{soul.soulLine}</ThemedText>
             ) : (
               <ThemedText style={styles.identityPlaceholder}>
-                The field has not yet revealed its soul.
+                The field is still becoming — its soul will emerge with time.
               </ThemedText>
             )}
-            {spirit.isEstablished && (
+            {spirit.isEstablished ? (
               <ThemedText style={styles.spiritPreview}>{spirit.spiritLine}</ThemedText>
+            ) : (
+              <ThemedText style={styles.spiritPlaceholder}>
+                Spirit aligns when the field has enough memory to recognize itself.
+              </ThemedText>
             )}
           </Animated.View>
 
@@ -198,6 +202,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.40)',
+    lineHeight: 1.6,
+    marginBottom: 6,
+  },
+  spiritPlaceholder: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.30)',
     lineHeight: 1.6,
   },
 
