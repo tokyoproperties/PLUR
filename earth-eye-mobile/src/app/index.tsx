@@ -1,7 +1,8 @@
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 
 import { EmergencyBanner } from '@/components/EmergencyBanner';
 import { HybridFieldStateCard } from '@/components/HybridFieldState';
@@ -28,13 +29,37 @@ const FADE_LAUNCH = FadeIn.duration(400).delay(520);
 
 type LaunchHref = '/map' | '/sensors' | '/atlas' | '/ecosystem' | '/suit';
 
-function QuickLaunchTile({ href, label, hint }: { href: LaunchHref; label: string; hint: string }) {
+interface LaunchItem {
+  href: LaunchHref;
+  label: string;
+  hint: string;
+}
+
+const LAUNCH_ITEMS: LaunchItem[] = [
+  { href: '/atlas', label: 'Atlas', hint: 'Cosmology stack' },
+  { href: '/ecosystem', label: 'Field', hint: 'Living ecosystem' },
+  { href: '/map', label: 'Map', hint: 'Trails & corridors' },
+  { href: '/suit', label: 'Suit', hint: 'Sensor bands' },
+  { href: '/sensors', label: 'Sensors', hint: 'Live readings' },
+];
+
+function QuickLaunchTile({ item, index }: { item: LaunchItem; index: number }) {
+  const handlePressIn = () => {
+    Haptics.selectionAsync();
+  };
+
+  // Each tile staggers 50ms after the grid container appears at 520ms
+  const tileDelay = 520 + index * 50;
+  const tileEntering = FadeIn.duration(300).delay(tileDelay).springify().damping(20).stiffness(100);
+
   return (
-    <Link href={href} asChild>
-      <ThemedView style={styles.tile} type="backgroundElement">
-        <ThemedText style={styles.tileLabel}>{label}</ThemedText>
-        <ThemedText style={styles.tileHint}>{hint}</ThemedText>
-      </ThemedView>
+    <Link href={item.href} asChild>
+      <Pressable onPressIn={handlePressIn} style={({ pressed }) => pressed ? styles.tilePressed : null}>
+        <Animated.View entering={tileEntering} style={styles.tile}>
+          <ThemedText style={styles.tileLabel}>{item.label}</ThemedText>
+          <ThemedText style={styles.tileHint}>{item.hint}</ThemedText>
+        </Animated.View>
+      </Pressable>
     </Link>
   );
 }
@@ -115,15 +140,13 @@ export default function HomeScreen() {
             <HybridFieldStateCard />
           </Animated.View>
 
-          {/* Quick Launch grid — 2 columns */}
+          {/* Quick Launch grid — tiles stagger individually */}
           <Animated.View entering={FADE_LAUNCH}>
             <ThemedText style={styles.sectionLabel}>EXPLORE</ThemedText>
             <View style={styles.tileGrid}>
-              <QuickLaunchTile href="/atlas" label="Atlas" hint="Cosmology stack" />
-              <QuickLaunchTile href="/ecosystem" label="Field" hint="Living ecosystem" />
-              <QuickLaunchTile href="/map" label="Map" hint="Trails & corridors" />
-              <QuickLaunchTile href="/suit" label="Suit" hint="Sensor bands" />
-              <QuickLaunchTile href="/sensors" label="Sensors" hint="Live readings" />
+              {LAUNCH_ITEMS.map((item, i) => (
+                <QuickLaunchTile key={item.href} item={item} index={i} />
+              ))}
             </View>
           </Animated.View>
         </ScrollView>
@@ -248,10 +271,13 @@ const styles = StyleSheet.create({
   },
   tile: {
     width: '48%',
-    borderRadius: 10,
+    borderRadius: 12,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.three,
     marginBottom: Spacing.two,
+  },
+  tilePressed: {
+    opacity: 0.7,
   },
   tileLabel: {
     fontSize: 14,
