@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -43,7 +43,15 @@ const LAUNCH_ITEMS: LaunchItem[] = [
   { href: '/sensors', label: 'Sensors', hint: 'Live readings' },
 ];
 
-function QuickLaunchTile({ item, index }: { item: LaunchItem; index: number }) {
+function QuickLaunchTile({
+  item,
+  index,
+  isLastInRow,
+}: {
+  item: LaunchItem;
+  index: number;
+  isLastInRow: boolean;
+}) {
   const handlePressIn = () => {
     Haptics.selectionAsync();
   };
@@ -54,8 +62,12 @@ function QuickLaunchTile({ item, index }: { item: LaunchItem; index: number }) {
 
   return (
     <Link href={item.href} asChild>
-      <Pressable onPressIn={handlePressIn} style={({ pressed }) => pressed ? styles.tilePressed : null}>
-        <Animated.View entering={tileEntering} style={styles.tile}>
+      <Pressable
+        onPressIn={handlePressIn}
+        style={({ pressed }) => [styles.tileFlex, pressed && styles.tilePressed]}>
+        <Animated.View
+          entering={tileEntering}
+          style={[styles.tile, !isLastInRow && styles.tileGap]}>
           <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
             {item.label}
           </ThemedText>
@@ -66,6 +78,19 @@ function QuickLaunchTile({ item, index }: { item: LaunchItem; index: number }) {
       </Pressable>
     </Link>
   );
+}
+
+// Chunk into rows of 2 — deterministic, no reliance on flexWrap +
+// percentage-width interaction (which proved unreliable: tiles kept
+// rendering past the screen edge regardless of upstream width fixes).
+// flex:1 on a fixed-length row always splits available width evenly,
+// full stop, independent of any ancestor's width propagation quirks.
+function chunkPairs<T>(items: T[]): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += 2) {
+    rows.push(items.slice(i, i + 2));
+  }
+  return rows;
 }
 
 export default function HomeScreen() {
@@ -90,14 +115,25 @@ export default function HomeScreen() {
         >
           <EmergencyBanner />
 
+          {/* TEMP DIAGNOSTIC — remove once we confirm actual measured width.
+              window = logical px React Native lays out against.
+              screen = raw physical px (can differ from window on some
+              Android devices/DPI settings) — if these numbers don't
+              match what a normal phone should be (~360-430px), that's
+              the root cause of the Field State/ModeToggle overflow. */}
+          <ThemedText style={styles.debugText} allowFontScaling={false}>
+            DEBUG window: {Math.round(Dimensions.get('window').width)}×{Math.round(Dimensions.get('window').height)}
+            {'  '}screen: {Math.round(Dimensions.get('screen').width)}×{Math.round(Dimensions.get('screen').height)}
+          </ThemedText>
+
           {/* Title */}
-          <Animated.View entering={FADE_TITLE}>
+          <Animated.View entering={FADE_TITLE} style={styles.fullWidth}>
             <ThemedText style={styles.title}>EarthEye</ThemedText>
             <ThemedText style={styles.subtitle}>Field atlas for Orange County ecology</ThemedText>
           </Animated.View>
 
           {/* Season badge */}
-          <Animated.View entering={FADE_SEASON}>
+          <Animated.View entering={FADE_SEASON} style={styles.fullWidth}>
             <View style={styles.seasonBadge}>
               <ThemedText style={styles.seasonLabel}>{seasonal.phaseLabel}</ThemedText>
               {seasonal.patternSuffix !== '' && (
@@ -145,11 +181,20 @@ export default function HomeScreen() {
           </Animated.View>
 
           {/* Quick Launch grid — tiles stagger individually */}
-          <Animated.View entering={FADE_LAUNCH}>
+          <Animated.View entering={FADE_LAUNCH} style={styles.fullWidth}>
             <ThemedText style={styles.sectionLabel}>EXPLORE</ThemedText>
             <View style={styles.tileGrid}>
-              {LAUNCH_ITEMS.map((item, i) => (
-                <QuickLaunchTile key={item.href} item={item} index={i} />
+              {chunkPairs(LAUNCH_ITEMS).map((row, rowIndex) => (
+                <View key={row[0].href} style={styles.tileRow}>
+                  {row.map((item, i) => (
+                    <QuickLaunchTile
+                      key={item.href}
+                      item={item}
+                      index={rowIndex * 2 + i}
+                      isLastInRow={i === row.length - 1}
+                    />
+                  ))}
+                </View>
               ))}
             </View>
           </Animated.View>
@@ -160,6 +205,14 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  debugText: {
+    fontSize: 10,
+    color: '#7AB87A',
+    backgroundColor: 'rgba(122,184,122,0.12)',
+    padding: 6,
+    marginBottom: Spacing.two,
+    borderRadius: 6,
+  },
   container: {
     flex: 1,
   },
@@ -277,17 +330,28 @@ const styles = StyleSheet.create({
     marginTop: Spacing.four,
   },
   tileGrid: {
+    width: '100%',
+  },
+  tileRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    width: '100%',
+  },
+  // Each tile's outer wrapper (Link + Pressable) gets flex:1 so a
+  // 2-item row always splits 50/50 — deterministic regardless of
+  // content length or any ancestor width quirk.
+  tileFlex: {
+    flex: 1,
+    minWidth: 0,
   },
   tile: {
-    width: '48%',
     minHeight: 76,
     borderRadius: 12,
+    marginBottom: Spacing.two,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.two,
-    marginBottom: Spacing.two,
+  },
+  tileGap: {
+    marginRight: Spacing.two,
   },
   tilePressed: {
     opacity: 0.7,
