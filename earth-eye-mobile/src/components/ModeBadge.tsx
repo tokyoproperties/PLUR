@@ -52,7 +52,15 @@ export function ModeBadge({ mode, statusText, compact = false, pulse = true }: M
       style={[
         styles.container,
         compact && styles.compactContainer,
-        { backgroundColor: meta.glowColor, maxWidth: maxBadgeWidth },
+        {
+          backgroundColor: meta.glowColor,
+          // Full-width badge (Home screen) now matches ModeToggle and
+          // Card above/below it — an explicit width, not maxWidth, so
+          // it always fills the row instead of shrinking to content.
+          // Compact badges (Sensors/Map corner placement) stay
+          // shrink-to-fit and just get a ceiling via maxWidth.
+          ...(compact ? { maxWidth: maxBadgeWidth } : { width: maxBadgeWidth, alignSelf: 'stretch' }),
+        },
       ]}>
       <Animated.View
         style={[styles.dot, { backgroundColor: meta.color, opacity: pulse ? pulseAnim : 1 }]}
@@ -72,16 +80,9 @@ export function ModeBadge({ mode, statusText, compact = false, pulse = true }: M
 }
 
 const styles = StyleSheet.create({
-  // alignSelf:'flex-start' is intentional — a short status line
-  // should size to its content, not stretch full-width as a giant
-  // bar. But with NO maxWidth, there's nothing to force a wrap
-  // decision: a long statusText (LOVE mode's firework-window line is
-  // much longer than PLUR's) just renders as one unbroken line past
-  // the screen edge instead of wrapping, because Yoga only wraps text
-  // when the container has a bounded width smaller than the content's
-  // natural single-line size. maxWidth:'100%' keeps the shrink-to-fit
-  // behavior for short text while still capping long text to the
-  // parent's actual width, which forces textBlock's Text to wrap.
+  // Base alignSelf is 'flex-start' (shrink-to-fit) for compact badges;
+  // the non-compact Home-screen badge overrides to width+stretch
+  // inline above so it fills the row like ModeToggle/Card do.
   container: {
     flexDirection: 'row',
     alignItems: 'center',
