@@ -12,6 +12,11 @@
  * - Field Moments history (patterns over time)
  * - Species canon (peak seasons from Phase VIII)
  *
+ * Pattern status:
+ * - 'forming' — fewer than 5 moments, atlas is still gathering
+ * - 'unclear' — 5+ moments but pattern doesn't match expectations
+ * - 'confirmed' — 5+ moments and pattern matches the expected season
+ *
  * Pure logic — no React, no hooks.
  */
 
@@ -26,6 +31,8 @@ export type SeasonalPhase =
   | 'winter-night'
   | 'transitional';
 
+export type PatternStatus = 'forming' | 'unclear' | 'confirmed';
+
 export interface SeasonalProfile {
   /** Current seasonal phase */
   phase: SeasonalPhase;
@@ -39,6 +46,10 @@ export interface SeasonalProfile {
   guidance: string;
   /** Whether the atlas data confirms the expected seasonal pattern */
   patternConfirmed: boolean;
+  /** Richer pattern status for the badge */
+  patternStatus: PatternStatus;
+  /** Short suffix for the badge — empty string when forming */
+  patternSuffix: string;
 }
 
 // ─── Phase determination ──────────────────────────────────
@@ -181,6 +192,21 @@ export function evaluateSeasonalProfile(
   const data = PHASE_DATA[phase];
   const patternConfirmed = checkPatternConfirmation(phase, moments);
 
+  // Determine pattern status
+  let patternStatus: PatternStatus;
+  let patternSuffix: string;
+
+  if (moments.length < 5) {
+    patternStatus = 'forming';
+    patternSuffix = ''; // No suffix — the atlas is still gathering
+  } else if (patternConfirmed) {
+    patternStatus = 'confirmed';
+    patternSuffix = 'pattern confirmed';
+  } else {
+    patternStatus = 'unclear';
+    patternSuffix = 'pattern unclear';
+  }
+
   // If pattern is confirmed by data, enrich the rhythm phrase
   let fieldRhythm = data.fieldRhythm;
   if (patternConfirmed && moments.length >= 5) {
@@ -205,5 +231,7 @@ export function evaluateSeasonalProfile(
     fieldRhythm,
     guidance: data.guidance,
     patternConfirmed,
+    patternStatus,
+    patternSuffix,
   };
 }

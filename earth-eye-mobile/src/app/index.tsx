@@ -71,8 +71,15 @@ export default function HomeScreen() {
           <Animated.View entering={FADE_SEASON}>
             <View style={styles.seasonBadge}>
               <ThemedText style={styles.seasonLabel}>{seasonal.phaseLabel}</ThemedText>
-              {seasonal.patternConfirmed && (
-                <ThemedText style={styles.seasonConfirmed}>pattern confirmed</ThemedText>
+              {seasonal.patternSuffix !== '' && (
+                <ThemedText
+                  style={[
+                    styles.seasonSuffix,
+                    seasonal.patternStatus === 'unclear' && styles.seasonUnclear,
+                  ]}
+                >
+                  {seasonal.patternSuffix}
+                </ThemedText>
               )}
             </View>
           </Animated.View>
@@ -171,11 +178,14 @@ const styles = StyleSheet.create({
     letterSpacing: 1.1,
     color: 'rgba(255,255,255,0.65)',
   },
-  seasonConfirmed: {
+  seasonSuffix: {
     fontSize: 9,
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.25)',
     marginLeft: 8,
+  },
+  seasonUnclear: {
+    color: 'rgba(196,151,74,0.40)',
   },
 
   // Identity preview
