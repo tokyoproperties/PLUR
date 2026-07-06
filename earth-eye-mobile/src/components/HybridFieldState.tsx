@@ -89,10 +89,10 @@ export function HybridFieldStateCard() {
         <CardInset>
           <CardRow noDivider>
             <View style={styles.rowLine}>
-              <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
+              <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel} allowFontScaling={false}>
                 Mode
               </ThemedText>
-              <ThemedText type="small" style={styles.rowValue}>
+              <ThemedText type="small" style={styles.rowValue} allowFontScaling={false}>
                 {hybrid.symbolic === 'plur' ? 'PLUR' : 'LOVE'}
               </ThemedText>
             </View>
@@ -115,10 +115,10 @@ export function HybridFieldStateCard() {
       <CardInset>
         <CardRow noDivider>
           <View style={styles.rowLine}>
-            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel} allowFontScaling={false}>
               Proximity
             </ThemedText>
-            <ThemedText type="small" style={styles.rowValue}>
+            <ThemedText type="small" style={styles.rowValue} allowFontScaling={false}>
               {PROXIMITY_LABEL[hybrid.proximity] ?? hybrid.proximity}
             </ThemedText>
           </View>
@@ -126,10 +126,10 @@ export function HybridFieldStateCard() {
 
         <CardRow>
           <View style={styles.rowLine}>
-            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel} allowFontScaling={false}>
               Mode
             </ThemedText>
-            <ThemedText type="small" style={styles.rowValue}>
+            <ThemedText type="small" style={styles.rowValue} allowFontScaling={false}>
               {hybrid.symbolic === 'plur' ? 'PLUR' : 'LOVE'}
             </ThemedText>
           </View>
@@ -137,10 +137,10 @@ export function HybridFieldStateCard() {
 
         <CardRow>
           <View style={styles.rowLine}>
-            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel} allowFontScaling={false}>
               Suggestion
             </ThemedText>
-            <ThemedText type="small" style={styles.rowValue}>
+            <ThemedText type="small" style={styles.rowValue} allowFontScaling={false}>
               {SUGGESTION_LABEL[hybrid.suggestion] ?? hybrid.suggestion}
             </ThemedText>
           </View>
@@ -206,6 +206,9 @@ const styles = StyleSheet.create({
   },
   // RN's default flexShrink is 0 — without it, a long value (e.g.
   // "Stillness suggested") overflows the row instead of wrapping.
+  // rowValue additionally gets flex:1 + minWidth:0 so it has an actual
+  // bounded box to wrap text within (flexShrink alone can still
+  // overflow in nested flex contexts without a definite flex basis).
   rowLabel: {
     lineHeight: 20,
     flexShrink: 0,
@@ -213,7 +216,9 @@ const styles = StyleSheet.create({
   },
   rowValue: {
     lineHeight: 20,
+    flex: 1,
     flexShrink: 1,
+    minWidth: 0,
     textAlign: 'right',
   },
   intensitySection: {

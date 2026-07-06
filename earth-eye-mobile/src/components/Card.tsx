@@ -60,10 +60,16 @@ export function CardRow({
 }
 
 const styles = StyleSheet.create({
+  // NOTE (July 6 2026): no marginHorizontal here — every screen that
+  // renders a Card already wraps its content in its own page-level
+  // paddingHorizontal (Spacing.three or Spacing.four). Adding a second
+  // horizontal inset here made every card narrower than the page's
+  // own title/labels/tiles, which only became visible once the
+  // hairline border was added — it read as the card being
+  // "off-center" relative to everything around it.
   card: {
     borderRadius: 12,
     padding: Spacing.three,
-    marginHorizontal: Spacing.three,
     marginBottom: Spacing.two,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.07)',

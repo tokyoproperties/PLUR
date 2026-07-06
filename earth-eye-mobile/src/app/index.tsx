@@ -56,10 +56,10 @@ function QuickLaunchTile({ item, index }: { item: LaunchItem; index: number }) {
     <Link href={item.href} asChild>
       <Pressable onPressIn={handlePressIn} style={({ pressed }) => pressed ? styles.tilePressed : null}>
         <Animated.View entering={tileEntering} style={styles.tile}>
-          <ThemedText style={styles.tileLabel} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+          <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
             {item.label}
           </ThemedText>
-          <ThemedText style={styles.tileHint} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+          <ThemedText style={styles.tileHint} numberOfLines={1} allowFontScaling={false}>
             {item.hint}
           </ThemedText>
         </Animated.View>
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     minHeight: 76,
     borderRadius: 12,
     paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.three,
+    paddingHorizontal: Spacing.two,
     marginBottom: Spacing.two,
   },
   tilePressed: {
