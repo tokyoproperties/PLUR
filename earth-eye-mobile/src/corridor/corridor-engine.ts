@@ -107,7 +107,7 @@ function classifyTone(
   snapshot: SensorSnapshot,
   yard: YardModeResult
 ): CorridorTone {
-  const { lux, motionMagnitude, soundRelativeDb } = snapshot;
+  const { lux, motionBand, soundRelativeDb } = snapshot;
 
   // Firework window overrides everything → still (suppressed)
   if (yard.isFireworkWindow) return 'still';
@@ -116,8 +116,8 @@ function classifyTone(
   const isDim = lux !== null && lux < 20;
   const isLoud = soundRelativeDb !== null && soundRelativeDb > 60;
   const isQuiet = soundRelativeDb !== null && soundRelativeDb < 25;
-  const isMoving = motionMagnitude > 0.15;
-  const isStill = motionMagnitude < 0.03;
+  const isMoving = motionBand === 'active';
+  const isStill = motionBand === 'still';
 
   if (isLoud && isBright) return 'mixed';
   if (isLoud) return 'noisy';

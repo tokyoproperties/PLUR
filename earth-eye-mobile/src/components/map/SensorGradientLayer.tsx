@@ -22,6 +22,7 @@ import { Circle } from 'react-native-maps';
 
 import { Accents } from '@/constants/theme';
 import type { SensorSnapshot } from '@/hooks/useSensors';
+import { MOTION_THRESHOLDS } from '@/utils/thresholds';
 
 type DominantChannel = 'light' | 'sound' | 'motion' | 'calm';
 
@@ -38,7 +39,7 @@ function classifyDominant(snapshot: SensorSnapshot): DominantChannel {
   // Normalize each channel to 0-1 range for comparison
   const lightNorm = lux !== null ? Math.min(lux / 1000, 1) : 0;
   const soundNorm = soundRelativeDb !== null ? Math.min(soundRelativeDb / 80, 1) : 0;
-  const motionNorm = Math.min(motionMagnitude / 0.3, 1);
+  const motionNorm = Math.min(motionMagnitude / (MOTION_THRESHOLDS.FORMING * 2), 1);
 
   // If all channels are low, it's calm
   if (lightNorm < 0.1 && soundNorm < 0.1 && motionNorm < 0.1) return 'calm';
@@ -68,7 +69,7 @@ export function SensorGradientLayer({
   const maxIntensity = Math.max(
     lux !== null ? lux / 1000 : 0,
     soundRelativeDb !== null ? soundRelativeDb / 80 : 0,
-    motionMagnitude / 0.3
+    motionMagnitude / (MOTION_THRESHOLDS.FORMING * 2)
   );
 
   const radius = 80 + maxIntensity * 200; // 80m (calm) to 280m (intense)

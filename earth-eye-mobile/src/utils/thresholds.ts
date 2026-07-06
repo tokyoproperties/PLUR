@@ -17,14 +17,28 @@ export const LUX_THRESHOLDS = {
   DAYLIGHT: 10000,
 } as const;
 
-/** Motion magnitude thresholds (derived from accelerometer, in g). */
+/**
+ * Motion magnitude thresholds (smoothed accelerometer delta, in g).
+ *
+ * CALIBRATED July 6 2026 — these were previously inconsistent across
+ * the codebase: hybrid-engine.ts/sensorSummary.ts used 0.02/0.15,
+ * corridor-engine.ts/plur-overlay-engine.ts used 0.03/0.15, and this
+ * file's own classifyMotion() used 0.05/0.6 with GENTLE (0.25) defined
+ * but never actually wired into the classify function. Different
+ * engines could read the SAME raw motion sample and disagree on
+ * whether the field was still or moving. Consolidated to the values
+ * that already had the most convergence across the codebase (0.03
+ * and 0.15) as the single canonical source — every consumer (Hybrid,
+ * Corridor, PLUR overlay, Sensor Summary, Yard/Lite modes) now reads
+ * through classifyMotion()/MOTION_THRESHOLDS instead of its own
+ * magic numbers.
+ */
 export const MOTION_THRESHOLDS = {
-  /** Below this magnitude delta, device/observer is considered stationary. */
-  STILL: 0.05,
-  /** Gentle handheld movement — walking pace observation. */
-  GENTLE: 0.25,
-  /** Abrupt movement — startles wildlife, should trigger dampening. */
-  ABRUPT: 0.6,
+  /** Below this windowed-mean magnitude, the field is truly at rest. */
+  STILL: 0.03,
+  /** Soft/gentle movement — the field waking up, not yet deliberate. */
+  FORMING: 0.15,
+  /** Above FORMING = active (deliberate movement with intent). No separate ceiling needed — it's the open top band. */
 } as const;
 
 /** Sound level thresholds (in dB, approximate/relative scale from mic metering). */
@@ -71,7 +85,7 @@ export function isWithinJulyFourthWindow(date: Date = new Date()): boolean {
 }
 
 export type LuxBand = 'dark' | 'twilight' | 'overcast' | 'daylight';
-export type MotionBand = 'still' | 'gentle' | 'abrupt';
+export type MotionBand = 'still' | 'forming' | 'active';
 export type SoundBand = 'quiet' | 'moderate' | 'loud';
 
 export function classifyLux(lux: number): LuxBand {
@@ -83,8 +97,8 @@ export function classifyLux(lux: number): LuxBand {
 
 export function classifyMotion(magnitude: number): MotionBand {
   if (magnitude < MOTION_THRESHOLDS.STILL) return 'still';
-  if (magnitude < MOTION_THRESHOLDS.ABRUPT) return 'gentle';
-  return 'abrupt';
+  if (magnitude < MOTION_THRESHOLDS.FORMING) return 'forming';
+  return 'active';
 }
 
 export function classifySound(db: number): SoundBand {

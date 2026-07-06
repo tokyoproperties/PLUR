@@ -47,7 +47,7 @@ export function usePLUROverlayState(): PLUROverlayState {
   const yard = evaluateYardMode(snapshot);
 
   return useMemo<PLUROverlayState>(() => {
-    const { lux, motionMagnitude, soundRelativeDb } = snapshot;
+    const { lux, motionMagnitude, motionBand, soundRelativeDb } = snapshot;
 
     // If all sensors are null/unavailable, stay neutral
     if (lux === null && soundRelativeDb === null && motionMagnitude === 0) {
@@ -92,13 +92,16 @@ export function usePLUROverlayState(): PLUROverlayState {
     }
 
     // --- MOTION ---
-    // motionMagnitude is a smoothed delta — values >0.1 indicate real movement
-    if (motionMagnitude > 0.15) {
+    // motionBand is the hysteresis-protected classification straight
+    // from useMotion (see useMotion.ts / thresholds.ts for the
+    // calibration story) — not re-derived here, so anti-flicker
+    // protection survives all the way to the overlay.
+    if (motionBand === 'active') {
       shade = 'alert';
       cue = 'pulse';
       intensity = Math.max(intensity, 0.55);
-      notes.push('abrupt motion');
-    } else if (motionMagnitude > 0.03) {
+      notes.push('active motion');
+    } else if (motionBand === 'forming') {
       notes.push('gentle motion');
     } else {
       notes.push('still');

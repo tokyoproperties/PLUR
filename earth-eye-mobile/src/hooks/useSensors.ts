@@ -19,12 +19,24 @@ import { useContext, useMemo } from 'react';
 
 import { SensorsContext } from '@/contexts/field-data-contexts';
 import { useAmbientLight } from '@/sensors/useAmbientLight';
-import { useMotion } from '@/sensors/useMotion';
+import { useMotion, type MotionConfidence } from '@/sensors/useMotion';
+import type { MotionBand } from '@/utils/thresholds';
 import { useSound } from '@/sensors/useSound';
 
 export interface SensorSnapshot {
   lux: number | null;
   motionMagnitude: number;
+  /**
+   * Hysteresis-protected band from useMotion — NOT the same as calling
+   * classifyMotion(motionMagnitude) again downstream. useMotion commits
+   * this band using a margin above/below the threshold specifically to
+   * avoid flicker at boundary values; re-deriving from the raw magnitude
+   * silently throws that protection away. Every consumer that classifies
+   * motion should read this field, not re-classify motionMagnitude.
+   */
+  motionBand: MotionBand;
+  /** How reliable the current motion band is right now (see useMotion.ts). */
+  motionConfidence: MotionConfidence;
   soundRelativeDb: number | null;
 }
 
@@ -45,9 +57,11 @@ export function useSensorsInternal(): UseSensorsResult {
     () => ({
       lux: light.lux,
       motionMagnitude: motion.magnitude,
+      motionBand: motion.band,
+      motionConfidence: motion.confidence,
       soundRelativeDb: sound.relativeDb,
     }),
-    [light.lux, motion.magnitude, sound.relativeDb]
+    [light.lux, motion.magnitude, motion.band, motion.confidence, sound.relativeDb]
   );
 
   return { light, motion, sound, snapshot };

@@ -102,7 +102,7 @@ export function evaluateYardMode(inputs: YardModeInputs): YardModeResult {
     soundSensitivity = Math.max(soundSensitivity, 0.4);
   }
 
-  const suppressActivity = motionBand === 'abrupt';
+  const suppressActivity = motionBand === 'active';
 
   const summary = isFireworkWindow
     ? 'Firework sensitivity window active — luminance and sound dampening widened.'

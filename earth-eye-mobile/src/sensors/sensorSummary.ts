@@ -100,13 +100,13 @@ function confidenceLabel(
 }
 
 function deriveFieldState(snapshot: SensorSnapshot): string {
-  const { lux, motionMagnitude, soundRelativeDb } = snapshot;
+  const { lux, motionBand, soundRelativeDb } = snapshot;
 
   if (lux !== null && lux > 800) return 'bright';
   if (soundRelativeDb !== null && soundRelativeDb > 60) return 'noisy';
   if (soundRelativeDb !== null && soundRelativeDb > 25) return 'mixed';
-  if (motionMagnitude > 0.15) return 'alert';
-  if (motionMagnitude < 0.02 && (soundRelativeDb === null || soundRelativeDb < 25)) return 'still';
+  if (motionBand === 'active') return 'alert';
+  if (motionBand === 'still' && (soundRelativeDb === null || soundRelativeDb < 25)) return 'still';
   return 'calm';
 }
 

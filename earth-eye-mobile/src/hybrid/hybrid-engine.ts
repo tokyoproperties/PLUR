@@ -77,7 +77,7 @@ export function evaluateHybrid(args: {
   yard: YardModeResult;
 }): HybridState {
   const { snapshot, corridor, mode, lite, yard } = args;
-  const { lux, motionMagnitude, soundRelativeDb } = snapshot;
+  const { lux, motionMagnitude, motionBand, soundRelativeDb } = snapshot;
 
   // --- 0. Data quality assessment ---
   const hasLight = lux !== null;
@@ -113,10 +113,10 @@ export function evaluateHybrid(args: {
   } else if (soundRelativeDb !== null && soundRelativeDb > 25) {
     fieldState = 'mixed';
     intensity = 0.35;
-  } else if (motionMagnitude > 0.15) {
+  } else if (motionBand === 'active') {
     fieldState = 'alert';
     intensity = 0.55;
-  } else if (motionMagnitude < 0.02 && (soundRelativeDb === null || soundRelativeDb < 25)) {
+  } else if (motionBand === 'still' && (soundRelativeDb === null || soundRelativeDb < 25)) {
     fieldState = 'still';
     intensity = 0.25;
   } else {
