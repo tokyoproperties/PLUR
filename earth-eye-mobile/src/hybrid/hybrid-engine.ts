@@ -14,6 +14,11 @@
  *   4. Symbolic mode → PLUR softens, LOVE warms
  *   5. Lite stillness → suggestion
  *   6. Proximity → from corridor engine
+ *
+ * Data quality:
+ *   'live'    — both light and sound sensors active
+ *   'partial' — one sensor active (motion always present)
+ *   'forming' — no sensors active, field state is a guess
  */
 
 import type { CorridorState, CorridorTone } from '@/corridor/corridor-engine';
@@ -29,9 +34,12 @@ export type HybridFieldState =
   | 'still'
   | 'mixed'
   | 'alert'
-  | 'dim';
+  | 'dim'
+  | 'forming';
 
 export type HybridSuggestion = 'stillness' | 'explore' | 'quiet' | 'none';
+
+export type DataQuality = 'live' | 'partial' | 'forming';
 
 export interface HybridState {
   /** One-word summary of the environmental field */
@@ -46,6 +54,10 @@ export interface HybridState {
   intensity: number;
   /** Human-readable one-line summary */
   summary: string;
+  /** Whether sensors are providing real data */
+  dataQuality: DataQuality;
+  /** Mode-aware accent color key */
+  accent: 'blue' | 'amber' | 'sage';
 }
 
 // Tone → field state mapping
@@ -66,6 +78,27 @@ export function evaluateHybrid(args: {
 }): HybridState {
   const { snapshot, corridor, mode, lite, yard } = args;
   const { lux, motionMagnitude, soundRelativeDb } = snapshot;
+
+  // --- 0. Data quality assessment ---
+  const hasLight = lux !== null;
+  const hasSound = soundRelativeDb !== null;
+  const sensorCount = (hasLight ? 1 : 0) + (hasSound ? 1 : 0);
+  const dataQuality: DataQuality =
+    sensorCount === 2 ? 'live' : sensorCount === 1 ? 'partial' : 'forming';
+
+  // If no sensors are active, the field state is a guess
+  if (dataQuality === 'forming') {
+    return {
+      fieldState: 'forming',
+      proximity: corridor.proximity,
+      symbolic: mode,
+      suggestion: 'none',
+      intensity: 0,
+      summary: 'forming · sensors not yet active',
+      dataQuality,
+      accent: mode === 'plur' ? 'blue' : 'amber',
+    };
+  }
 
   // --- 1. Base field state from sensor dominance ---
   let fieldState: HybridFieldState = 'mixed';
@@ -92,8 +125,6 @@ export function evaluateHybrid(args: {
   }
 
   // --- 2. Corridor tone override ---
-  // The corridor engine already fused sensors + location context,
-  // so its tone is a more contextual read than raw sensor dominance
   const corridorField = TONE_TO_FIELD[corridor.tone] ?? 'mixed';
   fieldState = corridorField;
 
@@ -104,24 +135,22 @@ export function evaluateHybrid(args: {
   }
 
   // --- 4. Symbolic mode shaping ---
-  // PLUR: soften harsh tones, reduce intensity (outward, gentle)
   if (mode === 'plur') {
     intensity *= 0.70;
     if (fieldState === 'alert') fieldState = 'mixed';
     if (fieldState === 'noisy') fieldState = 'mixed';
   }
 
-  // LOVE: warm and stabilize, reduce intensity (home, grounding)
   if (mode === 'love') {
     intensity *= 0.80;
-    if (fieldState === 'alert') fieldState = 'quiet' as HybridFieldState;
+    if (fieldState === 'alert') fieldState = 'calm';
     if (fieldState === 'noisy') fieldState = 'calm';
   }
 
   // Clamp intensity
   intensity = Math.min(Math.max(intensity, 0), 0.7);
 
-  // --- 5. Suggestion from Lite + Yard ---
+  // --- 5. Suggestion ---
   let suggestion: HybridSuggestion = 'none';
 
   if (lite.suggestStillness || yard.suppressActivity) {
@@ -141,6 +170,10 @@ export function evaluateHybrid(args: {
   else if (corridor.proximity === 'near-trail') parts.push('near trail');
   if (suggestion !== 'none') parts.push(suggestion);
   if (yard.isFireworkWindow) parts.push('firework window');
+  if (dataQuality === 'partial') parts.push('partial sensors');
+
+  // --- 7. Accent color ---
+  const accent = mode === 'plur' ? 'blue' : 'amber';
 
   return {
     fieldState,
@@ -149,5 +182,7 @@ export function evaluateHybrid(args: {
     suggestion,
     intensity,
     summary: parts.join(' · '),
+    dataQuality,
+    accent,
   };
 }
