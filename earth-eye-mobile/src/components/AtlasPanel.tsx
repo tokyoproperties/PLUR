@@ -112,8 +112,15 @@ export function AtlasPanel() {
         <ThemedText type="small" themeColor="textSecondary" style={styles.seasonalLabel}>
           {seasonal.phaseLabel.toUpperCase()}
         </ThemedText>
-        {seasonal.patternConfirmed && (
-          <ThemedText style={styles.confirmedText}>pattern confirmed</ThemedText>
+        {seasonal.patternSuffix !== '' && (
+          <ThemedText
+            style={[
+              styles.confirmedText,
+              seasonal.patternStatus === 'unclear' && styles.unclearText,
+            ]}
+          >
+            {seasonal.patternSuffix}
+          </ThemedText>
         )}
       </View>
 
@@ -134,7 +141,23 @@ export function AtlasPanel() {
           {hasPerception && <SectionDivider />}
           <ThemedText style={styles.zoneLabel}>ECOLOGY</ThemedText>
           {arrivals.imminent.length > 0 && (
-            <ThemedText style={styles.arrivalLine}>{arrivals.atlasLine}</ThemedText>
+            <>
+              <ThemedText style={styles.arrivalLine}>{arrivals.atlasLine}</ThemedText>
+              <View style={styles.densityBarOuter}>
+                <View
+                  style={[
+                    styles.densityBarInner,
+                    {
+                      width: `${Math.round((arrivals.imminent.length / arrivals.species.length) * 100)}%`,
+                      backgroundColor: Accents.sage,
+                    },
+                  ]}
+                />
+              </View>
+              <ThemedText style={styles.densityLabel}>
+                {arrivals.imminent.length} of {arrivals.species.length} species active
+              </ThemedText>
+            </>
           )}
           {habitats.isAssessed && habitats.primary && (
             <ThemedText style={styles.habitatLine}>{habitats.atlasLine}</ThemedText>
@@ -147,6 +170,15 @@ export function AtlasPanel() {
         <Animated.View entering={FADE_MEMORY} style={styles.zone}>
           {(hasPerception || hasEcology) && <SectionDivider />}
           <ThemedText style={styles.zoneLabel}>MEMORY</ThemedText>
+          <View style={styles.depthRow}>
+            <ThemedText style={styles.depthItem}>{atlas.totalMoments} moments</ThemedText>
+            <ThemedText style={styles.depthSep}>·</ThemedText>
+            <ThemedText style={styles.depthItem}>{memory.chapters.length} chapters</ThemedText>
+            <ThemedText style={styles.depthSep}>·</ThemedText>
+            <ThemedText style={styles.depthItem}>
+              {continuity.isEstablished ? 'stable' : 'forming'}
+            </ThemedText>
+          </View>
           {memory.isEstablished && (
             <ThemedText style={styles.memoryLine}>{memory.memoryLine}</ThemedText>
           )}
@@ -263,6 +295,41 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.25)',
+  },
+  unclearText: {
+    color: 'rgba(196,151,74,0.40)',
+  },
+  densityBarOuter: {
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    overflow: 'hidden',
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  densityBarInner: {
+    height: 3,
+    borderRadius: 1.5,
+  },
+  densityLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.35)',
+  },
+  depthRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  depthItem: {
+    fontSize: 10,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.35)',
+  },
+  depthSep: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.15)',
+    marginHorizontal: 6,
   },
 
   // Zone structure
