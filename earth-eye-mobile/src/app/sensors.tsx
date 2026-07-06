@@ -1,19 +1,22 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Card } from '@/components/Card';
 import { ModeBadge } from '@/components/ModeBadge';
 import { Row } from '@/components/Row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { Accents, BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useSensors } from '@/hooks/useSensors';
+import { useSensorSummary } from '@/sensors/useSensorSummary';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
 
 export default function SensorsScreen() {
   const { light, motion, sound, snapshot } = useSensors();
   const { mode } = useSymbolicMode();
+  const summary = useSensorSummary();
 
   const lite = evaluateLiteMode(snapshot);
   const yard = evaluateYardMode(snapshot);
@@ -22,6 +25,14 @@ export default function SensorsScreen() {
     mode === 'love'
       ? `In LOVE mode, motion sensitivity is reduced and sound/light dampening is widened (${Math.round(yard.luminanceDampening * 100)}% luminance, ${Math.round(yard.soundSensitivity * 100)}% sound).`
       : 'In PLUR mode, sensing stays lightweight — no dampening curves applied, just gross condition checks.';
+
+  // Summary dot color by data quality
+  const dotColor =
+    summary.dataQuality === 'live'
+      ? Accents.sage
+      : summary.dataQuality === 'partial'
+      ? Accents.amber
+      : 'rgba(255,255,255,0.25)';
 
   return (
     <ThemedView style={styles.container}>
@@ -32,6 +43,23 @@ export default function SensorsScreen() {
             <ThemedText type="subtitle">Field Sensors</ThemedText>
             <ModeBadge mode={mode} compact pulse={false} />
           </ThemedView>
+
+          {/* Sensor Summary — narrative interpretation */}
+          <Card style={styles.summaryCard}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.summaryLabel}>
+              SENSOR SUMMARY{summary.dataQuality === 'partial' ? ' · PARTIAL' : ''}
+            </ThemedText>
+            <View style={styles.summaryRow}>
+              <View style={[styles.summaryDot, { backgroundColor: dotColor }]} />
+              <ThemedText style={styles.summaryText}>
+                {summary.summary}
+              </ThemedText>
+            </View>
+            <ThemedText style={styles.confidenceLine}>
+              {summary.confidence}
+              {summary.dataQuality === 'forming' && ' · awaiting sensor data'}
+            </ThemedText>
+          </Card>
 
           <ThemedText type="small" themeColor="textSecondary" style={styles.interpretation}>
             {interpretation}
@@ -95,6 +123,43 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: Spacing.two,
+  },
+  summaryCard: {
+    marginBottom: Spacing.three,
+  },
+  summaryLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginBottom: 10,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+  },
+  summaryDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 10,
+    marginTop: 7,
+  },
+  summaryText: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.72)',
+    lineHeight: 1.6,
+  },
+  confidenceLine: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.35)',
+    marginLeft: 18,
   },
   interpretation: {
     marginBottom: Spacing.three,
