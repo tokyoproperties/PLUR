@@ -31,7 +31,7 @@
  * with each other.
  */
 
-import { CORRIDOR_THRESHOLDS, type LocationConfidence } from '@/utils/thresholds';
+import { CORRIDOR_THRESHOLDS, CORRIDOR_TONE_LUX_THRESHOLDS, type LocationConfidence } from '@/utils/thresholds';
 import type { TrailMarker } from '@/hooks/useCorridors';
 import type { YardStripPoint } from '@/hooks/useYardStrip';
 import type { SensorSnapshot } from '@/hooks/useSensors';
@@ -226,8 +226,8 @@ function classifyTone(
   // Firework window overrides everything → still (suppressed)
   if (yard.isFireworkWindow) return 'still';
 
-  const isBright = lux !== null && lux > 800;
-  const isDim = lux !== null && lux < 20;
+  const isBright = lux !== null && lux > CORRIDOR_TONE_LUX_THRESHOLDS.BRIGHT;
+  const isDim = lux !== null && lux < CORRIDOR_TONE_LUX_THRESHOLDS.DIM;
   const isLoud = soundRelativeDb !== null && soundRelativeDb > 60;
   const isQuiet = soundRelativeDb !== null && soundRelativeDb < 25;
   const isMoving = motionBand === 'active';

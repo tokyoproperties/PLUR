@@ -13,9 +13,10 @@
  */
 
 import type { CorridorState } from '@/corridor/corridor-engine';
-import type { HybridState } from '@/hybrid/hybrid-engine';
+import type { HybridState, HybridConfidence } from '@/hybrid/hybrid-engine';
 import type { SensorSnapshot } from '@/hooks/useSensors';
 import type { YardModeResult } from '@/modes/yard';
+import { ECOSYSTEM_LUX_THRESHOLDS } from '@/utils/thresholds';
 
 import {
   ECOSYSTEM_CANON,
@@ -51,6 +52,17 @@ export interface EcosystemState {
   suggestedActions: SuggestedAction[];
   /** Human-readable summary */
   summary: string;
+  /**
+   * Reliability of this evaluation. Ecosystem gates are conditioned
+   * directly on hybrid + corridor state, so it can never be more
+   * certain than the fused signal (motion + corridor, see Mission 3)
+   * that determined its own inputs — passed through directly rather
+   * than re-derived. Suit device online/offline status isn't factored
+   * in yet (devices are still mock/offline in the field — see file
+   * header); a real dedicated-sensor confidence bump is a fair v2 once
+   * suit hardware actually ships.
+   */
+  confidence: HybridConfidence;
 }
 
 // ─── Helpers ──────────────────────────────────────────────
@@ -65,13 +77,13 @@ function getCurrentSeason(date: Date): 'spring' | 'summer' | 'fall' | 'winter' {
 
 function isLowLight(hybrid: HybridState, snapshot: SensorSnapshot): boolean {
   if (hybrid.fieldState === 'dim' || hybrid.fieldState === 'still') return true;
-  if (snapshot.lux !== null && snapshot.lux < 50) return true;
+  if (snapshot.lux !== null && snapshot.lux < ECOSYSTEM_LUX_THRESHOLDS.LOW) return true;
   return false;
 }
 
 function isBrightLight(hybrid: HybridState, snapshot: SensorSnapshot): boolean {
   if (hybrid.fieldState === 'bright') return true;
-  if (snapshot.lux !== null && snapshot.lux > 400) return true;
+  if (snapshot.lux !== null && snapshot.lux > ECOSYSTEM_LUX_THRESHOLDS.BRIGHT) return true;
   return false;
 }
 
@@ -228,5 +240,6 @@ export function evaluateEcosystem(args: {
     conditionsScore,
     suggestedActions,
     summary: parts.join(' · '),
+    confidence: hybrid.confidence,
   };
 }

@@ -24,6 +24,7 @@
 import type { SeasonalPhase } from '@/atlas/seasonalProfile';
 import type { CorridorDrift } from '@/corridor/drift';
 import type { SensorSnapshot } from '@/hooks/useSensors';
+import { ECOSYSTEM_LUX_THRESHOLDS } from '@/utils/thresholds';
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -122,7 +123,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
     preferredConditions: ['bright', 'warm'],
     window: 'bright afternoons',
     reasonTemplate: (ctx) => {
-      const bright = ctx.drift.direction === 'bright-expanding' || ctx.snapshot.lux !== null && ctx.snapshot.lux > 100;
+      const bright = ctx.drift.direction === 'bright-expanding' || (ctx.snapshot.lux !== null && ctx.snapshot.lux > ECOSYSTEM_LUX_THRESHOLDS.BRIGHT);
       return `${bright ? 'Bright drift and' : 'Warm'} ${ctx.season === 'high-summer' ? 'high summer' : 'conditions'} favor Fence Lizard.`;
     },
   },
@@ -230,7 +231,7 @@ export function evaluateSpeciesArrival(args: {
       // Check time and conditions alignment
       const timeMatch = rule.preferredTime.includes('any') || rule.preferredTime.includes(timeOfDay as any);
       const isStill = drift.direction === 'stillness-pooling' || drift.direction === 'calm-drifting';
-      const isBright = drift.direction === 'bright-expanding' || snapshot.lux !== null && snapshot.lux > 100;
+      const isBright = drift.direction === 'bright-expanding' || (snapshot.lux !== null && snapshot.lux > ECOSYSTEM_LUX_THRESHOLDS.BRIGHT);
 
       const conditionMatch = rule.preferredConditions.includes('any') ||
         rule.preferredConditions.some((c) => {

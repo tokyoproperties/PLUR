@@ -70,6 +70,33 @@ export const GPS_THRESHOLDS = {
   STALE_MS: 45000,
 } as const;
 
+/**
+ * Lux cutoffs used OUTSIDE the sky-rendering domain (LUX_THRESHOLDS
+ * above is calibrated for moon/sky luminance, not ecology or corridor
+ * "feel"). Centralized here July 6 2026 (Mission 4 — Ecosystem Species
+ * Model) after finding FOUR different lux cutoffs answering "is it
+ * bright/dim right now" scattered across three files, none agreeing:
+ * corridor-engine.ts used 800/20, ecosystem-engine.ts used 400/50, and
+ * speciesArrival.ts independently used 100 (in two places) for what is
+ * conceptually the identical question ecosystem-engine.ts already
+ * answers — "is it bright enough for sun-loving canon species to be
+ * active." Two genuinely different domains are kept as two named
+ * groups rather than forced to one number: corridor tone is a general
+ * ambience-feel classification, ecosystem/arrival is specifically
+ * about the 10 canon species' light preferences.
+ */
+export const CORRIDOR_TONE_LUX_THRESHOLDS = {
+  DIM: 20,
+  BRIGHT: 800,
+} as const;
+
+export const ECOSYSTEM_LUX_THRESHOLDS = {
+  /** Below this, low-light/nocturnal species conditions are met (bats, frogs after dark). */
+  LOW: 50,
+  /** Above this, diurnal sun-loving species conditions are met (basking lizards, ground squirrels). */
+  BRIGHT: 400,
+} as const;
+
 /** Sound level thresholds (in dB, approximate/relative scale from mic metering). */
 export const SOUND_THRESHOLDS = {
   /** Ambient quiet — safe for sensitive species observation. */
