@@ -71,6 +71,56 @@ export const GPS_THRESHOLDS = {
 } as const;
 
 /**
+ * Seasonal phase date ranges (Mission 5 — Atlas Seasonal Profile,
+ * July 6 2026). Centralized from atlas/seasonalProfile.ts, where these
+ * were nested if/else month/day literals with no shared name. Ordered
+ * chronologically (ordinal-ascending) on purpose — see the in-array
+ * comment for why the order itself is load-bearing, not decorative.
+ * getSeasonalPhase() finds the latest boundary at or before the
+ * current date, defaulting to winter-night (the wraparound phase) if
+ * the date is before all of them.
+ */
+export const SEASON_BOUNDARIES: ReadonlyArray<{
+  phase: 'early-spring' | 'transitional' | 'high-summer' | 'late-autumn' | 'winter-night';
+  startMonth: number; // 0-11
+  startDay: number;
+}> = [
+  // Chronological (ordinal-ascending) order matters -- getSeasonalPhase()
+  // scans this in order and keeps the LAST boundary at or before the
+  // current date, so it must be sorted, not calendar-reading-order.
+  // winter-night is last on purpose: it is the wraparound phase (Dec 1
+  // through Feb 14, spanning the year boundary), and also the default
+  // when the date falls before ALL boundaries (early January, which is
+  // still chronologically inside the PRIOR year's winter-night).
+  { phase: 'early-spring', startMonth: 1, startDay: 15 },   // Feb 15
+  { phase: 'transitional', startMonth: 4, startDay: 1 },    // May 1
+  { phase: 'high-summer', startMonth: 5, startDay: 15 },    // Jun 15
+  { phase: 'late-autumn', startMonth: 8, startDay: 16 },    // Sep 16
+  { phase: 'winter-night', startMonth: 11, startDay: 1 },   // Dec 1
+] as const;
+
+/**
+ * Minimum accumulated Field Moments before a seasonal pattern can be
+ * assessed at all, and the per-phase ratio a recent-moments window
+ * must clear to call the pattern "confirmed" rather than "unclear."
+ * Each phase watches a different signal (bright afternoons for high
+ * summer, calm/still nights for winter, etc.) so the ratios are
+ * deliberately different values, not one duplicated cutoff — but they
+ * were previously inline literals in a switch statement with no name.
+ */
+export const SEASON_PATTERN_THRESHOLDS = {
+  MIN_MOMENTS_FOR_PATTERN: 5,
+  HIGH_SUMMER_BRIGHT_RATIO: 0.2,
+  WINTER_NIGHT_CALM_RATIO: 0.4,
+  EARLY_SPRING_CALM_RATIO: 0.3,
+  LATE_AUTUMN_CALM_RATIO: 0.3,
+  /** A confirmed ratio must clear its threshold by at least this multiple to count as 'high' confidence rather than 'medium'. */
+  HIGH_CONFIDENCE_MARGIN: 1.5,
+  /** Sample size (total moments) needed, in addition to margin, for 'high' confidence. */
+  HIGH_CONFIDENCE_MIN_MOMENTS: 10,
+} as const;
+
+/**
  * Lux cutoffs used OUTSIDE the sky-rendering domain (LUX_THRESHOLDS
  * above is calibrated for moon/sky luminance, not ecology or corridor
  * "feel"). Centralized here July 6 2026 (Mission 4 — Ecosystem Species
