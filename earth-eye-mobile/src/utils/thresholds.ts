@@ -41,6 +41,35 @@ export const MOTION_THRESHOLDS = {
   /** Above FORMING = active (deliberate movement with intent). No separate ceiling needed — it's the open top band. */
 } as const;
 
+/**
+ * Corridor proximity radii (meters). Previously hardcoded as local
+ * constants inside corridor-engine.ts — moved here July 6 2026
+ * (Mission 2 — Corridor Engine Stability) so the yard/trail hooks,
+ * the pure engine, and any future consumer all read the same values.
+ */
+export const CORRIDOR_THRESHOLDS = {
+  /** A 9x20ft plot is well below map scale — 50m is generous. */
+  YARD_RADIUS_M: 50,
+  NEAR_YARD_RADIUS_M: 200,
+  NEAR_TRAIL_RADIUS_M: 500,
+} as const;
+
+/**
+ * GPS fix quality thresholds. accuracy is expo-location's reported
+ * horizontal accuracy in meters (68% confidence radius per Android/iOS
+ * convention — smaller is better). Previously captured but never
+ * actually used anywhere downstream — every fix was trusted equally
+ * regardless of how noisy it was.
+ */
+export const GPS_THRESHOLDS = {
+  /** Accuracy at or below this is a trustworthy fix. */
+  GOOD_ACCURACY_M: 20,
+  /** Accuracy at or above this is noisy — treat with reduced confidence. */
+  POOR_ACCURACY_M: 65,
+  /** A fix older than this with no update is stale — confidence degrades even without a new reading. */
+  STALE_MS: 45000,
+} as const;
+
 /** Sound level thresholds (in dB, approximate/relative scale from mic metering). */
 export const SOUND_THRESHOLDS = {
   /** Ambient quiet — safe for sensitive species observation. */
@@ -87,6 +116,7 @@ export function isWithinJulyFourthWindow(date: Date = new Date()): boolean {
 export type LuxBand = 'dark' | 'twilight' | 'overcast' | 'daylight';
 export type MotionBand = 'still' | 'forming' | 'active';
 export type SoundBand = 'quiet' | 'moderate' | 'loud';
+export type LocationConfidence = 'high' | 'medium' | 'low' | 'uncertain';
 
 export function classifyLux(lux: number): LuxBand {
   if (lux < LUX_THRESHOLDS.DARK) return 'dark';
@@ -105,4 +135,21 @@ export function classifySound(db: number): SoundBand {
   if (db < SOUND_THRESHOLDS.QUIET) return 'quiet';
   if (db < SOUND_THRESHOLDS.LOUD) return 'moderate';
   return 'loud';
+}
+
+/**
+ * Classifies a GPS fix's reliability from its reported accuracy and
+ * how long ago it arrived. A fix can be accurate but stale (device
+ * stopped updating) or fresh but noisy (poor signal) — both degrade
+ * confidence, checked independently.
+ */
+export function classifyLocationConfidence(
+  accuracyMeters: number | null,
+  ageMs: number
+): LocationConfidence {
+  if (accuracyMeters === null) return 'uncertain';
+  if (ageMs >= GPS_THRESHOLDS.STALE_MS) return 'uncertain';
+  if (accuracyMeters >= GPS_THRESHOLDS.POOR_ACCURACY_M) return 'low';
+  if (accuracyMeters > GPS_THRESHOLDS.GOOD_ACCURACY_M) return 'medium';
+  return 'high';
 }

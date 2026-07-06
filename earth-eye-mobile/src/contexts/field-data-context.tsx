@@ -76,7 +76,10 @@ export function FieldDataProvider({ children }: { children: ReactNode }) {
 
   const locationValue = useMemo(
     () => location,
-    [location.location, location.permissionStatus, location.isLoading],
+    // confidence must be included — it changes on the staleness ticker
+    // even when location/permissionStatus/isLoading haven't, and this
+    // memo is what actually crosses the context boundary to consumers.
+    [location.location, location.confidence, location.permissionStatus, location.isLoading],
   );
 
   const atlasValue = useMemo(
