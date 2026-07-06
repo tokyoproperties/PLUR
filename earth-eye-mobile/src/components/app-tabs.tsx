@@ -46,7 +46,7 @@ export default function AppTabs() {
           marginBottom: 2,
         },
         tabBarShowLabel: true,
-        lazy: true,
+        
         freezeOnBlur: true,
       }}
     >

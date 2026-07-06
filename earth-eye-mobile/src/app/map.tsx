@@ -87,7 +87,7 @@ export default function MapScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <MapView
-          key={mode}
+          
           style={styles.map}
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}>
