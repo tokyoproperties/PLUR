@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -115,17 +115,6 @@ export default function HomeScreen() {
         >
           <EmergencyBanner />
 
-          {/* TEMP DIAGNOSTIC — remove once we confirm actual measured width.
-              window = logical px React Native lays out against.
-              screen = raw physical px (can differ from window on some
-              Android devices/DPI settings) — if these numbers don't
-              match what a normal phone should be (~360-430px), that's
-              the root cause of the Field State/ModeToggle overflow. */}
-          <ThemedText style={styles.debugText} allowFontScaling={false}>
-            DEBUG window: {Math.round(Dimensions.get('window').width)}×{Math.round(Dimensions.get('window').height)}
-            {'  '}screen: {Math.round(Dimensions.get('screen').width)}×{Math.round(Dimensions.get('screen').height)}
-          </ThemedText>
-
           {/* Title */}
           <Animated.View entering={FADE_TITLE} style={styles.fullWidth}>
             <ThemedText style={styles.title}>EarthEye</ThemedText>
@@ -205,14 +194,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  debugText: {
-    fontSize: 10,
-    color: '#7AB87A',
-    backgroundColor: 'rgba(122,184,122,0.12)',
-    padding: 6,
-    marginBottom: Spacing.two,
-    borderRadius: 6,
-  },
   container: {
     flex: 1,
   },
@@ -343,8 +324,17 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
+  // NOTE (July 6 2026): these tiles never had visible chrome (no
+  // background/border) since the very first version - confirmed via
+  // git history, not a regression. With flex:1 correctly splitting
+  // each row 50/50, invisible tiles made the right half of the row
+  // look like empty dead space instead of a second tappable card.
+  // Matches Card.tsx's own surface/border tokens for consistency.
   tile: {
     minHeight: 76,
+    backgroundColor: '#1A1A17',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
     borderRadius: 12,
     marginBottom: Spacing.two,
     paddingVertical: Spacing.three,

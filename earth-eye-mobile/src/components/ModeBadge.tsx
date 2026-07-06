@@ -64,10 +64,21 @@ export function ModeBadge({ mode, statusText, compact = false, pulse = true }: M
 }
 
 const styles = StyleSheet.create({
+  // alignSelf:'flex-start' is intentional — a short status line
+  // should size to its content, not stretch full-width as a giant
+  // bar. But with NO maxWidth, there's nothing to force a wrap
+  // decision: a long statusText (LOVE mode's firework-window line is
+  // much longer than PLUR's) just renders as one unbroken line past
+  // the screen edge instead of wrapping, because Yoga only wraps text
+  // when the container has a bounded width smaller than the content's
+  // natural single-line size. maxWidth:'100%' keeps the shrink-to-fit
+  // behavior for short text while still capping long text to the
+  // parent's actual width, which forces textBlock's Text to wrap.
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
+    maxWidth: '100%',
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.three,
     borderRadius: 999,
