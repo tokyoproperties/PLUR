@@ -47,6 +47,7 @@ export default function AppTabs() {
         },
         tabBarShowLabel: true,
         lazy: true,
+        freezeOnBlur: true,
       }}
     >
       <Tabs.Screen

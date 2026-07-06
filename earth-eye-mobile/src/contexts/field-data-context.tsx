@@ -1,25 +1,22 @@
 /**
  * contexts/field-data-context.tsx
  *
- * Global provider for the 4 state-bearing hooks that were being
- * duplicated through the hook dependency tree:
+ * Global provider for the 4 state-bearing hooks.
  *
- *   useSensors    — sensor subscriptions (expo-sensors)
- *   useCorridors  — trail data fetch
- *   useLocation   — GPS subscription (expo-location)
- *   useAtlas      — ring buffer state + hydration
- *
- * Before this provider, calling useFieldSoul() on Home cascaded
- * through useFieldSpirit → useFieldMythology → useFieldMemory →
- * useAtlas, with each useAtlas creating its own sensor subscriptions,
- * trail fetch, GPS subscription, and ring buffer state. This resulted
- * in ~10 useAtlas instances and ~150 total hook instances per render.
- *
- * Now: each hook is instantiated ONCE here, and consumed everywhere
- * via context. Derived hooks read from the shared instances automatically.
+ * PERFORMANCE NOTES:
+ * - Context values are memoized so consumers only re-render when
+ *   the underlying data actually changes, not on every provider render.
+ * - AtlasContext is the critical one: it only changes when the ring
+ *   buffer updates (new moment captured). This prevents the deep
+ *   derived hook chain (useFieldMemory → useFieldContinuity →
+ *   useFieldMythology → useFieldLore → useFieldSpirit → useFieldSoul)
+ *   from re-rendering on sensor ticks.
+ * - SensorsContext changes every ~2s (motion) — only hooks that
+ *   directly use sensor data (useHybrid, useCorridor, useEcosystem)
+ *   re-render. The deep chain is insulated by the stable AtlasContext.
  */
 
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
 import type { UseSensorsResult } from '@/hooks/useSensors';
 import type { UseCorridorsResult } from '@/hooks/useCorridors';
@@ -44,11 +41,49 @@ export function FieldDataProvider({ children }: { children: ReactNode }) {
   const location = useLocationInternal();
   const atlas = useAtlasInternal();
 
+  // Memoize each context value so the reference is stable
+  // unless the underlying data actually changed.
+  //
+  // sensors: changes every ~2s (motion) — consumers that use
+  //   sensor data will re-render, but the deep atlas chain won't
+  //   because it depends on AtlasContext, not SensorsContext.
+  const sensorsValue = useMemo(
+    () => sensors,
+    [sensors.light, sensors.motion, sensors.sound, sensors.snapshot],
+  );
+
+  // corridors: stable after initial fetch — only changes when
+  //   trails array, loading state, or error changes
+  const corridorsValue = useMemo(
+    () => corridors,
+    [corridors.trails, corridors.isLoading, corridors.error],
+  );
+
+  // location: changes on GPS update (~10s interval)
+  const locationValue = useMemo(
+    () => location,
+    [location.location, location.permissionStatus, location.isLoading],
+  );
+
+  // atlas: THE CRITICAL ONE — only changes when ring buffer updates
+  //   (new moment captured, at most every 5 minutes). This insulates
+  //   the deep derived hook chain from sensor ticks.
+  const atlasValue = useMemo(
+    () => ({
+      moments: atlas.moments,
+      summary: atlas.summary,
+      latest: atlas.latest,
+      totalMoments: atlas.totalMoments,
+      isHydrated: atlas.isHydrated,
+    }),
+    [atlas.moments, atlas.summary, atlas.isHydrated],
+  );
+
   return (
-    <SensorsContext.Provider value={sensors}>
-      <CorridorsContext.Provider value={corridors}>
-        <LocationContext.Provider value={location}>
-          <AtlasContext.Provider value={atlas}>
+    <SensorsContext.Provider value={sensorsValue}>
+      <CorridorsContext.Provider value={corridorsValue}>
+        <LocationContext.Provider value={locationValue}>
+          <AtlasContext.Provider value={atlasValue}>
             {children}
           </AtlasContext.Provider>
         </LocationContext.Provider>
