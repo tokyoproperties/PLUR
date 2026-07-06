@@ -255,6 +255,9 @@ const styles = StyleSheet.create({
   },
   contextRow: {
     alignItems: 'center',
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
   },
   contextLabel: {
     fontSize: 9,
@@ -268,6 +271,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.70)',
+    flexShrink: 1,
+    textAlign: 'center',
   },
   devicesLabel: {
     fontSize: 9,

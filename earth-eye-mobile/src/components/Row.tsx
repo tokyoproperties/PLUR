@@ -13,10 +13,10 @@ import { Spacing } from '@/constants/theme';
 export function Row({ label, value }: { label: string; value: string }) {
   return (
     <ThemedView style={styles.row} type="backgroundElement">
-      <ThemedText type="small" themeColor="textSecondary">
+      <ThemedText type="small" themeColor="textSecondary" style={styles.label}>
         {label}
       </ThemedText>
-      <ThemedText type="smallBold">{value}</ThemedText>
+      <ThemedText type="smallBold" style={styles.value}>{value}</ThemedText>
     </ThemedView>
   );
 }
@@ -30,5 +30,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
     marginBottom: Spacing.one,
+  },
+  // RN's default flexShrink is 0 (unlike web CSS, where it's 1) — without
+  // this, a long value string overflows the row instead of wrapping,
+  // producing clipped/overlapping text once the row is width-constrained.
+  label: {
+    flexShrink: 0,
+    marginRight: Spacing.two,
+  },
+  value: {
+    flexShrink: 1,
+    textAlign: 'right',
   },
 });

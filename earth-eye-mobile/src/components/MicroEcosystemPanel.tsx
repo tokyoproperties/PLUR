@@ -323,12 +323,16 @@ const styles = StyleSheet.create({
   conditionsLabel: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.50)',
+    flexShrink: 0,
+    marginRight: Spacing.two,
   },
   conditionsValue: {
     fontSize: 18,
     fontFamily: 'Georgia',
     fontWeight: '400',
     fontStyle: 'italic',
+    flexShrink: 1,
+    textAlign: 'right',
   },
 
   // Section

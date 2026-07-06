@@ -204,11 +204,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  // RN's default flexShrink is 0 — without it, a long value (e.g.
+  // "Stillness suggested") overflows the row instead of wrapping.
   rowLabel: {
     lineHeight: 20,
+    flexShrink: 0,
+    marginRight: Spacing.two,
   },
   rowValue: {
     lineHeight: 20,
+    flexShrink: 1,
+    textAlign: 'right',
   },
   intensitySection: {
     marginTop: Spacing.three,
