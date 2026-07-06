@@ -8,7 +8,7 @@
 
 import { useContext, useEffect, useState } from 'react';
 
-import { LocationContext } from '@/contexts/field-data-context';
+import { LocationContext } from '@/contexts/field-data-contexts';
 
 export interface UserLocation {
   latitude: number;

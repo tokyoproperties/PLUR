@@ -2,48 +2,26 @@
  * contexts/field-data-context.tsx
  *
  * Global provider for ALL state-bearing hooks.
- *
- * ARCHITECTURE:
- * - Base hooks (sensors, corridors, location) instantiated first
- * - Derived hooks (corridor, hybrid, ecosystem, emergency, suit) 
- *   computed next, receiving deps as direct arguments
- * - Atlas computed last, receiving all derived state
- * - Everything wrapped in memoized context providers
- * - Screens read from context — zero duplicate hook instances
- *
- * PERFORMANCE:
- * - Only the provider re-computes on sensor ticks (~2s)
- * - Screens that don't use sensor-derived data don't re-render
- * - AtlasContext only changes when ring buffer updates (~5 min)
- * - With lazy:true + freezeOnBlur, only the active screen's
- *   components render. Inactive screens are frozen.
+ * Context objects live in field-data-contexts.ts (no cycles).
+ * This file imports contexts + internal hooks and wires them together.
  */
 
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
-// Types
-import type { UseSensorsResult } from '@/hooks/useSensors';
-import type { UseCorridorsResult } from '@/hooks/useCorridors';
-import type { UseLocationResult } from '@/hooks/useLocation';
-import type { AtlasResult } from '@/atlas/useAtlas';
-import type { HybridState } from '@/hybrid/hybrid-engine';
-import type { CorridorState } from '@/corridor/corridor-engine';
-import type { EcosystemState } from '@/ecosystem/ecosystem-engine';
-import type { EmergencyState } from '@/emergency/state';
-import type { SuitState } from '@/suit/types';
+// Contexts (from split file — no circular deps)
+import {
+  SensorsContext,
+  CorridorsContext,
+  LocationContext,
+  AtlasContext,
+  HybridContext,
+  CorridorContext,
+  EcosystemContext,
+  EmergencyContext,
+  SuitContext,
+} from '@/contexts/field-data-contexts';
 
-// Contexts
-export const SensorsContext = createContext<UseSensorsResult | null>(null);
-export const CorridorsContext = createContext<UseCorridorsResult | null>(null);
-export const LocationContext = createContext<UseLocationResult | null>(null);
-export const AtlasContext = createContext<AtlasResult | null>(null);
-export const HybridContext = createContext<HybridState | null>(null);
-export const CorridorContext = createContext<CorridorState | null>(null);
-export const EcosystemContext = createContext<EcosystemState | null>(null);
-export const EmergencyContext = createContext<EmergencyState | null>(null);
-export const SuitContext = createContext<SuitState | null>(null);
-
-// Internal hooks
+// Internal hooks (state-bearing, called once here)
 import { useSensorsInternal } from '@/hooks/useSensors';
 import { useCorridorsInternal } from '@/hooks/useCorridors';
 import { useLocationInternal } from '@/hooks/useLocation';
@@ -55,8 +33,21 @@ import { useSuitDevicesInternal } from '@/suit/useSuitDevices';
 import { useAtlasInternal } from '@/atlas/useAtlas';
 import { useYardStrip } from '@/hooks/useYardStrip';
 
+// Re-export contexts for backwards compatibility
+export {
+  SensorsContext,
+  CorridorsContext,
+  LocationContext,
+  AtlasContext,
+  HybridContext,
+  CorridorContext,
+  EcosystemContext,
+  EmergencyContext,
+  SuitContext,
+} from '@/contexts/field-data-contexts';
+
 export function FieldDataProvider({ children }: { children: ReactNode }) {
-  // 1. Base hooks — raw data sources (no context deps)
+  // 1. Base hooks — raw data sources
   const sensors = useSensorsInternal();
   const corridors = useCorridorsInternal();
   const location = useLocationInternal();
@@ -72,10 +63,10 @@ export function FieldDataProvider({ children }: { children: ReactNode }) {
   // 3. Atlas — depends on all derived state
   const atlas = useAtlasInternal({ sensors, location, hybrid, corridor, ecosystem, emergency, suit });
 
-  // 4. Memoize context values — reference only changes when data changes
+  // 4. Memoize context values
   const sensorsValue = useMemo(
     () => sensors,
-    [sensors.light, sensors.motion, sensors.sound, sensors.snapshot],
+    [sensors.light, sensors.motion, sensors.snapshot],
   );
 
   const corridorsValue = useMemo(
@@ -99,7 +90,6 @@ export function FieldDataProvider({ children }: { children: ReactNode }) {
     [atlas.moments, atlas.summary, atlas.isHydrated],
   );
 
-  // Derived values — internal hooks already use useMemo, so stable references
   const corridorValue = useMemo(() => corridor, [corridor]);
   const hybridValue = useMemo(() => hybrid, [hybrid]);
   const ecosystemValue = useMemo(() => ecosystem, [ecosystem]);

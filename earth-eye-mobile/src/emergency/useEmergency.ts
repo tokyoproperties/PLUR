@@ -13,7 +13,7 @@ import {
   type NetworkInput,
   type BatteryInput,
 } from '@/emergency/state';
-import { EmergencyContext } from '@/contexts/field-data-context';
+import { EmergencyContext } from '@/contexts/field-data-contexts';
 import type { UseSensorsResult } from '@/hooks/useSensors';
 import type { HybridState } from '@/hybrid/hybrid-engine';
 

@@ -13,12 +13,12 @@ SplashScreen.preventAutoHideAsync();
 export default function TabLayout() {
   return (
     <ThemeProvider value={DarkTheme}>
-      <FieldDataProvider>
-        <ModeProvider>
+      <ModeProvider>
+        <FieldDataProvider>
           <AppTabs />
           <PLUROverlay />
-        </ModeProvider>
-      </FieldDataProvider>
+        </FieldDataProvider>
+      </ModeProvider>
     </ThemeProvider>
   );
 }

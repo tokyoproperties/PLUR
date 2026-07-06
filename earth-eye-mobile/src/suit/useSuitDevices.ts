@@ -14,7 +14,7 @@ import {
   MOCK_SOILBAND,
   type SuitState,
 } from '@/suit/types';
-import { SuitContext } from '@/contexts/field-data-context';
+import { SuitContext } from '@/contexts/field-data-contexts';
 
 // Internal — only called by FieldDataProvider
 export function useSuitDevicesInternal(): SuitState {

@@ -20,7 +20,7 @@ import {
   type AtlasSummary,
   type FieldMoment,
 } from '@/atlas/fieldMoment';
-import { AtlasContext } from '@/contexts/field-data-context';
+import { AtlasContext } from '@/contexts/field-data-contexts';
 import type { UseSensorsResult } from '@/hooks/useSensors';
 import type { UseLocationResult } from '@/hooks/useLocation';
 import type { HybridState } from '@/hybrid/hybrid-engine';

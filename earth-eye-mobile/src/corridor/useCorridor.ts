@@ -9,7 +9,7 @@
 import { useContext, useMemo } from 'react';
 
 import { evaluateCorridor, type CorridorState } from '@/corridor/corridor-engine';
-import { CorridorContext } from '@/contexts/field-data-context';
+import { CorridorContext } from '@/contexts/field-data-contexts';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import type { UseCorridorsResult } from '@/hooks/useCorridors';
 import type { UseLocationResult } from '@/hooks/useLocation';

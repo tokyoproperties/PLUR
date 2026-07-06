@@ -8,7 +8,7 @@
 import { useContext, useMemo } from 'react';
 
 import { evaluateHybrid, type HybridState } from '@/hybrid/hybrid-engine';
-import { HybridContext } from '@/contexts/field-data-context';
+import { HybridContext } from '@/contexts/field-data-contexts';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import type { UseSensorsResult } from '@/hooks/useSensors';
 import type { CorridorState } from '@/corridor/corridor-engine';

@@ -17,7 +17,7 @@
 
 import { useContext, useMemo } from 'react';
 
-import { SensorsContext } from '@/contexts/field-data-context';
+import { SensorsContext } from '@/contexts/field-data-contexts';
 import { useAmbientLight } from '@/sensors/useAmbientLight';
 import { useMotion } from '@/sensors/useMotion';
 import { useSound } from '@/sensors/useSound';

@@ -8,7 +8,7 @@
 
 import { useContext, useEffect, useState } from 'react';
 
-import { CorridorsContext } from '@/contexts/field-data-context';
+import { CorridorsContext } from '@/contexts/field-data-contexts';
 
 const API_BASE = 'https://special-agent-44-342f8e58.base44.app/functions/getAtlasData';
 
