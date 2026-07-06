@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -26,6 +26,14 @@ export interface ModeBadgeProps {
 export function ModeBadge({ mode, statusText, compact = false, pulse = true }: ModeBadgeProps) {
   const meta = MODE_META[mode];
   const pulseAnim = useRef(new Animated.Value(0.55)).current;
+  // maxWidth:'100%' (percentage) proved unreliable through this
+  // component's ancestor chain even after every wrapper was given an
+  // explicit width — computing an absolute pixel ceiling directly
+  // from the real window width removes any dependency on ancestor
+  // sizing propagation entirely. Page padding is Spacing.three (16)
+  // on each side = 32 total.
+  const { width: windowWidth } = useWindowDimensions();
+  const maxBadgeWidth = windowWidth - Spacing.three * 2;
 
   useEffect(() => {
     if (!pulse) return;
@@ -44,7 +52,7 @@ export function ModeBadge({ mode, statusText, compact = false, pulse = true }: M
       style={[
         styles.container,
         compact && styles.compactContainer,
-        { backgroundColor: meta.glowColor },
+        { backgroundColor: meta.glowColor, maxWidth: maxBadgeWidth },
       ]}>
       <Animated.View
         style={[styles.dot, { backgroundColor: meta.color, opacity: pulse ? pulseAnim : 1 }]}
@@ -78,7 +86,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    maxWidth: '100%',
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.three,
     borderRadius: 999,

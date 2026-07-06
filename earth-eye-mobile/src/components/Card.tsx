@@ -19,14 +19,37 @@
  */
 
 import { type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 
-export function Card({ children, style }: { children: ReactNode; style?: any }) {
+/**
+ * pagePadding: the horizontal page padding of whatever screen this
+ * Card lives on (defaults to Spacing.three=16, used by Home/Atlas/
+ * Ecosystem/Suit — pass Spacing.four=24 on Sensors/Explore for exact
+ * fit there too). Percentage/stretch-based width proved unreliable
+ * through the Animated.View entrance-animation ancestor chain even
+ * after every wrapper was given an explicit width — an absolute
+ * pixel width computed directly from the real window size removes
+ * the dependency on that chain entirely. Confirmed necessary: this
+ * is what was still truncating Field State's Mode row value even
+ * after width:'100%' was applied at every level.
+ */
+export function Card({
+  children,
+  style,
+  pagePadding = Spacing.three,
+}: {
+  children: ReactNode;
+  style?: any;
+  pagePadding?: number;
+}) {
+  const { width: windowWidth } = useWindowDimensions();
+  const cardWidth = windowWidth - pagePadding * 2;
+
   return (
-    <ThemedView style={[styles.card, style]} type="backgroundElement">
+    <ThemedView style={[styles.card, { width: cardWidth }, style]} type="backgroundElement">
       {children}
     </ThemedView>
   );
@@ -68,8 +91,6 @@ const styles = StyleSheet.create({
   // hairline border was added — it read as the card being
   // "off-center" relative to everything around it.
   card: {
-    width: '100%',
-    alignSelf: 'stretch',
     borderRadius: 12,
     padding: Spacing.three,
     marginBottom: Spacing.two,

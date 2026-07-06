@@ -45,7 +45,7 @@ export default function SensorsScreen() {
           </ThemedView>
 
           {/* Sensor Summary — narrative interpretation */}
-          <Card style={styles.summaryCard}>
+          <Card style={styles.summaryCard} pagePadding={Spacing.four}>
             <ThemedText type="small" themeColor="textSecondary" style={styles.summaryLabel}>
               SENSOR SUMMARY{summary.dataQuality === 'partial' ? ' · PARTIAL' : ''}
             </ThemedText>

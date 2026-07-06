@@ -5,7 +5,7 @@
  * accidental gesture. Reads/writes the shared ModeContext directly.
  */
 
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -15,9 +15,15 @@ const OPTIONS: SymbolicMode[] = ['plur', 'love'];
 
 export function ModeToggle() {
   const { mode, setMode } = useSymbolicMode();
+  // Same fix as ModeBadge: width:'100%' (percentage/stretch) proved
+  // unreliable through the Animated.View ancestor chain even after
+  // every wrapper got an explicit width. Absolute pixel width removes
+  // the dependency on ancestor sizing propagation entirely.
+  const { width: windowWidth } = useWindowDimensions();
+  const toggleWidth = windowWidth - Spacing.three * 2;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { width: toggleWidth }]}>
       {OPTIONS.map((option) => {
         const meta = MODE_META[option];
         const active = mode === option;
@@ -44,8 +50,6 @@ export function ModeToggle() {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    alignSelf: 'stretch',
     flexDirection: 'row',
     borderRadius: 999,
     overflow: 'hidden',
