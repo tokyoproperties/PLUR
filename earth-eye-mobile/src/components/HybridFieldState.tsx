@@ -15,17 +15,22 @@
  *   LOVE → warm amber intensity bar
  *
  * Styled to EarthEye design language:
- * - Card component (#1A1A17 surface)
+ * - Card component (#1A1A17 surface, hairline border)
  * - Whisper label (9px, uppercase, 35% white)
  * - Georgia italic serif for the field state value
  * - Muted body text (rgba 0.70)
  * - Intensity bar using EarthEye accent palette
  * - No exclamation marks, no directives
+ *
+ * Depth pass (July 6 2026): stat rows now sit in a CardInset panel
+ * with hairline row dividers (CardRow), so Proximity/Mode/Suggestion
+ * read as a distinct layered group rather than flush with the card
+ * background. No shadow, no glow — background contrast only.
  */
 
 import { StyleSheet, View } from 'react-native';
 
-import { Card } from '@/components/Card';
+import { Card, CardInset, CardRow } from '@/components/Card';
 import { ThemedText } from '@/components/themed-text';
 import { Accents, Spacing } from '@/constants/theme';
 import { useHybrid } from '@/hybrid/useHybrid';
@@ -81,14 +86,18 @@ export function HybridFieldStateCard() {
         <ThemedText style={styles.formingHint}>
           Sensors not yet active — the field will show its state once readings arrive.
         </ThemedText>
-        <View style={styles.row}>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
-            Mode
-          </ThemedText>
-          <ThemedText type="small" style={styles.rowValue}>
-            {hybrid.symbolic === 'plur' ? 'PLUR' : 'LOVE'}
-          </ThemedText>
-        </View>
+        <CardInset>
+          <CardRow noDivider>
+            <View style={styles.rowLine}>
+              <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
+                Mode
+              </ThemedText>
+              <ThemedText type="small" style={styles.rowValue}>
+                {hybrid.symbolic === 'plur' ? 'PLUR' : 'LOVE'}
+              </ThemedText>
+            </View>
+          </CardRow>
+        </CardInset>
       </Card>
     );
   }
@@ -103,32 +112,40 @@ export function HybridFieldStateCard() {
         {hybrid.fieldState}
       </ThemedText>
 
-      <View style={styles.row}>
-        <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
-          Proximity
-        </ThemedText>
-        <ThemedText type="small" style={styles.rowValue}>
-          {PROXIMITY_LABEL[hybrid.proximity] ?? hybrid.proximity}
-        </ThemedText>
-      </View>
+      <CardInset>
+        <CardRow noDivider>
+          <View style={styles.rowLine}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
+              Proximity
+            </ThemedText>
+            <ThemedText type="small" style={styles.rowValue}>
+              {PROXIMITY_LABEL[hybrid.proximity] ?? hybrid.proximity}
+            </ThemedText>
+          </View>
+        </CardRow>
 
-      <View style={styles.row}>
-        <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
-          Mode
-        </ThemedText>
-        <ThemedText type="small" style={styles.rowValue}>
-          {hybrid.symbolic === 'plur' ? 'PLUR' : 'LOVE'}
-        </ThemedText>
-      </View>
+        <CardRow>
+          <View style={styles.rowLine}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
+              Mode
+            </ThemedText>
+            <ThemedText type="small" style={styles.rowValue}>
+              {hybrid.symbolic === 'plur' ? 'PLUR' : 'LOVE'}
+            </ThemedText>
+          </View>
+        </CardRow>
 
-      <View style={styles.row}>
-        <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
-          Suggestion
-        </ThemedText>
-        <ThemedText type="small" style={styles.rowValue}>
-          {SUGGESTION_LABEL[hybrid.suggestion] ?? hybrid.suggestion}
-        </ThemedText>
-      </View>
+        <CardRow>
+          <View style={styles.rowLine}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
+              Suggestion
+            </ThemedText>
+            <ThemedText type="small" style={styles.rowValue}>
+              {SUGGESTION_LABEL[hybrid.suggestion] ?? hybrid.suggestion}
+            </ThemedText>
+          </View>
+        </CardRow>
+      </CardInset>
 
       <View style={styles.intensitySection}>
         <ThemedText type="small" themeColor="textSecondary" style={styles.rowLabel}>
@@ -182,11 +199,10 @@ const styles = StyleSheet.create({
     lineHeight: 1.6,
     marginBottom: Spacing.two,
   },
-  row: {
+  rowLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: Spacing.one,
   },
   rowLabel: {
     lineHeight: 20,
@@ -195,7 +211,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   intensitySection: {
-    marginTop: Spacing.two,
+    marginTop: Spacing.three,
   },
   barOuter: {
     marginTop: Spacing.half,
