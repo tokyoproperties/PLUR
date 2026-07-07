@@ -95,14 +95,12 @@ function fieldNarrative(hybrid: HybridState): string {
 // ─── Corridor ─────────────────────────────────────────────
 
 function corridorNarrative(corridor: CorridorState): string {
-  let base: string;
-  switch (corridor.tone) {
-    case 'calm': base = 'Corridor is calm.'; break;
-    case 'bright': base = 'Corridor is bright.'; break;
-    case 'noisy': base = 'Corridor is noisy.'; break;
-    case 'still': base = 'Corridor holds still.'; break;
-    case 'mixed': base = 'Corridor tone is mixed.'; break;
-  }
+  // Mission 11: unified to one 'Corridor is {tone}.' pattern across all
+  // five tones -- 'still' and 'mixed' previously broke the pattern
+  // ('Corridor holds still.', 'Corridor tone is mixed.'), which read as
+  // stitched-together fragments rather than one authored voice. Same
+  // 'X is {value}.' shape fieldNarrative already uses.
+  const base = `Corridor is ${corridor.tone}.`;
   if (corridor.confidence === 'uncertain') {
     return `${base} Reading is uncertain right now.`;
   }
@@ -116,7 +114,7 @@ function speciesNarrative(ecosystem: EcosystemState): string {
 
   if (invitedSpecies.length === 0) {
     return conditionsScore === 'poor'
-      ? 'Conditions poor — no species currently invited.'
+      ? 'Conditions poor. No species currently invited.'
       : 'No species currently invited.';
   }
 
@@ -125,7 +123,11 @@ function speciesNarrative(ecosystem: EcosystemState): string {
     conditionsScore === 'fair' ? 'possible' :
     'uncertain';
 
-  return `Species ${qualifier} — ${invitedSpecies.length} of ${canonSize} present.`;
+  // Mission 11: dropped the em-dash construction ("Species possible —
+  // 3 of 10 present.") -- it was the only VOICE line using that
+  // fragment-and-dash shape; every other line is plain sentences.
+  // Same information, same order, just two sentences like the rest.
+  return `${invitedSpecies.length} of ${canonSize} species present. Conditions ${qualifier}.`;
 }
 
 // ─── Season ───────────────────────────────────────────────
