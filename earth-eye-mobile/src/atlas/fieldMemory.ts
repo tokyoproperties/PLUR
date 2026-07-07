@@ -10,7 +10,7 @@
  */
 
 import type { FieldMoment } from '@/atlas/fieldMoment';
-import type { SeasonalPhase } from '@/atlas/seasonalProfile';
+import { getSeasonalPhase, type SeasonalPhase } from '@/atlas/seasonalProfile';
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -57,16 +57,14 @@ export interface FieldMemory {
 
 // ─── Helpers ──────────────────────────────────────────────
 
+// Mission 6 (July 7 2026): this used to be a second, independent copy
+// of the exact date-range logic in seasonalProfile.ts::getSeasonalPhase
+// -- same literals, drifting in silent lockstep with zero shared name.
+// Mission 5 already fixed a real year-wraparound bug in that function;
+// this file would have kept the bug at least in some forms even after
+// that fix, since it never imported the corrected version. Now it does.
 function getPhaseFromDate(timestamp: number): SeasonalPhase {
-  const date = new Date(timestamp);
-  const month = date.getMonth();
-  const day = date.getDate();
-
-  if ((month === 1 && day >= 15) || month === 2 || month === 3) return 'early-spring';
-  if (month === 4 || (month === 5 && day < 15)) return 'transitional';
-  if ((month === 5 && day >= 15) || month === 6 || month === 7 || (month === 8 && day <= 15)) return 'high-summer';
-  if ((month === 8 && day > 15) || month === 9 || month === 10) return 'late-autumn';
-  return 'winter-night';
+  return getSeasonalPhase(new Date(timestamp));
 }
 
 const PHASE_LABELS: Record<SeasonalPhase, string> = {

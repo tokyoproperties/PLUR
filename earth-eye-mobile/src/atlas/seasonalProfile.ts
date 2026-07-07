@@ -85,7 +85,7 @@ function toOrdinal(month: number, day: number): number {
   return month * 31 + day;
 }
 
-function getSeasonalPhase(date: Date): SeasonalPhase {
+export function getSeasonalPhase(date: Date): SeasonalPhase {
   const ordinal = toOrdinal(date.getMonth(), date.getDate());
 
   // SEASON_BOUNDARIES is sorted chronologically (ordinal-ascending),

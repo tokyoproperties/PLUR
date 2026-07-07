@@ -114,6 +114,8 @@ export function useAtlasInternal(args: {
       suit,
       snapshot,
       location: location.location,
+      locationConfidence: location.confidence,
+      priorMoments: ring,
       fireworkWindow,
       now: new Date(now),
     });

@@ -121,6 +121,18 @@ export const SEASON_PATTERN_THRESHOLDS = {
 } as const;
 
 /**
+ * Field Session boundary (Mission 6 — Field Memory, July 7 2026).
+ * Sessions are DERIVED from time gaps between consecutive Field
+ * Moments rather than driven by explicit start/end events wired to
+ * app foreground/background — see fieldSession.ts header for why.
+ * 45 minutes: long enough that the periodic 5-minute forced-capture
+ * cadence (fieldMoment.ts::shouldCaptureMoment) never falsely splits
+ * one continuous outing, short enough that a real gap (drove home,
+ * came back tomorrow) reliably reads as two sessions.
+ */
+export const SESSION_GAP_THRESHOLD_MS = 45 * 60 * 1000;
+
+/**
  * Lux cutoffs used OUTSIDE the sky-rendering domain (LUX_THRESHOLDS
  * above is calibrated for moon/sky luminance, not ecology or corridor
  * "feel"). Centralized here July 6 2026 (Mission 4 — Ecosystem Species

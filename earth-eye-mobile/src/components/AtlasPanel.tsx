@@ -42,6 +42,7 @@ import { useFieldSoul } from '@/atlas/useFieldSoul';
 import { useFieldSpirit } from '@/atlas/useFieldSpirit';
 import { useFieldLore } from '@/atlas/useFieldLore';
 import { useFieldContinuity } from '@/atlas/useFieldContinuity';
+import { useFieldSession } from '@/atlas/useFieldSession';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
@@ -66,6 +67,7 @@ const FADE_ECOLOGY = FadeIn.duration(500).delay(120);
 const FADE_MEMORY = FadeIn.duration(500).delay(240);
 const FADE_ESSENCE = FadeIn.duration(600).delay(380);
 const FADE_MOMENT = FadeIn.duration(500).delay(520);
+const FADE_SESSION = FadeIn.duration(500).delay(660);
 
 function SectionDivider() {
   return <View style={styles.divider} />;
@@ -84,6 +86,7 @@ export function AtlasPanel() {
   const spirit = useFieldSpirit();
   const lore = useFieldLore();
   const continuity = useFieldContinuity();
+  const session = useFieldSession();
 
   if (atlas.totalMoments === 0 || !atlas.latest) {
     return (
@@ -255,6 +258,31 @@ export function AtlasPanel() {
           </View>
         )}
       </Animated.View>
+
+      {/* ZONE 6 — THIS SESSION (Mission 6, July 7 2026) -- one step
+          zoomed out from the single instant above: the current
+          continuous outing, derived from time gaps in the moment
+          ring rather than an explicit start/stop control. */}
+      {session && (
+        <Animated.View entering={FADE_SESSION} style={styles.momentZone}>
+          <SectionDivider />
+          <View style={styles.cardTypeRow}>
+            <ThemedText style={styles.zoneLabel}>{session.session.isActive ? 'THIS SESSION' : 'LAST SESSION'}</ThemedText>
+          </View>
+          <ThemedText style={styles.summaryLine}>{session.summary}</ThemedText>
+          {session.speciesHighlights.length > 0 && (
+            <ThemedText style={styles.cardText}>
+              {session.speciesHighlights.slice(0, 3).join(', ')}
+              {session.speciesHighlights.length > 3 ? ', and more' : ''} present this session.
+            </ThemedText>
+          )}
+          {session.corridorStability !== 'insufficient-data' && (
+            <ThemedText style={styles.recentText}>
+              Corridor {session.corridorStability} this session.
+            </ThemedText>
+          )}
+        </Animated.View>
+      )}
     </Card>
   );
 }

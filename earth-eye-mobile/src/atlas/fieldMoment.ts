@@ -22,12 +22,14 @@
  */
 
 import type { CorridorState } from '@/corridor/corridor-engine';
-import type { HybridState } from '@/hybrid/hybrid-engine';
+import type { HybridState, HybridConfidence } from '@/hybrid/hybrid-engine';
 import type { EcosystemState } from '@/ecosystem/ecosystem-engine';
 import type { EmergencyState } from '@/emergency/state';
 import type { SuitState } from '@/suit/types';
 import type { SymbolicMode } from '@/contexts/mode-context';
 import type { SensorSnapshot } from '@/hooks/useSensors';
+import type { LocationConfidence } from '@/utils/thresholds';
+import { evaluateSeasonalProfile, type SeasonalConfidence } from '@/atlas/seasonalProfile';
 
 // ─── Field Moment ─────────────────────────────────────────
 
@@ -77,6 +79,20 @@ export interface FieldMoment {
   cardType: AtlasCardType;
   /** Poetic summary of the moment */
   cardText: string;
+  /**
+   * Confidence snapshot (Mission 6, July 7 2026) — the four
+   * confidence signals Missions 1-5 already established (motion+
+   * corridor fused into hybrid, ecosystem passed through from hybrid,
+   * and season's own data-richness axis) are now captured per-moment,
+   * so historical review can tell a solid read from a shaky one
+   * instead of only ever seeing the live value. Location confidence
+   * is its own thing (GPS quality), captured separately from the
+   * fused hybrid/ecosystem/season axis.
+   */
+  locationConfidence: LocationConfidence;
+  hybridConfidence: HybridConfidence;
+  ecosystemConfidence: HybridConfidence;
+  seasonalConfidence: SeasonalConfidence;
 }
 
 // ─── Season helper ────────────────────────────────────────
@@ -187,10 +203,14 @@ export function captureFieldMoment(args: {
   suit: SuitState;
   snapshot: SensorSnapshot;
   location: { latitude: number; longitude: number } | null;
+  locationConfidence: LocationConfidence;
+  /** Prior ring buffer (before this moment is added) — used to derive seasonalConfidence via the same pure evaluator the live seasonal card uses, without creating a hook-level dependency cycle. */
+  priorMoments: FieldMoment[];
   fireworkWindow: boolean;
   now?: Date;
 }): FieldMoment {
-  const { hybrid, corridor, ecosystem, emergency, suit, location, fireworkWindow, now = new Date() } = args;
+  const { hybrid, corridor, ecosystem, emergency, suit, location, locationConfidence, priorMoments, fireworkWindow, now = new Date() } = args;
+  const seasonalConfidence = evaluateSeasonalProfile(priorMoments, now).confidence;
 
   const season = getSeason(now);
   const hour = now.getHours();
@@ -237,6 +257,10 @@ export function captureFieldMoment(args: {
     fireworkWindow,
     cardType,
     cardText,
+    locationConfidence,
+    hybridConfidence: hybrid.confidence,
+    ecosystemConfidence: ecosystem.confidence,
+    seasonalConfidence,
   };
 }
 
