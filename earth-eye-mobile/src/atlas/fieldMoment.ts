@@ -291,6 +291,32 @@ export function captureFieldMoment(args: {
   };
 }
 
+/**
+ * Mission 8 hotfix (July 7 2026): closes the migration-guard gap
+ * documented back in Mission 6 -- moments persisted to AsyncStorage
+ * before a field was added come back from JSON.parse() missing it
+ * entirely (undefined, not just falsy), and every mission since has
+ * added at least one new required field (locationConfidence,
+ * hybridConfidence, ecosystemConfidence, seasonalConfidence in
+ * Mission 6; seasonalImminentSpecies in Mission 8). This crashed for
+ * real: legacy moments' missing seasonalImminentSpecies blew up a
+ * for-of in fieldSession.ts's summarizeSession(). Call this on every
+ * moment coming out of AsyncStorage before it re-enters the ring
+ * buffer, so old records always have a safe, well-typed value for
+ * every field added after they were originally saved.
+ */
+export function normalizeLegacyMoment(raw: FieldMoment): FieldMoment {
+  return {
+    ...raw,
+    invitedSpecies: raw.invitedSpecies ?? [],
+    locationConfidence: raw.locationConfidence ?? 'uncertain',
+    hybridConfidence: raw.hybridConfidence ?? 'uncertain',
+    ecosystemConfidence: raw.ecosystemConfidence ?? 'uncertain',
+    seasonalConfidence: raw.seasonalConfidence ?? 'uncertain',
+    seasonalImminentSpecies: raw.seasonalImminentSpecies ?? [],
+  };
+}
+
 // ─── Moment comparison (for change detection) ─────────────
 
 export function shouldCaptureMoment(

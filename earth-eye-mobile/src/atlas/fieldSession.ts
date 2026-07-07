@@ -181,7 +181,11 @@ export function summarizeSession(session: FieldSession): FieldSessionSummary {
   const speciesSeasonalHighlights: string[] = [];
   const seenSeasonal = new Set<string>();
   for (const m of moments) {
-    for (const s of m.seasonalImminentSpecies) {
+    // Defensive default (Mission 8 hotfix): the real fix is
+    // normalizeLegacyMoment() at hydration time in useAtlas.ts, but
+    // this stays as a second line of defense against any other future
+    // path that might construct a FieldSession from un-normalized data.
+    for (const s of m.seasonalImminentSpecies ?? []) {
       if (!seenSeasonal.has(s)) {
         seenSeasonal.add(s);
         speciesSeasonalHighlights.push(s);

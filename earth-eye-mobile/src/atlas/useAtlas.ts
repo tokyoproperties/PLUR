@@ -15,6 +15,7 @@ import {
   ATLAS_RING_SIZE,
   addToRing,
   captureFieldMoment,
+  normalizeLegacyMoment,
   shouldCaptureMoment,
   summarizeAtlas,
   type AtlasSummary,
@@ -72,9 +73,13 @@ export function useAtlasInternal(args: {
           try {
             const parsed: FieldMoment[] = JSON.parse(stored);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              setRing(parsed);
-              lastMomentRef.current = parsed[parsed.length - 1];
-              lastCaptureTimeRef.current = parsed[parsed.length - 1].timestamp;
+              // Normalize legacy moments (Mission 8 hotfix) -- records
+              // persisted before a field existed come back from
+              // JSON.parse() missing it entirely, not just falsy.
+              const normalized = parsed.map(normalizeLegacyMoment);
+              setRing(normalized);
+              lastMomentRef.current = normalized[normalized.length - 1];
+              lastCaptureTimeRef.current = normalized[normalized.length - 1].timestamp;
             }
           } catch {
             // Corrupt data — start fresh
