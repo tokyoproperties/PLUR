@@ -193,13 +193,25 @@ export function summarizeSession(session: FieldSession): FieldSessionSummary {
     }
   }
 
-  const parts: string[] = [];
-  const minutes = Math.round(durationMs / 60000);
-  parts.push(minutes >= 1 ? `${minutes} min` : 'just started');
-  if (dominantFieldState) parts.push(`mostly ${dominantFieldState}`);
-  if (speciesHighlights.length > 0) {
-    parts.push(`${speciesHighlights.length} species present`);
-  }
+  // Mission 11 Layer 3: summary was a dot-joined fragment string
+  // ('27 min · mostly bright · 4 species present') -- the one
+  // leftover utilitarian construction in the panel, sitting directly
+  // above two properly-voiced sentences (the named species-highlight
+  // line and the corridor-stability line just below it in
+  // AtlasPanel.tsx) and the fully prose VOICE.sessionLine further
+  // down. Rewritten as one plain sentence in the same register as
+  // everything else. Dropped the species COUNT clause specifically
+  // because AtlasPanel already renders the actual named species list
+  // right underneath whenever speciesHighlights is non-empty -- same
+  // gate condition, so nothing is lost, just no longer said twice in
+  // two different ways back to back.
+  const minutes = Math.max(1, Math.round(durationMs / 60000));
+  const summary =
+    moments.length <= 1
+      ? 'Session just started.'
+      : dominantFieldState
+      ? `${minutes}-minute session, mostly ${dominantFieldState} field.`
+      : `${minutes}-minute session.`;
 
   return {
     session,
@@ -210,6 +222,6 @@ export function summarizeSession(session: FieldSession): FieldSessionSummary {
     corridorStability,
     speciesHighlights,
     speciesSeasonalHighlights,
-    summary: parts.join(' · '),
+    summary,
   };
 }
