@@ -1,0 +1,159 @@
+/**
+ * atlas/narrative.ts
+ *
+ * Narrative Overlays — Mission 7. A pure translation layer: takes the
+ * ALREADY-COMPUTED state from Hybrid, Corridor, Ecosystem, Seasonal,
+ * and Session, and turns it into five short, atomic, constitutional-
+ * voice lines. Never re-derives anything — every phrase is chosen
+ * from a real, verified enum value already sitting on another
+ * engine's output.
+ *
+ * CORRECTION to the mission brief, found by mapping the real code
+ * first (same discipline as Missions 1-6): the premise "engines
+ * currently output raw states with no narrative" isn't quite right.
+ * HybridState, CorridorState, and EcosystemState each already carry a
+ * `summary: string` field — but those are dev-facing debug strings
+ * built with `parts.join(' · ')` (e.g. "Near yard (120m) · tone: calm
+ * · stillness suggested"), not the field-notebook prose voice used
+ * everywhere else in Atlas (fieldIdentity.reflection, drift.description,
+ * fieldMythology's description, fieldMemory.memoryLine). So fieldLine /
+ * corridorLine / speciesLine below ARE genuinely new translation work.
+ * seasonLine and sessionLine are different — SeasonalProfile and
+ * FieldSessionSummary already carry real prose-adjacent fields
+ * (phaseLabel/patternSuffix/fieldRhythm; summarizeSession's summary),
+ * so those two are thin compositions of existing content, not new
+ * derivation dressed up as new derivation.
+ *
+ * Also corrected against the ACTUAL type definitions rather than the
+ * brief's assumed vocabulary: HybridFieldState is really
+ * 'calm'|'bright'|'noisy'|'still'|'mixed'|'alert'|'dim'|'forming'
+ * (the brief's list included a non-existent 'active' and omitted the
+ * real 'noisy'). CorridorTone is really
+ * 'calm'|'noisy'|'bright'|'still'|'mixed' (the brief's proposed
+ * "steady/shifting/uncertain/quiet/open" vocabulary doesn't match any
+ * of the real values at all). EcosystemState has no five-level
+ * favorable/likely/possible/uncertain/inactive species gate — it has
+ * `invitedSpecies` (array) + `conditionsScore` ('good'|'fair'|'poor'),
+ * so speciesLine is built from those real fields instead.
+ *
+ * Pure logic — no React, no hooks. No engine logic lives here; this
+ * file only chooses words for values other files already computed.
+ */
+
+import type { HybridState } from '@/hybrid/hybrid-engine';
+import type { CorridorState } from '@/corridor/corridor-engine';
+import type { EcosystemState } from '@/ecosystem/ecosystem-engine';
+import type { SeasonalProfile } from '@/atlas/seasonalProfile';
+import type { FieldSessionSummary } from '@/atlas/fieldSession';
+
+export interface NarrativeLines {
+  fieldLine: string;
+  corridorLine: string;
+  speciesLine: string;
+  seasonLine: string;
+  /** null when no session has started yet (mirrors useFieldSession()'s own null-before-first-moment contract) */
+  sessionLine: string | null;
+}
+
+// ─── Field (Hybrid) ───────────────────────────────────────
+
+function fieldNarrative(hybrid: HybridState): string {
+  if (hybrid.dataQuality === 'forming') {
+    return 'Field reading is forming — sensors not yet active.';
+  }
+  switch (hybrid.fieldState) {
+    case 'calm': return 'Field is calm.';
+    case 'bright': return 'Field is bright.';
+    case 'noisy': return 'Field is noisy.';
+    case 'still': return 'Field is still.';
+    case 'mixed': return 'Field is mixed.';
+    case 'dim': return 'Field is dim.';
+    case 'forming': return 'Field reading is forming.';
+    case 'alert':
+      // Not currently reachable — evaluateHybrid() only ever narrows
+      // an existing 'alert' toward 'mixed'/'calm' by symbolic mode
+      // (hybrid-engine.ts), but nothing actually assigns 'alert' in
+      // the first place under present logic. Kept for exhaustiveness
+      // and in case a future engine change makes it reachable.
+      return 'Field is alert.';
+  }
+}
+
+// ─── Corridor ─────────────────────────────────────────────
+
+function corridorNarrative(corridor: CorridorState): string {
+  let base: string;
+  switch (corridor.tone) {
+    case 'calm': base = 'Corridor is calm.'; break;
+    case 'bright': base = 'Corridor is bright.'; break;
+    case 'noisy': base = 'Corridor is noisy.'; break;
+    case 'still': base = 'Corridor holds still.'; break;
+    case 'mixed': base = 'Corridor tone is mixed.'; break;
+  }
+  if (corridor.confidence === 'uncertain') {
+    return `${base} Reading is uncertain right now.`;
+  }
+  return base;
+}
+
+// ─── Species (Ecosystem) ─────────────────────────────────
+
+function speciesNarrative(ecosystem: EcosystemState): string {
+  const { invitedSpecies, canonSize, conditionsScore } = ecosystem;
+
+  if (invitedSpecies.length === 0) {
+    return conditionsScore === 'poor'
+      ? 'Conditions poor — no species currently invited.'
+      : 'No species currently invited.';
+  }
+
+  const qualifier =
+    conditionsScore === 'good' ? 'favorable' :
+    conditionsScore === 'fair' ? 'possible' :
+    'uncertain';
+
+  return `Species ${qualifier} — ${invitedSpecies.length} of ${canonSize} present.`;
+}
+
+// ─── Season ───────────────────────────────────────────────
+
+function seasonNarrative(seasonal: SeasonalProfile): string {
+  const phase = seasonal.phaseLabel.toLowerCase();
+  switch (seasonal.patternStatus) {
+    case 'forming': return `Pattern forming for ${phase}.`;
+    case 'confirmed': return `Pattern clear for ${phase}.`;
+    case 'unclear': return `Pattern unclear for ${phase}.`;
+  }
+}
+
+// ─── Session ──────────────────────────────────────────────
+
+function sessionNarrative(session: FieldSessionSummary | null): string | null {
+  if (!session) return null;
+
+  const stateClause = session.dominantFieldState ? `${session.dominantFieldState} field` : 'field';
+  const stabilityClause =
+    session.corridorStability === 'stable' ? ', steady corridor' :
+    session.corridorStability === 'shifting' ? ', shifting corridor' :
+    '';
+
+  return `Session shows a ${stateClause}${stabilityClause}.`;
+}
+
+// ─── Composer ─────────────────────────────────────────────
+
+export function buildNarrative(args: {
+  hybrid: HybridState;
+  corridor: CorridorState;
+  ecosystem: EcosystemState;
+  seasonal: SeasonalProfile;
+  session: FieldSessionSummary | null;
+}): NarrativeLines {
+  return {
+    fieldLine: fieldNarrative(args.hybrid),
+    corridorLine: corridorNarrative(args.corridor),
+    speciesLine: speciesNarrative(args.ecosystem),
+    seasonLine: seasonNarrative(args.seasonal),
+    sessionLine: sessionNarrative(args.session),
+  };
+}

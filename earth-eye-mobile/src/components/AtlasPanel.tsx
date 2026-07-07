@@ -43,6 +43,7 @@ import { useFieldSpirit } from '@/atlas/useFieldSpirit';
 import { useFieldLore } from '@/atlas/useFieldLore';
 import { useFieldContinuity } from '@/atlas/useFieldContinuity';
 import { useFieldSession } from '@/atlas/useFieldSession';
+import { useNarrative } from '@/atlas/useNarrative';
 import type { AtlasCardType } from '@/atlas/fieldMoment';
 
 const CARD_TYPE_COLORS: Partial<Record<AtlasCardType, string>> = {
@@ -68,6 +69,7 @@ const FADE_MEMORY = FadeIn.duration(500).delay(240);
 const FADE_ESSENCE = FadeIn.duration(600).delay(380);
 const FADE_MOMENT = FadeIn.duration(500).delay(520);
 const FADE_SESSION = FadeIn.duration(500).delay(660);
+const FADE_NARRATIVE = FadeIn.duration(500).delay(780);
 
 function SectionDivider() {
   return <View style={styles.divider} />;
@@ -87,6 +89,7 @@ export function AtlasPanel() {
   const lore = useFieldLore();
   const continuity = useFieldContinuity();
   const session = useFieldSession();
+  const narrative = useNarrative();
 
   if (atlas.totalMoments === 0 || !atlas.latest) {
     return (
@@ -283,6 +286,23 @@ export function AtlasPanel() {
           )}
         </Animated.View>
       )}
+
+      {/* ZONE 7 — VOICE (Mission 7, July 7 2026) -- the five engines
+          speaking in one line each: pure translation of state already
+          computed above, no new logic. */}
+      <Animated.View entering={FADE_NARRATIVE} style={styles.momentZone}>
+        <SectionDivider />
+        <ThemedText style={styles.zoneLabel}>VOICE</ThemedText>
+        <View style={styles.voiceLines}>
+          <ThemedText style={styles.voiceLine}>{narrative.fieldLine}</ThemedText>
+          <ThemedText style={styles.voiceLine}>{narrative.corridorLine}</ThemedText>
+          <ThemedText style={styles.voiceLine}>{narrative.speciesLine}</ThemedText>
+          <ThemedText style={styles.voiceLine}>{narrative.seasonLine}</ThemedText>
+          {narrative.sessionLine !== null && (
+            <ThemedText style={styles.voiceLine}>{narrative.sessionLine}</ThemedText>
+          )}
+        </View>
+      </Animated.View>
     </Card>
   );
 }
@@ -585,5 +605,15 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 11,
     color: 'rgba(255,255,255,0.30)',
+  },
+  voiceLines: {
+    gap: Spacing.one,
+  },
+  voiceLine: {
+    fontSize: 14,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.65)',
+    lineHeight: 21,
   },
 });
