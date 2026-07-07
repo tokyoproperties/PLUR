@@ -71,8 +71,14 @@ export interface NarrativeLines {
 // ─── Field (Hybrid) ───────────────────────────────────────
 
 function fieldNarrative(hybrid: HybridState): string {
+  // Mission 11 Layer 1 follow-up (spotted live on-device, July 7 2026):
+  // this guard ran before the switch and used its own one-off
+  // construction with an em-dash -- exactly the pattern broken
+  // everywhere else in this file. Unified to the same
+  // 'base sentence. qualifier sentence.' shape corridorNarrative
+  // already uses for its 'uncertain confidence' case.
   if (hybrid.dataQuality === 'forming') {
-    return 'Field reading is forming — sensors not yet active.';
+    return 'Field is forming. Sensors not yet active.';
   }
   switch (hybrid.fieldState) {
     case 'calm': return 'Field is calm.';
