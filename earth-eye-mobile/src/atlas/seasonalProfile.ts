@@ -52,8 +52,13 @@ export type PatternStatus = 'forming' | 'unclear' | 'confirmed';
 /**
  * Data-richness confidence — mirrors DriftConfidence's axis (how much
  * history backs this read), not live-sensor reliability. 'uncertain'
- * covers the zero-data case, which DriftConfidence's 3-level scale
- * doesn't distinguish from plain 'low'.
+ * covers the zero-data case.
+ *
+ * (Mission 8 update: DriftConfidence was 3-level when this comment was
+ * first written and genuinely couldn't make this distinction -- it has
+ * since been widened to the same 4-level shape as this type, for the
+ * same reason. Comment corrected so it doesn't claim a gap that no
+ * longer exists.)
  */
 export type SeasonalConfidence = 'high' | 'medium' | 'low' | 'uncertain';
 

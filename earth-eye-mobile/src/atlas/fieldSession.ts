@@ -61,8 +61,17 @@ export interface FieldSessionSummary {
   dominantFieldState: HybridFieldState | null;
   dominantCorridorTone: CorridorTone | null;
   corridorStability: CorridorStability;
-  /** Species invited at any point during the session, in first-seen order */
+  /** Species invited at any point during the session, in first-seen order (real-time, ecosystem-engine.ts) */
   speciesHighlights: string[];
+  /**
+   * Species forecast as seasonally likely at any point during the
+   * session, in first-seen order (Mission 8 — seasonal forecast,
+   * speciesArrival.ts). Genuinely different question from
+   * speciesHighlights above ("was it invited right now?" vs "was it
+   * seasonally likely?") -- kept as its own field per the Mission 8
+   * decision not to merge the two species engines.
+   */
+  speciesSeasonalHighlights: string[];
   /** Human-readable one-line summary */
   summary: string;
 }
@@ -169,6 +178,17 @@ export function summarizeSession(session: FieldSession): FieldSessionSummary {
     }
   }
 
+  const speciesSeasonalHighlights: string[] = [];
+  const seenSeasonal = new Set<string>();
+  for (const m of moments) {
+    for (const s of m.seasonalImminentSpecies) {
+      if (!seenSeasonal.has(s)) {
+        seenSeasonal.add(s);
+        speciesSeasonalHighlights.push(s);
+      }
+    }
+  }
+
   const parts: string[] = [];
   const minutes = Math.round(durationMs / 60000);
   parts.push(minutes >= 1 ? `${minutes} min` : 'just started');
@@ -185,6 +205,7 @@ export function summarizeSession(session: FieldSession): FieldSessionSummary {
     dominantCorridorTone,
     corridorStability,
     speciesHighlights,
+    speciesSeasonalHighlights,
     summary: parts.join(' · '),
   };
 }

@@ -26,7 +26,21 @@ export type DriftDirection =
   | 'mixed-oscillating'
   | 'stable';
 
-export type DriftConfidence = 'low' | 'medium' | 'high';
+/**
+ * Mission 8 (Species Architecture v2): widened from 3 values to the
+ * same 4-value shape as HybridConfidence/SeasonalConfidence
+ * ('high'|'medium'|'low'|'uncertain'). Distinct concept, same
+ * vocabulary -- this is data-richness confidence (how much history
+ * backs this drift read), not live-sensor confidence, matching the
+ * existing conceptual split documented in ecosystem-engine.ts and
+ * seasonalProfile.ts. Also fixes a real ambiguity: the
+ * insufficient-data early-return below used to return 'low', the
+ * exact same label as a fully-assessed-but-weak read at the bottom of
+ * this function -- two different situations sharing one word.
+ * 'uncertain' now means "not enough moments yet," 'low' means "enough
+ * moments, and the signal genuinely reads weak."
+ */
+export type DriftConfidence = 'high' | 'medium' | 'low' | 'uncertain';
 
 export type DriftCharacter =
   | 'stable'
@@ -95,7 +109,7 @@ export function evaluateCorridorDrift(
   if (moments.length < 5) {
     return {
       direction: 'stable',
-      confidence: 'low',
+      confidence: 'uncertain',
       character: 'stable',
       alignsWithSeason: false,
       recentEvents: [],

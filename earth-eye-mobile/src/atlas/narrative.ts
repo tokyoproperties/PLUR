@@ -45,12 +45,25 @@ import type { CorridorState } from '@/corridor/corridor-engine';
 import type { EcosystemState } from '@/ecosystem/ecosystem-engine';
 import type { SeasonalProfile } from '@/atlas/seasonalProfile';
 import type { FieldSessionSummary } from '@/atlas/fieldSession';
+import type { ArrivalSummary } from '@/ecosystem/speciesArrival';
 
 export interface NarrativeLines {
   fieldLine: string;
   corridorLine: string;
+  /** Real-time species gate (ecosystem-engine.ts) — "is this species invited right now?" */
   speciesLine: string;
   seasonLine: string;
+  /**
+   * Seasonal species forecast (speciesArrival.ts, Mission 8) — "is this
+   * species seasonally likely?" A genuinely different question from
+   * speciesLine above, per the Mission 8 architecture decision to keep
+   * the two species engines separate rather than merge them. Thin
+   * composition, not new derivation: speciesArrival.ts's ArrivalSummary
+   * already produces a complete, well-formed one-line headline covering
+   * every case (no species likely / high-likelihood species / moderate
+   * only) -- reused directly rather than re-implemented here.
+   */
+  seasonalSpeciesLine: string;
   /** null when no session has started yet (mirrors useFieldSession()'s own null-before-first-moment contract) */
   sessionLine: string | null;
 }
@@ -137,7 +150,17 @@ function sessionNarrative(session: FieldSessionSummary | null): string | null {
     session.corridorStability === 'shifting' ? ', shifting corridor' :
     '';
 
-  return `Session shows a ${stateClause}${stabilityClause}.`;
+  let line = `Session shows a ${stateClause}${stabilityClause}.`;
+
+  // Mission 8: mention seasonal forecast species when present -- the
+  // brief's "speciesSessionTone" ask, satisfied as an enrichment of
+  // the existing session line rather than a separate new field, since
+  // it's the same sentence just saying one more true thing.
+  if (session.speciesSeasonalHighlights.length > 0) {
+    line += ` ${session.speciesSeasonalHighlights[0]} in season.`;
+  }
+
+  return line;
 }
 
 // ─── Composer ─────────────────────────────────────────────
@@ -147,6 +170,7 @@ export function buildNarrative(args: {
   corridor: CorridorState;
   ecosystem: EcosystemState;
   seasonal: SeasonalProfile;
+  arrivals: ArrivalSummary;
   session: FieldSessionSummary | null;
 }): NarrativeLines {
   return {
@@ -154,6 +178,7 @@ export function buildNarrative(args: {
     corridorLine: corridorNarrative(args.corridor),
     speciesLine: speciesNarrative(args.ecosystem),
     seasonLine: seasonNarrative(args.seasonal),
+    seasonalSpeciesLine: args.arrivals.headline,
     sessionLine: sessionNarrative(args.session),
   };
 }

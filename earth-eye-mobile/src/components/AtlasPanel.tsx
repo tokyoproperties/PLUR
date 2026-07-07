@@ -279,6 +279,12 @@ export function AtlasPanel() {
               {session.speciesHighlights.length > 3 ? ', and more' : ''} present this session.
             </ThemedText>
           )}
+          {session.speciesSeasonalHighlights.length > 0 && (
+            <ThemedText style={styles.recentText}>
+              {session.speciesSeasonalHighlights.slice(0, 3).join(', ')}
+              {session.speciesSeasonalHighlights.length > 3 ? ', and more' : ''} forecast this session.
+            </ThemedText>
+          )}
           {session.corridorStability !== 'insufficient-data' && (
             <ThemedText style={styles.recentText}>
               Corridor {session.corridorStability} this session.
@@ -297,6 +303,7 @@ export function AtlasPanel() {
           <ThemedText style={styles.voiceLine}>{narrative.fieldLine}</ThemedText>
           <ThemedText style={styles.voiceLine}>{narrative.corridorLine}</ThemedText>
           <ThemedText style={styles.voiceLine}>{narrative.speciesLine}</ThemedText>
+          <ThemedText style={styles.voiceLine}>{narrative.seasonalSpeciesLine}</ThemedText>
           <ThemedText style={styles.voiceLine}>{narrative.seasonLine}</ThemedText>
           {narrative.sessionLine !== null && (
             <ThemedText style={styles.voiceLine}>{narrative.sessionLine}</ThemedText>

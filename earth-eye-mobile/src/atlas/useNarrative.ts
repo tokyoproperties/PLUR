@@ -15,6 +15,7 @@ import { useCorridor } from '@/corridor/useCorridor';
 import { useEcosystem } from '@/ecosystem/useEcosystem';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useFieldSession } from '@/atlas/useFieldSession';
+import { useSpeciesArrival } from '@/ecosystem/useSpeciesArrival';
 
 export type { NarrativeLines } from '@/atlas/narrative';
 
@@ -23,10 +24,11 @@ export function useNarrative(): NarrativeLines {
   const corridor = useCorridor();
   const ecosystem = useEcosystem();
   const seasonal = useSeasonalProfile();
+  const arrivals = useSpeciesArrival();
   const session = useFieldSession();
 
   return useMemo(
-    () => buildNarrative({ hybrid, corridor, ecosystem, seasonal, session }),
-    [hybrid, corridor, ecosystem, seasonal, session]
+    () => buildNarrative({ hybrid, corridor, ecosystem, seasonal, arrivals, session }),
+    [hybrid, corridor, ecosystem, seasonal, arrivals, session]
   );
 }

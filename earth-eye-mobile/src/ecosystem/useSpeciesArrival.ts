@@ -17,6 +17,7 @@ import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useCorridorDrift } from '@/corridor/useCorridorDrift';
 import { useSensors } from '@/hooks/useSensors';
 import { useCorridor } from '@/corridor/useCorridor';
+import { isCoastalTrailName } from '@/utils/coastalTrails';
 
 export type { ArrivalSummary, SpeciesArrival, ArrivalLikelihood } from '@/ecosystem/speciesArrival';
 
@@ -26,14 +27,11 @@ export function useSpeciesArrival(): ArrivalSummary {
   const { snapshot } = useSensors();
   const corridor = useCorridor();
 
-  // Detect coastal proximity from nearest trail name
-  const nearCoastal = useMemo(() => {
-    const name = corridor.nearestTrailName?.toLowerCase() ?? '';
-    return name.includes('beach') || name.includes('cove') || name.includes('coast') ||
-      name.includes('bluff') || name.includes('harbor') || name.includes('pier') ||
-      name.includes('dana point') || name.includes('crystal cove') ||
-      name.includes('laguna') || name.includes('aliso creek beach');
-  }, [corridor.nearestTrailName]);
+  // Detect coastal proximity from nearest trail name (Mission 8: now
+  // the shared isCoastalTrailName() matcher -- this used to be an
+  // independent copy of fieldMoment.ts's own coastal keyword list,
+  // already diverged from it)
+  const nearCoastal = useMemo(() => isCoastalTrailName(corridor.nearestTrailName), [corridor.nearestTrailName]);
 
   return useMemo(
     () => evaluateSpeciesArrival({

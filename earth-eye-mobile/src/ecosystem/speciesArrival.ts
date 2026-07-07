@@ -25,12 +25,17 @@ import type { SeasonalPhase } from '@/atlas/seasonalProfile';
 import type { CorridorDrift } from '@/corridor/drift';
 import type { SensorSnapshot } from '@/hooks/useSensors';
 import { ECOSYSTEM_LUX_THRESHOLDS } from '@/utils/thresholds';
+import { ECOSYSTEM_CANON } from '@/ecosystem/species';
 
 // ─── Types ────────────────────────────────────────────────
 
 export type ArrivalLikelihood = 'high' | 'moderate' | 'low' | 'dormant';
 
 export interface SpeciesArrival {
+  /** Canonical species id (Mission 8) — matches ECOSYSTEM_CANON, the same
+   * id ecosystem-engine.ts uses, so both engines can be correlated by
+   * id instead of by fragile name-string equality. */
+  id: string;
   /** Species name */
   name: string;
   /** Likelihood of encountering this species soon */
@@ -73,7 +78,14 @@ function isNight(timeOfDay: string): boolean {
 // ─── Species arrival data ─────────────────────────────────
 
 interface SpeciesArrivalRule {
-  name: string;
+  /** Canonical species id (Mission 8) — looked up against ECOSYSTEM_CANON
+   * for the display name, instead of duplicating the name string here.
+   * Verified 1:1 against ecosystem/species.ts before this change: all
+   * 10 rules already matched an existing canon species by name exactly
+   * (no mismatches, no missing species) -- this just makes that
+   * correlation an explicit id instead of an implicit string match, so
+   * a future rename can't silently break the correlation. */
+  id: string;
   peakSeasons: SeasonalPhase[];
   activeSeasons: SeasonalPhase[];
   preferredTime: ('dawn' | 'morning' | 'midday' | 'afternoon' | 'dusk' | 'night' | 'any')[];
@@ -92,7 +104,7 @@ interface ArrivalContext {
 
 const SPECIES_RULES: SpeciesArrivalRule[] = [
   {
-    name: 'Pacific Chorus Frog',
+    id: 'pacific-chorus-frog',
     peakSeasons: ['early-spring'],
     activeSeasons: ['early-spring', 'winter-night', 'transitional'],
     preferredTime: ['night', 'dusk', 'dawn'],
@@ -104,7 +116,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
     },
   },
   {
-    name: 'Big Brown Bat',
+    id: 'big-brown-bat',
     peakSeasons: ['high-summer'],
     activeSeasons: ['high-summer', 'late-autumn', 'transitional'],
     preferredTime: ['night', 'dusk'],
@@ -116,7 +128,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
     },
   },
   {
-    name: 'Western Fence Lizard',
+    id: 'fence-lizard',
     peakSeasons: ['high-summer'],
     activeSeasons: ['high-summer', 'early-spring', 'transitional'],
     preferredTime: ['midday', 'afternoon', 'morning'],
@@ -128,7 +140,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
     },
   },
   {
-    name: 'California Ground Squirrel',
+    id: 'ground-squirrel',
     peakSeasons: ['high-summer'],
     activeSeasons: ['high-summer', 'late-autumn', 'transitional'],
     preferredTime: ['morning', 'midday', 'afternoon'],
@@ -138,7 +150,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
       `${ctx.season === 'high-summer' ? 'High summer' : 'Warm'} corridors favor Ground Squirrel — active below and above ground.`,
   },
   {
-    name: 'Acorn Woodpecker',
+    id: 'acorn-woodpecker',
     peakSeasons: ['late-autumn'],
     activeSeasons: ['late-autumn', 'early-spring', 'transitional'],
     preferredTime: ['morning', 'midday', 'afternoon'],
@@ -148,7 +160,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
       `${ctx.season === 'late-autumn' ? 'Late autumn' : 'The season'} brings Acorn Woodpecker — storing and foraging in calm corridors.`,
   },
   {
-    name: 'Turkey Tail',
+    id: 'turkey-tail',
     peakSeasons: ['late-autumn', 'winter-night'],
     activeSeasons: ['late-autumn', 'winter-night', 'transitional'],
     preferredTime: ['any'],
@@ -158,7 +170,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
       `${ctx.season === 'late-autumn' || ctx.season === 'winter-night' ? 'Cool, moist conditions' : 'Moist conditions'} favor Turkey Tail — decomposer on fallen branches.`,
   },
   {
-    name: 'Brown Pelican',
+    id: 'brown-pelican',
     peakSeasons: ['high-summer'],
     activeSeasons: ['high-summer', 'late-autumn', 'transitional'],
     preferredTime: ['morning', 'midday', 'afternoon'],
@@ -168,7 +180,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
       `${ctx.nearCoastal ? 'Salt air corridor and' : 'Coastal proximity and'} ${ctx.season === 'high-summer' ? 'summer' : 'the season'} favor Brown Pelican.`,
   },
   {
-    name: 'Belted Kingfisher',
+    id: 'belted-kingfisher',
     peakSeasons: ['late-autumn', 'winter-night'],
     activeSeasons: ['late-autumn', 'winter-night', 'transitional', 'early-spring'],
     preferredTime: ['morning', 'midday', 'afternoon'],
@@ -178,7 +190,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
       `${ctx.nearCoastal ? 'Water corridor and' : 'Riparian conditions and'} ${ctx.season === 'late-autumn' ? 'autumn' : 'the season'} favor Belted Kingfisher.`,
   },
   {
-    name: 'Lemonade Berry',
+    id: 'lemonade-berry',
     peakSeasons: ['early-spring', 'transitional'],
     activeSeasons: ['early-spring', 'transitional', 'high-summer', 'late-autumn'],
     preferredTime: ['any'],
@@ -188,7 +200,7 @@ const SPECIES_RULES: SpeciesArrivalRule[] = [
       'Lemonade Berry holds the ground — roots run deep, always present in the corridor.',
   },
   {
-    name: 'Purple Needlegrass',
+    id: 'purple-needlegrass',
     peakSeasons: ['early-spring'],
     activeSeasons: ['early-spring', 'transitional'],
     preferredTime: ['any'],
@@ -220,6 +232,11 @@ export function evaluateSpeciesArrival(args: {
   };
 
   const species = SPECIES_RULES.map((rule) => {
+    // Mission 8: name is looked up from the canonical list by id rather
+    // than duplicated as a string on the rule -- one source of truth.
+    // Non-null assert is safe: the reconciliation done when this field
+    // was added verified every rule.id has a matching canon entry.
+    const canonEntry = ECOSYSTEM_CANON.find((s) => s.id === rule.id)!;
     const inPeakSeason = rule.peakSeasons.includes(season);
     const isActiveSeason = rule.activeSeasons.includes(season);
 
@@ -255,7 +272,8 @@ export function evaluateSpeciesArrival(args: {
     }
 
     return {
-      name: rule.name,
+      id: rule.id,
+      name: canonEntry.name,
       likelihood,
       window: rule.window,
       reason: rule.reasonTemplate(ctx),

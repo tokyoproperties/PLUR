@@ -30,6 +30,9 @@ import type { SymbolicMode } from '@/contexts/mode-context';
 import type { SensorSnapshot } from '@/hooks/useSensors';
 import type { LocationConfidence } from '@/utils/thresholds';
 import { evaluateSeasonalProfile, type SeasonalConfidence } from '@/atlas/seasonalProfile';
+import { isCoastalTrailName } from '@/utils/coastalTrails';
+import { evaluateCorridorDrift } from '@/corridor/drift';
+import { evaluateSpeciesArrival } from '@/ecosystem/speciesArrival';
 
 // ─── Field Moment ─────────────────────────────────────────
 
@@ -93,6 +96,15 @@ export interface FieldMoment {
   hybridConfidence: HybridConfidence;
   ecosystemConfidence: HybridConfidence;
   seasonalConfidence: SeasonalConfidence;
+  /**
+   * Species Mission 8 (July 7 2026): the seasonal-forecast species
+   * (speciesArrival.ts's "high"/"moderate" likelihood list) present at
+   * capture time -- distinct from `invitedSpecies` above, which is the
+   * real-time ecosystem-engine.ts gate. Two different questions, two
+   * different lists, kept genuinely separate per the Mission 8
+   * architecture decision not to merge the two species engines.
+   */
+  seasonalImminentSpecies: string[];
 }
 
 // ─── Season helper ────────────────────────────────────────
@@ -123,17 +135,10 @@ function determineCardType(args: {
   // Rough: after 8pm or before 5am
   if (hour >= 20 || hour < 5) return 'night';
 
-  // Coastal detection from trail name
-  const coastal = nearestTrail?.toLowerCase().includes('beach') ||
-    nearestTrail?.toLowerCase().includes('cove') ||
-    nearestTrail?.toLowerCase().includes('coast') ||
-    nearestTrail?.toLowerCase().includes('bluff') ||
-    nearestTrail?.toLowerCase().includes('harbor') ||
-    nearestTrail?.toLowerCase().includes('pier') ||
-    nearestTrail?.toLowerCase().includes('dana point') ||
-    false;
-
-  if (coastal) return 'coastal';
+  // Coastal detection from trail name (Mission 8: now the shared
+  // isCoastalTrailName() matcher instead of a local keyword copy that
+  // had already drifted out of sync with useSpeciesArrival.ts's own copy)
+  if (isCoastalTrailName(nearestTrail)) return 'coastal';
   if (proximity === 'in-yard' || proximity === 'near-yard') return 'yard';
   if (proximity === 'near-trail') return 'trail';
 
@@ -209,8 +214,29 @@ export function captureFieldMoment(args: {
   fireworkWindow: boolean;
   now?: Date;
 }): FieldMoment {
-  const { hybrid, corridor, ecosystem, emergency, suit, location, locationConfidence, priorMoments, fireworkWindow, now = new Date() } = args;
-  const seasonalConfidence = evaluateSeasonalProfile(priorMoments, now).confidence;
+  const { hybrid, corridor, ecosystem, emergency, suit, snapshot, location, locationConfidence, priorMoments, fireworkWindow, now = new Date() } = args;
+
+  // Mission 8: seasonalProfile evaluated once and reused for both
+  // confidence (already existed, Mission 6) and .phase (new -- feeds
+  // the drift + arrival evaluation below), instead of a second call.
+  const seasonalProfile = evaluateSeasonalProfile(priorMoments, now);
+  const seasonalConfidence = seasonalProfile.confidence;
+
+  // Seasonal species forecast at capture time. Reuses the same pure
+  // evaluators the live Atlas cards call (drift + arrival), over the
+  // prior ring + this moment's own corridor/snapshot -- no new logic,
+  // just the existing seasonal-forecast pipeline run at capture time
+  // instead of only at render time.
+  const drift = evaluateCorridorDrift(priorMoments, seasonalProfile.phase, now);
+  const nearCoastal = isCoastalTrailName(corridor.nearestTrailName);
+  const arrivals = evaluateSpeciesArrival({
+    season: seasonalProfile.phase,
+    drift,
+    snapshot,
+    nearCoastal,
+    now,
+  });
+  const seasonalImminentSpecies = arrivals.imminent.map((s) => s.name);
 
   const season = getSeason(now);
   const hour = now.getHours();
@@ -261,6 +287,7 @@ export function captureFieldMoment(args: {
     hybridConfidence: hybrid.confidence,
     ecosystemConfidence: ecosystem.confidence,
     seasonalConfidence,
+    seasonalImminentSpecies,
   };
 }
 
