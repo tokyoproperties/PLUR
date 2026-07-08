@@ -18,7 +18,12 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.eartheyemobile"
+      "package": "com.anonymous.eartheyemobile",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCombWGLM-pMIFUbAV-is3bknfuJs8VA38"
+        }
+      }
     },
     "web": {
       "output": "static",
