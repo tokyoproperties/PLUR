@@ -280,13 +280,13 @@ export function AtlasPanel() {
             </ThemedText>
           )}
           {session.speciesSeasonalHighlights.length > 0 && (
-            <ThemedText style={styles.recentText}>
+            <ThemedText style={styles.sessionNoteLine}>
               {session.speciesSeasonalHighlights.slice(0, 3).join(', ')}
               {session.speciesSeasonalHighlights.length > 3 ? ', and more' : ''} forecast this session.
             </ThemedText>
           )}
           {session.corridorStability !== 'insufficient-data' && (
-            <ThemedText style={styles.recentText}>
+            <ThemedText style={styles.sessionNoteLine}>
               Corridor {session.corridorStability} this session.
             </ThemedText>
           )}
@@ -592,6 +592,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.50)',
     lineHeight: 21,
+    marginBottom: Spacing.two,
   },
   recentSection: {
     marginTop: Spacing.three,
@@ -613,8 +614,24 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: 'rgba(255,255,255,0.30)',
   },
+  // Mission 11 Layer 2: the seasonal-species and corridor-stability
+  // lines in THIS SESSION were reusing recentText -- an 11px plain
+  // style built for the compact recent-moments LOG above, not
+  // narrative prose. That made them read as afterthoughts next to
+  // the bold cardText species line right above them. This is the
+  // correct register for those two lines: same family as
+  // driftLine/rhythmLine, dimmer than cardText since it IS secondary,
+  // but no longer an orphan style outside the constitution's type tokens.
+  sessionNoteLine: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.45)',
+    lineHeight: 21,
+    marginTop: Spacing.half,
+  },
   voiceLines: {
-    gap: Spacing.one,
+    gap: Spacing.two,
   },
   voiceLine: {
     fontSize: 14,
