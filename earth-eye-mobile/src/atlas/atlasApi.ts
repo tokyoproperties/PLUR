@@ -23,11 +23,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ──────────────────────────────────────────────────────────────────
 // CDN URLs — update these once you push the JSON files to your host.
-// Recommended host: GitHub Pages → tokyoproperties.github.io/PLUR/data/
+// Host: media.base44.com (permanent CDN, same host as all atlas imagery)
 // ──────────────────────────────────────────────────────────────────
 export const ATLAS_URLS = {
-  species: 'https://tokyoproperties.github.io/PLUR/data/eartheye_species.json',
-  trails:  'https://tokyoproperties.github.io/PLUR/data/eartheye_trails.json',
+  species: 'https://media.base44.com/files/public/69dffe15eb268f56342f8e58/f2725f3b3_eartheye_species.json',
+  trails:  'https://media.base44.com/files/public/69dffe15eb268f56342f8e58/34af6d78d_eartheye_trails.json',
 } as const;
 
 const CACHE_KEYS = {
