@@ -44,6 +44,7 @@ const s = StyleSheet.create({
     padding: 16,
     gap: 6,
     marginBottom: Spacing.three,
+    alignSelf: 'stretch',
   },
   whisper: {
     fontSize: 9, fontWeight: '700', textTransform: 'uppercase',
