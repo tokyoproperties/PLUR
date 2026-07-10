@@ -43,7 +43,6 @@ const s = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.07)',
     padding: 16,
     gap: 6,
-    marginHorizontal: Spacing.three,
     marginBottom: Spacing.three,
   },
   whisper: {
