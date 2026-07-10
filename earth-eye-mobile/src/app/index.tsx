@@ -58,7 +58,7 @@ function QuickLaunchTile({
 
   // Each tile staggers 50ms after the grid container appears at 520ms
   const tileDelay = 520 + index * 50;
-  const tileEntering = FadeIn.duration(300).delay(tileDelay).springify().damping(20).stiffness(100);
+  const tileEntering = FadeIn.duration(300).delay(tileDelay);
 
   return (
     <Link href={item.href} asChild>
@@ -104,7 +104,6 @@ export default function HomeScreen() {
   const yard = evaluateYardMode(snapshot);
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
 
-  console.log('[HOME] render called, mode=', mode, 'seasonal=', seasonal.phaseLabel);
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
