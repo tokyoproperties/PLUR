@@ -9,6 +9,7 @@ import { HybridFieldStateCard } from '@/components/HybridFieldState';
 import { ModeBadge } from '@/components/ModeBadge';
 import { ModeToggle } from '@/components/ModeToggle';
 import { ThemedText } from '@/components/themed-text';
+import { SeasonalFieldCard } from '@/components/SeasonalFieldCard';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useFieldSoul } from '@/atlas/useFieldSoul';
@@ -173,6 +174,8 @@ export default function HomeScreen() {
 
           {/* Quick Launch grid — tiles stagger individually */}
           <Animated.View entering={FADE_LAUNCH} style={styles.fullWidth}>
+          <SeasonalFieldCard />
+
             <ThemedText style={styles.sectionLabel}>EXPLORE</ThemedText>
             <View style={styles.tileGrid}>
               {chunkPairs(LAUNCH_ITEMS).map((row, rowIndex) => (

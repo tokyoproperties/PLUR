@@ -1,3 +1,4 @@
+import { getCalendarSeason } from '@/hooks/useSeason';
 /**
  * useTrailList.ts — Mission 15
  *
@@ -32,14 +33,6 @@ export function normHeatRisk(h?: string): string {
   return h?.toLowerCase().trim() ?? 'unknown';
 }
 
-function getCurrentSeason(): string {
-  const m = new Date().getMonth();
-  if (m >= 2 && m <= 4) return 'spring';
-  if (m >= 5 && m <= 7) return 'summer';
-  if (m >= 8 && m <= 10) return 'fall';
-  return 'winter';
-}
-
 export function useTrailList(filter: TrailFilter): UseTrailListResult {
   const [all, setAll]       = useState<AtlasTrail[]>([]);
   const [loading, setLoad]  = useState(true);
@@ -69,7 +62,7 @@ export function useTrailList(filter: TrailFilter): UseTrailListResult {
       );
     }
 
-    const season = getCurrentSeason();
+    const season = getCalendarSeason();
     result = [...result].sort((a, b) => {
       switch (filter.sort) {
         case 'distance':

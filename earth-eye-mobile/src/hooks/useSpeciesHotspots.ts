@@ -1,3 +1,4 @@
+import { getCalendarSeason } from '@/hooks/useSeason';
 /**
  * useSpeciesHotspots.ts — Mission 16
  *
@@ -23,14 +24,6 @@ export type SpeciesHotspot = {
   dominantGroup: string;   // most frequent group at this trail
 };
 
-function getCurrentSeason(): string {
-  const m = new Date().getMonth();
-  if (m >= 2 && m <= 4) return 'spring';
-  if (m >= 5 && m <= 7) return 'summer';
-  if (m >= 8 && m <= 10) return 'fall';
-  return 'winter';
-}
-
 export function useSpeciesHotspots(
   species: AtlasSpecies[],
   trails:  AtlasTrail[],
@@ -39,7 +32,7 @@ export function useSpeciesHotspots(
   return useMemo(() => {
     if (!enabled || species.length === 0 || trails.length === 0) return [];
 
-    const season = getCurrentSeason();
+    const season = getCalendarSeason();
     const trailMap = new Map(trails.map((t) => [t.id, t]));
 
     // Build per-trail species lists
