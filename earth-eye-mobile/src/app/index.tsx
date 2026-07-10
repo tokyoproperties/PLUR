@@ -50,12 +50,10 @@ function QuickLaunchTile({
   item,
   index,
   isLastInRow,
-  isSolo = false,
 }: {
   item: LaunchItem;
   index: number;
   isLastInRow: boolean;
-  isSolo?: boolean;
 }) {
   const handlePressIn = () => {
     Haptics.selectionAsync();
@@ -72,7 +70,7 @@ function QuickLaunchTile({
         style={({ pressed }) => [styles.tileFlex, pressed && styles.tilePressed]}>
         <Animated.View
           entering={tileEntering}
-          style={[styles.tile, !isLastInRow && styles.tileGap, isSolo && styles.tileSolo]}>
+          style={[styles.tile, !isLastInRow && styles.tileGap]}>
           <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
             {item.label}
           </ThemedText>
@@ -175,7 +173,9 @@ export default function HomeScreen() {
           </Animated.View>
 
           {/* Season intelligence card */}
-          <SeasonalFieldCard />
+          <View style={styles.fullWidth}>
+            <SeasonalFieldCard />
+          </View>
 
           {/* Quick Launch grid — tiles stagger individually */}
           <Animated.View entering={FADE_LAUNCH} style={styles.fullWidth}>
@@ -189,9 +189,9 @@ export default function HomeScreen() {
                       item={item}
                       index={rowIndex * 2 + i}
                       isLastInRow={i === row.length - 1}
-                      isSolo={row.length === 1}
                     />
                   ))}
+                  {row.length === 1 && <View style={styles.tileFlex} />}
                 </View>
               ))}
             </View>
@@ -349,10 +349,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.two,
   },
-  tileSolo: {
-    // Solo tile: constrain to half-row width so it doesn't span full width
-    maxWidth: '50%',
-  },
+
   tileGap: {
     marginRight: Spacing.two,
   },
