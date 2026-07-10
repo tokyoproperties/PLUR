@@ -104,6 +104,7 @@ export default function HomeScreen() {
   const yard = evaluateYardMode(snapshot);
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
 
+  console.log('[HOME] render called, mode=', mode, 'seasonal=', seasonal.phaseLabel);
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
