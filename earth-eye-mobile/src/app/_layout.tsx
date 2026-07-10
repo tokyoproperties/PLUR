@@ -1,3 +1,4 @@
+import 'expo-dev-client';
 import { DarkTheme, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { enableFreeze } from 'react-native-screens';
