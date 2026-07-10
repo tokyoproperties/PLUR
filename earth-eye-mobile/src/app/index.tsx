@@ -27,7 +27,7 @@ const FADE_MODE = FadeIn.duration(400).delay(320);
 const FADE_STATE = FadeIn.duration(400).delay(400);
 const FADE_LAUNCH = FadeIn.duration(400).delay(520);
 
-type LaunchHref = '/map' | '/sensors' | '/atlas' | '/ecosystem' | '/suit';
+type LaunchHref = '/map' | '/sensors' | '/atlas' | '/ecosystem' | '/suit' | '/species';
 
 interface LaunchItem {
   href: LaunchHref;
@@ -36,9 +36,10 @@ interface LaunchItem {
 }
 
 const LAUNCH_ITEMS: LaunchItem[] = [
+  { href: '/species', label: 'Species', hint: '542 atlas entries' },
+  { href: '/map', label: 'Map', hint: 'Trails & corridors' },
   { href: '/atlas', label: 'Atlas', hint: 'Cosmology stack' },
   { href: '/ecosystem', label: 'Field', hint: 'Living ecosystem' },
-  { href: '/map', label: 'Map', hint: 'Trails & corridors' },
   { href: '/suit', label: 'Suit', hint: 'Sensor bands' },
   { href: '/sensors', label: 'Sensors', hint: 'Live readings' },
 ];
