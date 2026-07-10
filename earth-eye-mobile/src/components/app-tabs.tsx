@@ -89,8 +89,9 @@ export default function AppTabs() {
       {/* Hidden routes — accessible from Home quick-launch */}
       <Tabs.Screen name="sensors" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="explore" options={{ href: null, headerShown: false }} />
-      {/* Species browser — accessible via Quick Launch and deep link */}
-      <Tabs.Screen name="species" options={{ href: null, headerShown: false }} />
+      {/* Species browser — folder route, all sub-screens hidden from tab bar */}
+      <Tabs.Screen name="species/index" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="species/[id]" options={{ href: null, headerShown: false }} />
     </Tabs>
   );
 }
