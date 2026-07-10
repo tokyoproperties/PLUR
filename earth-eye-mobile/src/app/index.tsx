@@ -50,10 +50,12 @@ function QuickLaunchTile({
   item,
   index,
   isLastInRow,
+  isSolo = false,
 }: {
   item: LaunchItem;
   index: number;
   isLastInRow: boolean;
+  isSolo?: boolean;
 }) {
   const handlePressIn = () => {
     Haptics.selectionAsync();
@@ -70,7 +72,7 @@ function QuickLaunchTile({
         style={({ pressed }) => [styles.tileFlex, pressed && styles.tilePressed]}>
         <Animated.View
           entering={tileEntering}
-          style={[styles.tile, !isLastInRow && styles.tileGap]}>
+          style={[styles.tile, !isLastInRow && styles.tileGap, isSolo && styles.tileSolo]}>
           <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
             {item.label}
           </ThemedText>
@@ -172,10 +174,11 @@ export default function HomeScreen() {
             <HybridFieldStateCard />
           </Animated.View>
 
-          {/* Quick Launch grid — tiles stagger individually */}
-          <Animated.View entering={FADE_LAUNCH} style={styles.fullWidth}>
+          {/* Season intelligence card */}
           <SeasonalFieldCard />
 
+          {/* Quick Launch grid — tiles stagger individually */}
+          <Animated.View entering={FADE_LAUNCH} style={styles.fullWidth}>
             <ThemedText style={styles.sectionLabel}>EXPLORE</ThemedText>
             <View style={styles.tileGrid}>
               {chunkPairs(LAUNCH_ITEMS).map((row, rowIndex) => (
@@ -186,6 +189,7 @@ export default function HomeScreen() {
                       item={item}
                       index={rowIndex * 2 + i}
                       isLastInRow={i === row.length - 1}
+                      isSolo={row.length === 1}
                     />
                   ))}
                 </View>
@@ -344,6 +348,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.two,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.two,
+  },
+  tileSolo: {
+    // Solo tile: constrain to half-row width so it doesn't span full width
+    maxWidth: '50%',
   },
   tileGap: {
     marginRight: Spacing.two,
