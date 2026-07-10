@@ -1,10 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import MapView, { PROVIDER_DEFAULT } from 'react-native-maps';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CorridorShading } from '@/components/map/CorridorShading';
 import { CorridorLayer } from '@/components/map/CorridorLayer';
+import { LayerControls, type MapLayers } from '@/components/map/LayerControls';
+import { SpeciesHotspotLayer } from '@/components/map/SpeciesHotspotLayer';
+import { TrailMarkerLayer } from '@/components/map/TrailMarkerLayer';
+import { useSpeciesHotspots } from '@/hooks/useSpeciesHotspots';
+import { loadSpecies, type AtlasSpecies, type AtlasTrail } from '@/atlas/atlasApi';
 import { EcosystemRing } from '@/components/map/EcosystemRing';
 import { FireworkWindowOverlay } from '@/components/map/FireworkWindowOverlay';
 import { IdentityStrip } from '@/components/map/IdentityStrip';
@@ -62,6 +67,19 @@ export default function MapScreen() {
   const sensorSummary = mode === 'plur' ? lite.summary : yardEval.summary;
 
   const [overlaysVisible, setOverlaysVisible] = useState(true);
+  const [mapLayers, setMapLayers] = useState<MapLayers>({
+    trails: true, hotspots: false, overlays: true,
+  });
+  const [allSpecies, setAllSpecies] = useState<AtlasSpecies[]>([]);
+  const allTrails   = trails as unknown as AtlasTrail[];
+
+  // Load species for hotspot layer (lazy — only when hotspots toggled on)
+  useEffect(() => {
+    if (!mapLayers.hotspots || allSpecies.length > 0) return;
+    loadSpecies().then(setAllSpecies).catch(() => {});
+  }, [mapLayers.hotspots, allSpecies.length]);
+
+  const hotspots = useSpeciesHotspots(allSpecies, allTrails, mapLayers.hotspots);
 
   const initialRegion = useMemo(
     () =>
@@ -127,8 +145,14 @@ export default function MapScreen() {
             />
           )}
 
-          {/* 74 trail markers — always shown */}
-          <CorridorLayer trails={trails} mode={mode} />
+          {/* Trail markers — tappable, navigate to trail detail */}
+          <TrailMarkerLayer trails={allTrails} visible={mapLayers.trails} />
+
+          {/* Legacy CorridorLayer hidden when new layer is active */}
+          {!mapLayers.trails && <CorridorLayer trails={trails} mode={mode} />}
+
+          {/* Species hotspot circles — density per trail anchor */}
+          <SpeciesHotspotLayer hotspots={hotspots} visible={mapLayers.hotspots} />
 
           {/* Yard marker — always shown */}
           <YardStripLayer yard={yard} mode={mode} sensorSummary={sensorSummary} />
@@ -156,6 +180,9 @@ export default function MapScreen() {
             {overlaysVisible ? '◐' : '○'}
           </ThemedText>
         </Pressable>
+
+        {/* Layer controls — below toggle button */}
+        <LayerControls layers={mapLayers} onChange={setMapLayers} />
 
         {/* Identity strip — bottom of map */}
         <IdentityStrip />
