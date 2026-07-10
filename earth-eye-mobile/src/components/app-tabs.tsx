@@ -92,6 +92,9 @@ export default function AppTabs() {
       {/* Species browser — folder route, all sub-screens hidden from tab bar */}
       <Tabs.Screen name="species/index" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="species/[id]" options={{ href: null, headerShown: false }} />
+      {/* Trail browser — folder route, hidden from tab bar */}
+      <Tabs.Screen name="trails/index" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="trails/[id]" options={{ href: null, headerShown: false }} />
     </Tabs>
   );
 }
