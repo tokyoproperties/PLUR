@@ -1,17 +1,18 @@
 /**
- * SeasonalFieldCard.tsx -- Arc 21
+ * SeasonalFieldCard.tsx -- Arc 22
  *
  * Home screen season intelligence card.
- * Signal stack (bottom to top, each optional):
- *   1. Field Window -- always shown
- *   2. Alignment -- shown when calibrated (3+ moments)
- *   3. Presence -- shown when calibrated + not absent
- *   4. Initiative -- shown when isSurfaced (confidence >= 0.55)
+ * Full signal stack (top to bottom, each optional below window):
+ *   1. Field Window   -- always shown
+ *   2. Branch         -- shown when isSurfaced (confidence >= 0.58, 5+ moments)
+ *   3. Initiative     -- shown when isSurfaced (confidence >= 0.55, 3+ moments)
+ *   4. Alignment      -- shown when calibrated (3+ moments)
+ *   5. Presence       -- shown when calibrated + not absent
+ *   6. Season label   -- always shown
  *
- * Initiative is the highest-priority signal. It appears above
- * presence and alignment in the read order -- but below the window
- * label, so the clock/season anchor stays first.
- * Constitutional: whisper label, italic serif directive, no shouts.
+ * Branch is the outermost signal -- the "what kind of field" layer.
+ * It sits above initiative, which sits above alignment, which sits above presence.
+ * Constitutional: whisper labels, italic serif prose, no shouts.
  */
 import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
@@ -21,6 +22,7 @@ import { useSeasonalFieldWindow } from '@/hooks/useSeasonalFieldWindow';
 import { useFieldAlignment } from '@/hooks/useFieldAlignment';
 import { useFieldPresence } from '@/hooks/useFieldPresence';
 import { useFieldInitiative } from '@/hooks/useFieldInitiative';
+import { useFieldBranch } from '@/hooks/useFieldBranch';
 
 const QUALITY_ACCENT: Record<string, string> = {
   prime:    Accents.sage,
@@ -49,21 +51,32 @@ const INITIATIVE_COLOR: Record<string, string> = {
   return:   '#C47A7A',
 };
 
+const BRANCH_COLOR: Record<string, string> = {
+  stillness:   '#9A7AB8',
+  movement:    '#7AB87A',
+  observation: '#7A9AB8',
+  return:      '#C47A7A',
+  exploration: '#C4974A',
+};
+
 export function SeasonalFieldCard() {
   const { label }    = useSeason();
   const fieldWindow  = useSeasonalFieldWindow();
   const alignment    = useFieldAlignment();
   const presence     = useFieldPresence();
   const initiative   = useFieldInitiative();
+  const branch       = useFieldBranch();
 
-  const accent         = QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage;
-  const alignColor     = ALIGNMENT_COLOR[alignment.state];
-  const presenceColor  = PRESENCE_COLOR[presence.state];
-  const initColor      = INITIATIVE_COLOR[initiative.action];
+  const accent        = QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage;
+  const alignColor    = ALIGNMENT_COLOR[alignment.state];
+  const presenceColor = PRESENCE_COLOR[presence.state];
+  const initColor     = INITIATIVE_COLOR[initiative.action];
+  const branchColor   = BRANCH_COLOR[branch.path];
 
+  const showBranch     = branch.isSurfaced;
+  const showInitiative = initiative.isSurfaced;
   const showAlignment  = alignment.isCalibrated;
   const showPresence   = presence.isCalibrated && presence.state !== 'absent';
-  const showInitiative = initiative.isSurfaced;
 
   return (
     <View style={s.card}>
@@ -74,8 +87,21 @@ export function SeasonalFieldCard() {
       </ThemedText>
       <ThemedText style={s.suggestion}>{fieldWindow.suggestion}</ThemedText>
 
+      {showBranch && (
+        <View style={[s.signalRow, s.branchRow]}>
+          <View style={[s.dot, { backgroundColor: branchColor }]} />
+          <ThemedText style={[s.signalLabel, { color: branchColor }]}>
+            {branch.path.toUpperCase()}
+            {branch.variant ? '  ' + branch.variant : ''}
+          </ThemedText>
+          <ThemedText style={s.signalDirective}>
+            {branch.overlay}
+          </ThemedText>
+        </View>
+      )}
+
       {showInitiative && (
-        <View style={[s.signalRow, s.initiativeRow]}>
+        <View style={s.signalRow}>
           <View style={[s.dot, { backgroundColor: initColor }]} />
           <ThemedText style={[s.signalLabel, { color: initColor }]}>
             {initiative.action.toUpperCase()}
@@ -137,8 +163,8 @@ const s = StyleSheet.create({
     fontSize: 14, fontFamily: 'Georgia', fontStyle: 'italic',
     color: 'rgba(255,255,255,0.72)', lineHeight: 22,
   },
-  initiativeRow: {
-    marginTop: 4,
+  branchRow: {
+    marginTop: 6,
     marginBottom: 2,
   },
   signalRow: {
