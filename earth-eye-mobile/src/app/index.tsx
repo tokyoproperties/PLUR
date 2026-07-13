@@ -50,10 +50,12 @@ function QuickLaunchTile({
   item,
   index,
   isLastInRow,
+  isSolo = false,
 }: {
   item: LaunchItem;
   index: number;
   isLastInRow: boolean;
+  isSolo?: boolean;
 }) {
   const handlePressIn = () => {
     Haptics.selectionAsync();
@@ -329,6 +331,11 @@ const styles = StyleSheet.create({
   tileRow: {
     flexDirection: 'row',
     width: '100%',
+  },
+  tileSpacer: {
+    flex: 1,
+    marginBottom: Spacing.two,
+    marginRight: 0,
   },
   // Each tile's outer wrapper (Link + Pressable) gets flex:1 so a
   // 2-item row always splits 50/50 — deterministic regardless of
