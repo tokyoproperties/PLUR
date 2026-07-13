@@ -17,6 +17,7 @@ import { useFieldSoul } from '@/atlas/useFieldSoul';
 import { useFieldSpirit } from '@/atlas/useFieldSpirit';
 import { useFieldMemory } from '@/atlas/useFieldMemory';
 import { useSeasonalFieldWindow } from '@/hooks/useSeasonalFieldWindow';
+import { useFieldAlignment } from '@/hooks/useFieldAlignment';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useSensors } from '@/hooks/useSensors';
@@ -117,18 +118,35 @@ export default function HomeScreen() {
   const seasonal = useSeasonalProfile();
 
   const memory = useFieldMemory();
-  const fieldWindow = useSeasonalFieldWindow();
+  const fieldWindow  = useSeasonalFieldWindow();
+  const alignment    = useFieldAlignment();
   const lite = evaluateLiteMode(snapshot);
   const yard = evaluateYardMode(snapshot);
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
 
   // Context-aware tile accents — living atlas layer
-  const tileAccents = useMemo<Record<string, string | undefined>>(() => ({
-    '/species': memory.totalMoments > 0 ? '#7AB87A' : undefined,        // sage when memory active
-    '/trails':  fieldWindow.quality === 'avoid' ? '#C47A7A' : undefined, // rose warning in danger window
-    '/sensors': !memory.isEstablished ? '#C4974A' : undefined,           // amber pulse while forming
-    '/field':   soul.isEstablished ? soul.traits[0]?.color ?? undefined : undefined,
-  }), [memory, fieldWindow.quality, soul]);
+  const tileAccents = useMemo<Record<string, string | undefined>>(() => {
+    const aligned    = alignment.state === 'aligned';
+    const misaligned = alignment.state === 'misaligned';
+    return {
+      // Species: sage when aligned + memory active
+      '/species': (aligned && memory.totalMoments > 0) ? '#7AB87A' : undefined,
+      // Trails: rose during misaligned/danger, sage during aligned movement
+      '/trails':  misaligned || fieldWindow.quality === 'avoid'
+                    ? '#C47A7A'
+                    : (aligned && alignment.mode === 'movement' ? '#7AB87A' : undefined),
+      // Sensors: amber while forming, sage when calibrated + aligned
+      '/sensors': !alignment.isCalibrated
+                    ? '#C4974A'
+                    : (aligned ? '#7AB87A' : undefined),
+      // Field: soul color when established, alignment-modulated
+      '/field':   soul.isEstablished
+                    ? (aligned ? '#7AB87A' : misaligned ? '#C47A7A' : '#C4974A')
+                    : undefined,
+      // Suit: amber when aligned movement window (gear up signal)
+      '/suit':    (aligned && alignment.mode === 'movement') ? '#C4974A' : undefined,
+    };
+  }, [memory, fieldWindow.quality, soul, alignment]);
 
   return (
     <ThemedView style={styles.container}>
