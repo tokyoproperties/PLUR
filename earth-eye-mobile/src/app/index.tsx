@@ -22,6 +22,7 @@ import { useFieldPresence } from '@/hooks/useFieldPresence';
 import { useFieldInitiative } from '@/hooks/useFieldInitiative';
 import { useFieldBranch } from '@/hooks/useFieldBranch';
 import { useFieldReweight } from '@/hooks/useFieldReweight';
+import { useFieldConstellation } from '@/hooks/useFieldConstellation';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useSensors } from '@/hooks/useSensors';
@@ -128,6 +129,7 @@ export default function HomeScreen() {
   const initiative   = useFieldInitiative();
   const branch       = useFieldBranch();
   const reweight     = useFieldReweight();
+  const constellation = useFieldConstellation();
   const lite = evaluateLiteMode(snapshot);
   const yard = evaluateYardMode(snapshot);
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
@@ -144,48 +146,58 @@ export default function HomeScreen() {
     const bSurfaced  = branch.isSurfaced;
     const dom        = reweight.dominant;
     const mature     = reweight.isMature;
+    const arch       = constellation.archetype;
+    const cFormed    = constellation.isFormed;
 
-    // Reweight modulates accent intensity -- dominant signal gets boosted color
-    // Priority stack: reweight > branch > initiative > alignment/presence
+    // Constellation sits below reweight in priority but provides the
+    // stable baseline color. Reweight + branch + initiative override it
+    // when they have higher-confidence signals.
     return {
-      // Species: reweight emphasis on observation/presence = stronger blue/sage
+      // Species: observer archetype (stable blue); reweight/branch override
       '/species': (mature && (dom === 'presence' || dom === 'soul'))
                     ? '#9A7AB8'
                     : (bSurfaced && bPath === 'observation') ? '#7A9AB8'
                     : (iSurfaced && act === 'observe') ? '#7A9AB8'
+                    : (cFormed && arch === 'observer') ? '#7A9AB8'
                     : (isPresent && aligned && presence.quality === 'deep' ? '#7AB87A' : undefined),
 
-      // Trails: reweight emphasis on initiative/alignment = stronger sage
+      // Trails: wanderer/seeker archetype (stable sage); danger/misaligned always rose
       '/trails':  (mature && (dom === 'initiative' || dom === 'alignment') && !misaligned)
                     ? '#7AB87A'
                     : (bSurfaced && (bPath === 'movement' || bPath === 'exploration')) ? '#7AB87A'
                     : (bSurfaced && (bPath === 'return' || bPath === 'stillness')) ? '#C47A7A'
-                    : (misaligned || fieldWindow.quality === 'avoid' ? '#C47A7A' : undefined),
+                    : (misaligned || fieldWindow.quality === 'avoid') ? '#C47A7A'
+                    : (cFormed && (arch === 'wanderer' || arch === 'seeker')) ? '#7AB87A'
+                    : undefined,
 
-      // Field: reweight emphasis on soul = lavender; branch stillness/return = lavender
+      // Field: steady/returner archetype (stable lavender); soul dominant amplifies
       '/field':   (mature && dom === 'soul')
                     ? '#9A7AB8'
                     : (bSurfaced && (bPath === 'stillness' || bPath === 'return')) ? '#9A7AB8'
+                    : (cFormed && (arch === 'steady' || arch === 'returner')) ? '#9A7AB8'
                     : (soul.isEstablished
                         ? (isPresent && aligned ? '#7AB87A'
                             : isDrifting ? '#C4974A'
                             : misaligned ? '#C47A7A' : undefined)
                         : undefined),
 
-      // Sensors: reweight emphasis on presence = amber; observation branch = blue
+      // Sensors: seeker archetype (stable amber); observation branch = blue
       '/sensors': (mature && dom === 'presence')
                     ? '#C4974A'
                     : (bSurfaced && (bPath === 'observation' || bPath === 'exploration')) ? '#7A9AB8'
+                    : (cFormed && arch === 'seeker') ? '#C4974A'
                     : (!alignment.isCalibrated ? '#C4974A'
                         : (isPresent && aligned ? '#7AB87A' : undefined)),
 
-      // Suit: reweight emphasis on initiative = amber; movement/exploration branch = amber
+      // Suit: wanderer/seeker archetype baseline; initiative/branch amplify
       '/suit':    (mature && dom === 'initiative')
                     ? '#C4974A'
                     : (bSurfaced && (bPath === 'movement' || bPath === 'exploration')) ? '#C4974A'
-                    : (iSurfaced && (act === 'explore' || act === 'move') ? '#C4974A' : undefined),
+                    : (iSurfaced && (act === 'explore' || act === 'move')) ? '#C4974A'
+                    : (cFormed && (arch === 'wanderer' || arch === 'seeker')) ? '#C4974A'
+                    : undefined,
     };
-  }, [memory, fieldWindow.quality, soul, alignment, presence, initiative, branch, reweight]);
+  }, [memory, fieldWindow.quality, soul, alignment, presence, initiative, branch, reweight, constellation]);
 
   return (
     <ThemedView style={styles.container}>

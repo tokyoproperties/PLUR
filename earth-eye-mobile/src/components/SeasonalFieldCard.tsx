@@ -1,17 +1,19 @@
 /**
- * SeasonalFieldCard.tsx -- Arc 23
+ * SeasonalFieldCard.tsx -- Arc 24
  *
- * Full signal stack (top to bottom):
- *   1. Field Window     -- always
- *   2. Reweight tone    -- isMature (10+ moments), shown as tinted suggestion
- *   3. Branch           -- isSurfaced (5+ moments, conf >= 0.58)
- *   4. Initiative       -- isSurfaced (3+ moments, conf >= 0.55)
- *   5. Alignment        -- isCalibrated (3+ moments)
- *   6. Presence         -- calibrated + not absent
- *   7. Season label     -- always
+ * Full signal stack:
+ *   Window label color   <- constellation archetype tint (slowest layer)
+ *   Suggestion color     <- reweight dominant tint
+ *   toneShift line       <- reweight phrase (when mature)
+ *   Branch row           <- isSurfaced
+ *   Initiative row       <- isSurfaced
+ *   Alignment row        <- isCalibrated
+ *   Presence row         <- calibrated + not absent
+ *   Season label         <- always
  *
- * Reweight does NOT get its own row. It shifts the color of the
- * suggestion line -- a tone shift, not a new signal. Constitutional.
+ * Constellation does NOT add a row. It tints the window label --
+ * the outermost, slowest signal shows in the most prominent register.
+ * Constitutional: whisper labels, italic serif prose, no shouts.
  */
 import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
@@ -23,6 +25,7 @@ import { useFieldPresence } from '@/hooks/useFieldPresence';
 import { useFieldInitiative } from '@/hooks/useFieldInitiative';
 import { useFieldBranch } from '@/hooks/useFieldBranch';
 import { useFieldReweight } from '@/hooks/useFieldReweight';
+import { useFieldConstellation } from '@/hooks/useFieldConstellation';
 
 const QUALITY_ACCENT: Record<string, string> = {
   prime:    Accents.sage,
@@ -59,7 +62,7 @@ const BRANCH_COLOR: Record<string, string> = {
   exploration: '#C4974A',
 };
 
-// Reweight dominant -> suggestion line tint
+// Reweight: suggestion line tint
 const REWEIGHT_TINT: Record<string, string> = {
   alignment:  '#7AB87A',
   presence:   '#9A7AB8',
@@ -69,50 +72,68 @@ const REWEIGHT_TINT: Record<string, string> = {
   season:     'rgba(255,255,255,0.72)',
 };
 
-export function SeasonalFieldCard() {
-  const { label }    = useSeason();
-  const fieldWindow  = useSeasonalFieldWindow();
-  const alignment    = useFieldAlignment();
-  const presence     = useFieldPresence();
-  const initiative   = useFieldInitiative();
-  const branch       = useFieldBranch();
-  const reweight     = useFieldReweight();
+// Constellation: window label tint (very subtle -- blended toward base)
+// Constellation is slow and stable; its color shifts gradually over weeks.
+// We blend toward the base quality accent so danger overrides cleanly.
+const CONSTELLATION_TINT: Record<string, string> = {
+  wanderer:  '#7AB87A',   // sage -- outward, ranging
+  observer:  '#7A9AB8',   // blue -- still, attentive
+  steady:    'rgba(255,255,255,0.85)',  // near-white -- neutral, grounded
+  returner:  '#9A7AB8',   // lavender -- cyclical, returning
+  seeker:    '#C4974A',   // amber -- expansive, searching
+};
 
-  const accent        = QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage;
+export function SeasonalFieldCard() {
+  const { label }        = useSeason();
+  const fieldWindow      = useSeasonalFieldWindow();
+  const alignment        = useFieldAlignment();
+  const presence         = useFieldPresence();
+  const initiative       = useFieldInitiative();
+  const branch           = useFieldBranch();
+  const reweight         = useFieldReweight();
+  const constellation    = useFieldConstellation();
+
+  // Window label: constellation tint when formed, quality accent as fallback
+  const windowColor = constellation.isFormed
+    ? CONSTELLATION_TINT[constellation.archetype]
+    : (QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage);
+
   const alignColor    = ALIGNMENT_COLOR[alignment.state];
   const presenceColor = PRESENCE_COLOR[presence.state];
   const initColor     = INITIATIVE_COLOR[initiative.action];
   const branchColor   = BRANCH_COLOR[branch.path];
-  // Reweight shifts the suggestion line color when mature
   const suggestionColor = reweight.isMature
     ? REWEIGHT_TINT[reweight.dominant]
     : 'rgba(255,255,255,0.72)';
 
-  const showBranch     = branch.isSurfaced;
-  const showInitiative = initiative.isSurfaced;
-  const showAlignment  = alignment.isCalibrated;
-  const showPresence   = presence.isCalibrated && presence.state !== 'absent';
+  const showBranch        = branch.isSurfaced;
+  const showInitiative    = initiative.isSurfaced;
+  const showAlignment     = alignment.isCalibrated;
+  const showPresence      = presence.isCalibrated && presence.state !== 'absent';
+  const showReweightShift = reweight.isMature;
 
   return (
     <View style={s.card}>
       <ThemedText style={s.whisper}>Field Window</ThemedText>
 
-      <ThemedText style={[s.windowLabel, { color: accent }]}>
+      {/* Window label: constellation-tinted */}
+      <ThemedText style={[s.windowLabel, { color: windowColor }]}>
         {fieldWindow.label}
       </ThemedText>
 
-      {/* Suggestion tinted by reweight dominant */}
+      {/* Suggestion: reweight-tinted */}
       <ThemedText style={[s.suggestion, { color: suggestionColor }]}>
         {fieldWindow.suggestion}
       </ThemedText>
 
-      {/* Reweight tone shift -- whisper only, no separate row */}
-      {reweight.isMature && (
+      {/* Reweight tone shift */}
+      {showReweightShift && (
         <ThemedText style={[s.toneShift, { color: suggestionColor }]}>
           {reweight.toneShift}
         </ThemedText>
       )}
 
+      {/* Branch */}
       {showBranch && (
         <View style={[s.signalRow, s.branchRow]}>
           <View style={[s.dot, { backgroundColor: branchColor }]} />
@@ -126,6 +147,7 @@ export function SeasonalFieldCard() {
         </View>
       )}
 
+      {/* Initiative */}
       {showInitiative && (
         <View style={s.signalRow}>
           <View style={[s.dot, { backgroundColor: initColor }]} />
@@ -138,6 +160,7 @@ export function SeasonalFieldCard() {
         </View>
       )}
 
+      {/* Alignment */}
       {showAlignment && (
         <View style={s.signalRow}>
           <View style={[s.dot, { backgroundColor: alignColor }]} />
@@ -150,6 +173,7 @@ export function SeasonalFieldCard() {
         </View>
       )}
 
+      {/* Presence */}
       {showPresence && (
         <View style={s.signalRow}>
           <View style={[s.dot, { backgroundColor: presenceColor }]} />
