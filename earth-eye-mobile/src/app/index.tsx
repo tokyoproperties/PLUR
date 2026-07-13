@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    alignItems: 'center',
   },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,
+    alignSelf: 'stretch',
     paddingHorizontal: Spacing.three,
     paddingTop: Spacing.four,
   },
