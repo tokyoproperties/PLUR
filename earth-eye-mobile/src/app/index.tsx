@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,6 +15,8 @@ import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useFieldSoul } from '@/atlas/useFieldSoul';
 import { useFieldSpirit } from '@/atlas/useFieldSpirit';
+import { useFieldMemory } from '@/atlas/useFieldMemory';
+import { useSeasonalFieldWindow } from '@/hooks/useSeasonalFieldWindow';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useSensors } from '@/hooks/useSensors';
@@ -34,6 +37,7 @@ interface LaunchItem {
   href: LaunchHref;
   label: string;
   hint: string;
+  accent?: string;
 }
 
 const LAUNCH_ITEMS: LaunchItem[] = [
@@ -51,11 +55,13 @@ function QuickLaunchTile({
   index,
   isLastInRow,
   isSolo = false,
+  accent,
 }: {
   item: LaunchItem;
   index: number;
   isLastInRow: boolean;
   isSolo?: boolean;
+  accent?: string;
 }) {
   const handlePressIn = () => {
     Haptics.selectionAsync();
@@ -75,7 +81,8 @@ function QuickLaunchTile({
             !isLastInRow && styles.tileGap,
             pressed && styles.tilePressed,
           ]}>
-          <View style={styles.tileCard}>
+          <View style={[styles.tileCard, accent ? { borderColor: accent + '44', borderWidth: 1 } : null]}>
+            {accent && <View style={[styles.tileAccentDot, { backgroundColor: accent }]} />}
             <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
               {item.label}
             </ThemedText>
@@ -109,9 +116,19 @@ export default function HomeScreen() {
   const spirit = useFieldSpirit();
   const seasonal = useSeasonalProfile();
 
+  const memory = useFieldMemory();
+  const fieldWindow = useSeasonalFieldWindow();
   const lite = evaluateLiteMode(snapshot);
   const yard = evaluateYardMode(snapshot);
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
+
+  // Context-aware tile accents — living atlas layer
+  const tileAccents = useMemo<Record<string, string | undefined>>(() => ({
+    '/species': memory.totalMoments > 0 ? '#7AB87A' : undefined,        // sage when memory active
+    '/trails':  fieldWindow.quality === 'avoid' ? '#C47A7A' : undefined, // rose warning in danger window
+    '/sensors': !memory.isEstablished ? '#C4974A' : undefined,           // amber pulse while forming
+    '/field':   soul.isEstablished ? soul.traits[0]?.color ?? undefined : undefined,
+  }), [memory, fieldWindow.quality, soul]);
 
   return (
     <ThemedView style={styles.container}>
@@ -195,6 +212,7 @@ export default function HomeScreen() {
                       item={item}
                       index={rowIndex * 2 + i}
                       isLastInRow={i === row.length - 1}
+                      accent={tileAccents[item.href]}
                     />
                   ))}
                   {row.length === 1 && <View style={styles.tileFlex} />}
@@ -364,6 +382,14 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 14,
     justifyContent: 'flex-end',
+  },
+  tileAccentDot: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
 
   tileGap: {

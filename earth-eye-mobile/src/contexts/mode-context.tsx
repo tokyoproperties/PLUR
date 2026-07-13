@@ -11,12 +11,12 @@
  *          (its dampening curves are the literal expression of "go
  *          gentle, you're near the people/creatures you love").
  *
- * This is a lightweight React Context — no persistence yet (resets to
- * 'plur' on app restart). AsyncStorage persistence is a easy follow-up
- * if wanted.
+ * Arc 18-A: Mode now persists across app launches via AsyncStorage.
+ * Boots into last-used mode; falls back to 'plur' on first launch.
  */
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export type SymbolicMode = 'plur' | 'love';
 
@@ -48,6 +48,8 @@ export const MODE_META: Record<SymbolicMode, ModeMeta> = {
   },
 };
 
+const STORAGE_KEY = '@eartheye/symbolic_mode';
+
 interface ModeContextValue {
   mode: SymbolicMode;
   meta: ModeMeta;
@@ -58,16 +60,30 @@ interface ModeContextValue {
 const ModeContext = createContext<ModeContextValue | null>(null);
 
 export function ModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<SymbolicMode>('plur');
+  const [mode, setModeState] = useState<SymbolicMode>('plur');
+
+  // Hydrate from storage on mount
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY).then((stored) => {
+      if (stored === 'plur' || stored === 'love') {
+        setModeState(stored);
+      }
+    }).catch(() => {});
+  }, []);
+
+  const setMode = useCallback((next: SymbolicMode) => {
+    setModeState(next);
+    AsyncStorage.setItem(STORAGE_KEY, next).catch(() => {});
+  }, []);
 
   const value = useMemo<ModeContextValue>(
     () => ({
       mode,
       meta: MODE_META[mode],
       setMode,
-      toggle: () => setMode((current) => (current === 'plur' ? 'love' : 'plur')),
+      toggle: () => setMode(mode === 'plur' ? 'love' : 'plur'),
     }),
-    [mode]
+    [mode, setMode]
   );
 
   return <ModeContext.Provider value={value}>{children}</ModeContext.Provider>;
