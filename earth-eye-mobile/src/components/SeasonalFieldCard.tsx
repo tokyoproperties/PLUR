@@ -1,18 +1,16 @@
 /**
- * SeasonalFieldCard.tsx -- Arc 24
+ * SeasonalFieldCard.tsx -- Arc 25
  *
- * Full signal stack:
- *   Window label color   <- constellation archetype tint (slowest layer)
- *   Suggestion color     <- reweight dominant tint
- *   toneShift line       <- reweight phrase (when mature)
- *   Branch row           <- isSurfaced
- *   Initiative row       <- isSurfaced
- *   Alignment row        <- isCalibrated
- *   Presence row         <- calibrated + not absent
- *   Season label         <- always
+ * Three-register color system (from slowest to fastest):
+ *   Window label   <- constellation archetype tint (weeks)
+ *   Suggestion     <- reweight dominant tint (days)
+ *   Chapter label  <- drift direction tint (weeks, but directional)
  *
- * Constellation does NOT add a row. It tints the window label --
- * the outermost, slowest signal shows in the most prominent register.
+ * Signal rows (fast layer, each optional):
+ *   Branch, Initiative, Alignment, Presence
+ *
+ * Drift does NOT add a row. It tints the season/chapter label
+ * at the bottom -- the temporal anchor of the card.
  * Constitutional: whisper labels, italic serif prose, no shouts.
  */
 import { StyleSheet, View } from 'react-native';
@@ -26,6 +24,7 @@ import { useFieldInitiative } from '@/hooks/useFieldInitiative';
 import { useFieldBranch } from '@/hooks/useFieldBranch';
 import { useFieldReweight } from '@/hooks/useFieldReweight';
 import { useFieldConstellation } from '@/hooks/useFieldConstellation';
+import { useFieldDrift } from '@/hooks/useFieldDrift';
 
 const QUALITY_ACCENT: Record<string, string> = {
   prime:    Accents.sage,
@@ -62,7 +61,14 @@ const BRANCH_COLOR: Record<string, string> = {
   exploration: '#C4974A',
 };
 
-// Reweight: suggestion line tint
+const CONSTELLATION_TINT: Record<string, string> = {
+  wanderer:  '#7AB87A',
+  observer:  '#7A9AB8',
+  steady:    'rgba(255,255,255,0.85)',
+  returner:  '#9A7AB8',
+  seeker:    '#C4974A',
+};
+
 const REWEIGHT_TINT: Record<string, string> = {
   alignment:  '#7AB87A',
   presence:   '#9A7AB8',
@@ -72,39 +78,43 @@ const REWEIGHT_TINT: Record<string, string> = {
   season:     'rgba(255,255,255,0.72)',
 };
 
-// Constellation: window label tint (very subtle -- blended toward base)
-// Constellation is slow and stable; its color shifts gradually over weeks.
-// We blend toward the base quality accent so danger overrides cleanly.
-const CONSTELLATION_TINT: Record<string, string> = {
-  wanderer:  '#7AB87A',   // sage -- outward, ranging
-  observer:  '#7A9AB8',   // blue -- still, attentive
-  steady:    'rgba(255,255,255,0.85)',  // near-white -- neutral, grounded
-  returner:  '#9A7AB8',   // lavender -- cyclical, returning
-  seeker:    '#C4974A',   // amber -- expansive, searching
+// Drift: chapter label tint (very subtle -- this is the slowest register)
+const DRIFT_TINT: Record<string, string> = {
+  settling:    'rgba(255,255,255,0.28)',   // muted -- field is quieting
+  brightening: 'rgba(196,151,74,0.55)',    // warm amber -- brightening
+  wandering:   'rgba(122,154,184,0.55)',   // cool blue -- ranging
+  returning:   'rgba(154,122,184,0.55)',   // lavender -- cycling back
+  seeking:     'rgba(196,151,74,0.65)',    // vivid amber -- expanding
 };
 
 export function SeasonalFieldCard() {
-  const { label }        = useSeason();
-  const fieldWindow      = useSeasonalFieldWindow();
-  const alignment        = useFieldAlignment();
-  const presence         = useFieldPresence();
-  const initiative       = useFieldInitiative();
-  const branch           = useFieldBranch();
-  const reweight         = useFieldReweight();
-  const constellation    = useFieldConstellation();
+  const { label }      = useSeason();
+  const fieldWindow    = useSeasonalFieldWindow();
+  const alignment      = useFieldAlignment();
+  const presence       = useFieldPresence();
+  const initiative     = useFieldInitiative();
+  const branch         = useFieldBranch();
+  const reweight       = useFieldReweight();
+  const constellation  = useFieldConstellation();
+  const drift          = useFieldDrift();
 
-  // Window label: constellation tint when formed, quality accent as fallback
+  // Three registers, three speeds
   const windowColor = constellation.isFormed
     ? CONSTELLATION_TINT[constellation.archetype]
     : (QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage);
+
+  const suggestionColor = reweight.isMature
+    ? REWEIGHT_TINT[reweight.dominant]
+    : 'rgba(255,255,255,0.72)';
+
+  const chapterColor = drift.isMeasurable
+    ? DRIFT_TINT[drift.direction]
+    : 'rgba(255,255,255,0.30)';
 
   const alignColor    = ALIGNMENT_COLOR[alignment.state];
   const presenceColor = PRESENCE_COLOR[presence.state];
   const initColor     = INITIATIVE_COLOR[initiative.action];
   const branchColor   = BRANCH_COLOR[branch.path];
-  const suggestionColor = reweight.isMature
-    ? REWEIGHT_TINT[reweight.dominant]
-    : 'rgba(255,255,255,0.72)';
 
   const showBranch        = branch.isSurfaced;
   const showInitiative    = initiative.isSurfaced;
@@ -116,24 +126,23 @@ export function SeasonalFieldCard() {
     <View style={s.card}>
       <ThemedText style={s.whisper}>Field Window</ThemedText>
 
-      {/* Window label: constellation-tinted */}
+      {/* Register 1: constellation-tinted window label */}
       <ThemedText style={[s.windowLabel, { color: windowColor }]}>
         {fieldWindow.label}
       </ThemedText>
 
-      {/* Suggestion: reweight-tinted */}
+      {/* Register 2: reweight-tinted suggestion */}
       <ThemedText style={[s.suggestion, { color: suggestionColor }]}>
         {fieldWindow.suggestion}
       </ThemedText>
 
-      {/* Reweight tone shift */}
       {showReweightShift && (
         <ThemedText style={[s.toneShift, { color: suggestionColor }]}>
           {reweight.toneShift}
         </ThemedText>
       )}
 
-      {/* Branch */}
+      {/* Fast signal rows */}
       {showBranch && (
         <View style={[s.signalRow, s.branchRow]}>
           <View style={[s.dot, { backgroundColor: branchColor }]} />
@@ -147,7 +156,6 @@ export function SeasonalFieldCard() {
         </View>
       )}
 
-      {/* Initiative */}
       {showInitiative && (
         <View style={s.signalRow}>
           <View style={[s.dot, { backgroundColor: initColor }]} />
@@ -160,7 +168,6 @@ export function SeasonalFieldCard() {
         </View>
       )}
 
-      {/* Alignment */}
       {showAlignment && (
         <View style={s.signalRow}>
           <View style={[s.dot, { backgroundColor: alignColor }]} />
@@ -173,7 +180,6 @@ export function SeasonalFieldCard() {
         </View>
       )}
 
-      {/* Presence */}
       {showPresence && (
         <View style={s.signalRow}>
           <View style={[s.dot, { backgroundColor: presenceColor }]} />
@@ -186,7 +192,17 @@ export function SeasonalFieldCard() {
         </View>
       )}
 
-      <ThemedText style={s.seasonLabel}>{label}</ThemedText>
+      {/* Register 3: drift-tinted chapter label with chapterNote */}
+      <View style={s.chapterFooter}>
+        <ThemedText style={[s.seasonLabel, { color: chapterColor }]}>
+          {label}
+        </ThemedText>
+        {drift.isMeasurable && (
+          <ThemedText style={[s.chapterNote, { color: chapterColor }]}>
+            {drift.chapterNote}
+          </ThemedText>
+        )}
+      </View>
     </View>
   );
 }
@@ -243,8 +259,18 @@ const s = StyleSheet.create({
     fontSize: 12, fontFamily: 'Georgia', fontStyle: 'italic',
     color: 'rgba(255,255,255,0.45)', lineHeight: 18, flex: 1,
   },
+  chapterFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+    flexWrap: 'wrap',
+  },
   seasonLabel: {
-    fontSize: 11, color: 'rgba(255,255,255,0.30)',
-    marginTop: 4, letterSpacing: 0.3,
+    fontSize: 11, letterSpacing: 0.3,
+  },
+  chapterNote: {
+    fontSize: 10, fontFamily: 'Georgia', fontStyle: 'italic',
+    letterSpacing: 0.2,
   },
 });
