@@ -331,6 +331,8 @@ const styles = StyleSheet.create({
   tileRow: {
     flexDirection: 'row',
     width: '100%',
+    gap: 10,
+    marginBottom: 10,
   },
   tileSpacer: {
     flex: 1,
@@ -352,7 +354,6 @@ const styles = StyleSheet.create({
   // Matches Card.tsx's own surface/border tokens for consistency.
   tile: {
     flex: 1,
-    marginBottom: Spacing.two,
   },
   tileCard: {
     height: 88,
@@ -360,13 +361,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.07)',
     borderRadius: 12,
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.two,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
     justifyContent: 'flex-end',
   },
 
   tileGap: {
-    marginRight: Spacing.two,
+    marginRight: 0,
   },
   tilePressed: {
     opacity: 0.7,
