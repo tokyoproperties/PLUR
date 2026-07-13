@@ -18,6 +18,7 @@ import { useFieldSpirit } from '@/atlas/useFieldSpirit';
 import { useFieldMemory } from '@/atlas/useFieldMemory';
 import { useSeasonalFieldWindow } from '@/hooks/useSeasonalFieldWindow';
 import { useFieldAlignment } from '@/hooks/useFieldAlignment';
+import { useFieldPresence } from '@/hooks/useFieldPresence';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useSensors } from '@/hooks/useSensors';
@@ -120,6 +121,7 @@ export default function HomeScreen() {
   const memory = useFieldMemory();
   const fieldWindow  = useSeasonalFieldWindow();
   const alignment    = useFieldAlignment();
+  const presence     = useFieldPresence();
   const lite = evaluateLiteMode(snapshot);
   const yard = evaluateYardMode(snapshot);
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
@@ -128,25 +130,32 @@ export default function HomeScreen() {
   const tileAccents = useMemo<Record<string, string | undefined>>(() => {
     const aligned    = alignment.state === 'aligned';
     const misaligned = alignment.state === 'misaligned';
+    const isPresent  = presence.state === 'present';
+    const isDrifting = presence.state === 'drifting';
     return {
-      // Species: sage when aligned + memory active
-      '/species': (aligned && memory.totalMoments > 0) ? '#7AB87A' : undefined,
-      // Trails: rose during misaligned/danger, sage during aligned movement
+      // Species: deep presence + alignment = sage; drifting = amber nudge
+      '/species': (isPresent && aligned && presence.quality === 'deep')
+                    ? '#7AB87A'
+                    : (isDrifting ? '#C4974A' : undefined),
+      // Trails: rose when danger/misaligned; sage during present movement window
       '/trails':  misaligned || fieldWindow.quality === 'avoid'
                     ? '#C47A7A'
-                    : (aligned && alignment.mode === 'movement' ? '#7AB87A' : undefined),
-      // Sensors: amber while forming, sage when calibrated + aligned
+                    : (isPresent && aligned && alignment.mode === 'movement' ? '#7AB87A' : undefined),
+      // Sensors: amber forming, sage when present+calibrated
       '/sensors': !alignment.isCalibrated
                     ? '#C4974A'
-                    : (aligned ? '#7AB87A' : undefined),
-      // Field: soul color when established, alignment-modulated
+                    : (isPresent && aligned ? '#7AB87A' : undefined),
+      // Field: presence-modulated soul color
       '/field':   soul.isEstablished
-                    ? (aligned ? '#7AB87A' : misaligned ? '#C47A7A' : '#C4974A')
+                    ? (isPresent && aligned ? '#7AB87A'
+                        : isDrifting ? '#C4974A'
+                        : misaligned ? '#C47A7A'
+                        : undefined)
                     : undefined,
-      // Suit: amber when aligned movement window (gear up signal)
-      '/suit':    (aligned && alignment.mode === 'movement') ? '#C4974A' : undefined,
+      // Suit: amber when present + aligned movement (gear up signal)
+      '/suit':    (isPresent && aligned && alignment.mode === 'movement') ? '#C4974A' : undefined,
     };
-  }, [memory, fieldWindow.quality, soul, alignment]);
+  }, [memory, fieldWindow.quality, soul, alignment, presence]);
 
   return (
     <ThemedView style={styles.container}>
