@@ -21,6 +21,7 @@ import { useFieldAlignment } from '@/hooks/useFieldAlignment';
 import { useFieldPresence } from '@/hooks/useFieldPresence';
 import { useFieldInitiative } from '@/hooks/useFieldInitiative';
 import { useFieldBranch } from '@/hooks/useFieldBranch';
+import { useFieldReweight } from '@/hooks/useFieldReweight';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useSensors } from '@/hooks/useSensors';
@@ -126,6 +127,7 @@ export default function HomeScreen() {
   const presence     = useFieldPresence();
   const initiative   = useFieldInitiative();
   const branch       = useFieldBranch();
+  const reweight     = useFieldReweight();
   const lite = evaluateLiteMode(snapshot);
   const yard = evaluateYardMode(snapshot);
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
@@ -140,45 +142,50 @@ export default function HomeScreen() {
     const iSurfaced  = initiative.isSurfaced;
     const bPath      = branch.path;
     const bSurfaced  = branch.isSurfaced;
+    const dom        = reweight.dominant;
+    const mature     = reweight.isMature;
 
-    // Branch sits above initiative in priority stack
+    // Reweight modulates accent intensity -- dominant signal gets boosted color
+    // Priority stack: reweight > branch > initiative > alignment/presence
     return {
-      // Species: blue on observation branch/initiative; sage on deep present+aligned
-      '/species': (bSurfaced && bPath === 'observation')
-                    ? '#7A9AB8'
-                    : (iSurfaced && act === 'observe')
-                    ? '#7A9AB8'
+      // Species: reweight emphasis on observation/presence = stronger blue/sage
+      '/species': (mature && (dom === 'presence' || dom === 'soul'))
+                    ? '#9A7AB8'
+                    : (bSurfaced && bPath === 'observation') ? '#7A9AB8'
+                    : (iSurfaced && act === 'observe') ? '#7A9AB8'
                     : (isPresent && aligned && presence.quality === 'deep' ? '#7AB87A' : undefined),
 
-      // Trails: sage on movement/exploration branch; rose on return/danger
-      '/trails':  (bSurfaced && (bPath === 'movement' || bPath === 'exploration'))
+      // Trails: reweight emphasis on initiative/alignment = stronger sage
+      '/trails':  (mature && (dom === 'initiative' || dom === 'alignment') && !misaligned)
                     ? '#7AB87A'
-                    : (bSurfaced && (bPath === 'return' || bPath === 'stillness'))
-                    ? '#C47A7A'
+                    : (bSurfaced && (bPath === 'movement' || bPath === 'exploration')) ? '#7AB87A'
+                    : (bSurfaced && (bPath === 'return' || bPath === 'stillness')) ? '#C47A7A'
                     : (misaligned || fieldWindow.quality === 'avoid' ? '#C47A7A' : undefined),
 
-      // Field: lavender on stillness/return branch; soul-modulated otherwise
-      '/field':   (bSurfaced && (bPath === 'stillness' || bPath === 'return'))
+      // Field: reweight emphasis on soul = lavender; branch stillness/return = lavender
+      '/field':   (mature && dom === 'soul')
                     ? '#9A7AB8'
+                    : (bSurfaced && (bPath === 'stillness' || bPath === 'return')) ? '#9A7AB8'
                     : (soul.isEstablished
                         ? (isPresent && aligned ? '#7AB87A'
                             : isDrifting ? '#C4974A'
-                            : misaligned ? '#C47A7A'
-                            : undefined)
+                            : misaligned ? '#C47A7A' : undefined)
                         : undefined),
 
-      // Sensors: blue on observation/exploration branch; amber forming
-      '/sensors': (bSurfaced && (bPath === 'observation' || bPath === 'exploration'))
-                    ? '#7A9AB8'
+      // Sensors: reweight emphasis on presence = amber; observation branch = blue
+      '/sensors': (mature && dom === 'presence')
+                    ? '#C4974A'
+                    : (bSurfaced && (bPath === 'observation' || bPath === 'exploration')) ? '#7A9AB8'
                     : (!alignment.isCalibrated ? '#C4974A'
                         : (isPresent && aligned ? '#7AB87A' : undefined)),
 
-      // Suit: amber on movement/exploration branch (gear-up signal)
-      '/suit':    (bSurfaced && (bPath === 'movement' || bPath === 'exploration'))
+      // Suit: reweight emphasis on initiative = amber; movement/exploration branch = amber
+      '/suit':    (mature && dom === 'initiative')
                     ? '#C4974A'
+                    : (bSurfaced && (bPath === 'movement' || bPath === 'exploration')) ? '#C4974A'
                     : (iSurfaced && (act === 'explore' || act === 'move') ? '#C4974A' : undefined),
     };
-  }, [memory, fieldWindow.quality, soul, alignment, presence, initiative, branch]);
+  }, [memory, fieldWindow.quality, soul, alignment, presence, initiative, branch, reweight]);
 
   return (
     <ThemedView style={styles.container}>

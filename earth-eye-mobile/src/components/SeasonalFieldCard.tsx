@@ -1,18 +1,17 @@
 /**
- * SeasonalFieldCard.tsx -- Arc 22
+ * SeasonalFieldCard.tsx -- Arc 23
  *
- * Home screen season intelligence card.
- * Full signal stack (top to bottom, each optional below window):
- *   1. Field Window   -- always shown
- *   2. Branch         -- shown when isSurfaced (confidence >= 0.58, 5+ moments)
- *   3. Initiative     -- shown when isSurfaced (confidence >= 0.55, 3+ moments)
- *   4. Alignment      -- shown when calibrated (3+ moments)
- *   5. Presence       -- shown when calibrated + not absent
- *   6. Season label   -- always shown
+ * Full signal stack (top to bottom):
+ *   1. Field Window     -- always
+ *   2. Reweight tone    -- isMature (10+ moments), shown as tinted suggestion
+ *   3. Branch           -- isSurfaced (5+ moments, conf >= 0.58)
+ *   4. Initiative       -- isSurfaced (3+ moments, conf >= 0.55)
+ *   5. Alignment        -- isCalibrated (3+ moments)
+ *   6. Presence         -- calibrated + not absent
+ *   7. Season label     -- always
  *
- * Branch is the outermost signal -- the "what kind of field" layer.
- * It sits above initiative, which sits above alignment, which sits above presence.
- * Constitutional: whisper labels, italic serif prose, no shouts.
+ * Reweight does NOT get its own row. It shifts the color of the
+ * suggestion line -- a tone shift, not a new signal. Constitutional.
  */
 import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
@@ -23,6 +22,7 @@ import { useFieldAlignment } from '@/hooks/useFieldAlignment';
 import { useFieldPresence } from '@/hooks/useFieldPresence';
 import { useFieldInitiative } from '@/hooks/useFieldInitiative';
 import { useFieldBranch } from '@/hooks/useFieldBranch';
+import { useFieldReweight } from '@/hooks/useFieldReweight';
 
 const QUALITY_ACCENT: Record<string, string> = {
   prime:    Accents.sage,
@@ -59,6 +59,16 @@ const BRANCH_COLOR: Record<string, string> = {
   exploration: '#C4974A',
 };
 
+// Reweight dominant -> suggestion line tint
+const REWEIGHT_TINT: Record<string, string> = {
+  alignment:  '#7AB87A',
+  presence:   '#9A7AB8',
+  initiative: '#C4974A',
+  branch:     '#7A9AB8',
+  soul:       '#9A7AB8',
+  season:     'rgba(255,255,255,0.72)',
+};
+
 export function SeasonalFieldCard() {
   const { label }    = useSeason();
   const fieldWindow  = useSeasonalFieldWindow();
@@ -66,12 +76,17 @@ export function SeasonalFieldCard() {
   const presence     = useFieldPresence();
   const initiative   = useFieldInitiative();
   const branch       = useFieldBranch();
+  const reweight     = useFieldReweight();
 
   const accent        = QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage;
   const alignColor    = ALIGNMENT_COLOR[alignment.state];
   const presenceColor = PRESENCE_COLOR[presence.state];
   const initColor     = INITIATIVE_COLOR[initiative.action];
   const branchColor   = BRANCH_COLOR[branch.path];
+  // Reweight shifts the suggestion line color when mature
+  const suggestionColor = reweight.isMature
+    ? REWEIGHT_TINT[reweight.dominant]
+    : 'rgba(255,255,255,0.72)';
 
   const showBranch     = branch.isSurfaced;
   const showInitiative = initiative.isSurfaced;
@@ -85,7 +100,18 @@ export function SeasonalFieldCard() {
       <ThemedText style={[s.windowLabel, { color: accent }]}>
         {fieldWindow.label}
       </ThemedText>
-      <ThemedText style={s.suggestion}>{fieldWindow.suggestion}</ThemedText>
+
+      {/* Suggestion tinted by reweight dominant */}
+      <ThemedText style={[s.suggestion, { color: suggestionColor }]}>
+        {fieldWindow.suggestion}
+      </ThemedText>
+
+      {/* Reweight tone shift -- whisper only, no separate row */}
+      {reweight.isMature && (
+        <ThemedText style={[s.toneShift, { color: suggestionColor }]}>
+          {reweight.toneShift}
+        </ThemedText>
+      )}
 
       {showBranch && (
         <View style={[s.signalRow, s.branchRow]}>
@@ -161,7 +187,11 @@ const s = StyleSheet.create({
   },
   suggestion: {
     fontSize: 14, fontFamily: 'Georgia', fontStyle: 'italic',
-    color: 'rgba(255,255,255,0.72)', lineHeight: 22,
+    lineHeight: 22,
+  },
+  toneShift: {
+    fontSize: 11, fontFamily: 'Georgia', fontStyle: 'italic',
+    lineHeight: 18, opacity: 0.6, marginTop: -2,
   },
   branchRow: {
     marginTop: 6,
