@@ -64,18 +64,15 @@ function QuickLaunchTile({
   const tileEntering = FadeIn.duration(300).delay(tileDelay);
 
   return (
-    <Animated.View
-      entering={tileEntering}
-      style={[styles.tileFlex, !isLastInRow && styles.tileGap]}
-    >
+    <Animated.View entering={tileEntering} style={styles.tileFlex}>
       <Link href={item.href} asChild>
         <Pressable
           onPressIn={handlePressIn}
           style={({ pressed }) => [
             styles.tile,
+            !isLastInRow && styles.tileGap,
             pressed && styles.tilePressed,
-          ]}
-        >
+          ]}>
           <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
             {item.label}
           </ThemedText>
