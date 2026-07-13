@@ -35,6 +35,7 @@ export default {
       favicon: "./assets/images/favicon.png",
     },
     plugins: [
+      "./plugins/withGoogleMapsApiKey",
       "expo-router",
       "expo-asset",
       [
