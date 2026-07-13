@@ -118,6 +118,14 @@ export default function HomeScreen() {
           overScrollMode="never"
           scrollEventThrottle={16}
         >
+          {/* ===== DIAGNOSTIC MARKER - AGENT44 - REMOVE AFTER CONFIRM ===== */}
+          <View style={{ width: '100%', backgroundColor: '#FF0000', padding: 12, marginBottom: 8 }}>
+            <ThemedText style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14, textAlign: 'center' }}>
+              BUNDLE v2 LOADED — Agent44 diagnostic
+            </ThemedText>
+          </View>
+          {/* ===== END DIAGNOSTIC ===== */}
+
           <EmergencyBanner />
 
           {/* Title */}
