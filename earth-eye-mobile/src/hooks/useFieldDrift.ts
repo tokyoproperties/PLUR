@@ -1,32 +1,25 @@
 /**
- * hooks/useFieldDrift.ts -- Arc 25
+ * hooks/useFieldDrift.ts -- Arc 25 (hotfix)
  *
  * React hook wrapping the field drift engine.
- * Reads the raw moments ring directly so it can split it into
- * early/late halves. This is intentional -- drift needs the temporal
- * order of moments, which the derived FieldMemory does not preserve
- * per-moment (it groups by phase).
- *
- * Memoized on ring length only -- drift only changes when new moments
- * are added, and at 20+ moments it changes very slowly.
+ * Reads raw moments from the atlas ring -- temporal order is required.
+ * No longer passes memory/soul to the engine (those required the full
+ * evaluator chain with currentPhase + 5 composed layers).
+ * Drift now characterizes each half directly from moment data.
  */
 import { useMemo } from 'react';
 import { useAtlas } from '@/atlas/useAtlas';
-import { useFieldMemory } from '@/atlas/useFieldMemory';
-import { useFieldSoul } from '@/atlas/useFieldSoul';
 import { evaluateFieldDrift, type FieldDrift } from '@/atlas/fieldDrift';
 
 export type { FieldDrift, DriftDirection, DriftStability } from '@/atlas/fieldDrift';
 
 export function useFieldDrift(): FieldDrift {
-  const atlas  = useAtlas();
-  const memory = useFieldMemory();
-  const soul   = useFieldSoul();
+  const atlas = useAtlas();
 
   return useMemo(
-    () => evaluateFieldDrift(atlas.moments, memory, soul),
+    () => evaluateFieldDrift(atlas.moments),
     // Only recompute when ring size changes -- drift is the slowest signal
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [atlas.moments.length, memory.chapters.length, soul.isRevealed]
+    [atlas.moments.length]
   );
 }

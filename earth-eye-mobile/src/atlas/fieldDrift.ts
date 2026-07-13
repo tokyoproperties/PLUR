@@ -1,51 +1,37 @@
 /**
- * atlas/fieldDrift.ts -- Arc 25 (DRIFT)
+ * atlas/fieldDrift.ts -- Arc 25 (DRIFT) -- hotfix
  *
  * Field Drift Engine.
  *
- * Measures how the field's constellation has changed over time by
- * comparing the "early field" (first half of moments) to the "current
- * field" (second half of moments). No new storage key -- drift is
- * derived entirely from the existing ring buffer, same design
- * philosophy as sessions-over-moments and memory-over-moments.
+ * Measures how the field's behavioral character has changed over time
+ * by comparing the "early field" (first half of moments) to the
+ * "current field" (second half of moments).
  *
- * Why no AsyncStorage snapshot:
- *   The ring already contains the full temporal record. A snapshot
- *   would introduce a new failure surface (stale data, version
- *   mismatch, failed write) for a signal that can be derived cleanly.
- *   Comparing early vs late ring halves is honest and needs no new
- *   infrastructure.
+ * No new AsyncStorage key. No full soul/memory re-evaluation chain
+ * (which requires currentPhase, spirit, continuity, mythology, lore).
+ * Drift derives its signal directly from what each half of the ring
+ * recorded -- tone distribution, corridor tone variance, species
+ * frequency -- without re-composing the entire intelligence stack.
  *
  * Five drift directions:
- *   settling   -- field becoming more consistent/stable over time
+ *   settling   -- field becoming more consistent over time
  *   brightening -- field becoming more active/outward over time
- *   wandering  -- field ranging wider, more diverse tones over time
- *   returning  -- field cycling back, familiar corridors strengthening
- *   seeking    -- field expanding, new phases/tones appearing
+ *   wandering  -- field ranging wider, more diverse over time
+ *   returning  -- field cycling back, familiar patterns strengthening
+ *   seeking    -- field expanding, new territory opening
  *
  * Three stability readings:
- *   stable   -- constellation direction is consistent
- *   shifting -- constellation is in transition
- *   volatile -- high variance, not enough signal
+ *   stable   -- character is consistent between halves
+ *   shifting -- character is in transition
+ *   volatile -- not enough signal to determine
  *
- * Magnitude: 0.0-1.0, how much drift has occurred.
- * A stable, deeply established field has low magnitude.
- * A field actively shifting archetype has high magnitude.
- *
- * Confidence gate: 20+ moments (need enough for a meaningful split).
- * Below that: direction='settling', magnitude=0, stability='volatile'.
+ * Confidence gate: 20+ moments (needs enough for a meaningful split).
  *
  * Pure logic -- no React, no hooks.
  */
 
 import type { FieldMoment } from '@/atlas/fieldMoment';
-import type { FieldMemory } from '@/atlas/fieldMemory';
-import type { FieldSoul } from '@/atlas/fieldSoul';
-import type { ConstellationArchetype } from '@/atlas/fieldConstellation';
 import type { SymbolicMode } from '@/contexts/mode-context';
-import { evaluateFieldConstellation } from '@/atlas/fieldConstellation';
-import { evaluateFieldMemory } from '@/atlas/fieldMemory';
-import { evaluateFieldSoul } from '@/atlas/fieldSoul';
 
 // ---- Types -----------------------------------------------------------
 
@@ -59,15 +45,15 @@ export type DriftDirection =
 export type DriftStability = 'stable' | 'shifting' | 'volatile';
 
 export interface FieldDrift {
-  direction:   DriftDirection;
-  magnitude:   number;
-  stability:   DriftStability;
-  /** Chapter label tint phrase (three-register: label=constellation, suggestion=reweight, chapter=drift) */
-  chapterNote: string;
+  direction:    DriftDirection;
+  magnitude:    number;
+  stability:    DriftStability;
+  /** Chapter label note when measurable */
+  chapterNote:  string;
   /** Whether drift has enough data to be meaningful */
   isMeasurable: boolean;
   /** Implied mode nudge from drift direction */
-  impliedMode: SymbolicMode;
+  impliedMode:  SymbolicMode;
 }
 
 // ---- Thresholds ------------------------------------------------------
@@ -94,92 +80,142 @@ const DRIFT_MODE: Record<DriftDirection, SymbolicMode> = {
   seeking:     'plur',
 };
 
-// ---- Flat reweight emphasis for split-memory evaluation --------------
-// We need to evaluate constellation for early/late halves without a
-// live reweight signal. Use equal weights -- we're measuring the
-// moment ring, not the reweight layer.
+// ---- Half-ring character extraction ----------------------------------
+// Instead of re-running the full soul/memory evaluator chain (which
+// requires currentPhase + 5 composed layers), we extract behavioral
+// signals directly from each half of the moment ring.
 
-const NEUTRAL_EMPHASIS = {
-  alignment:  1/6, presence: 1/6, initiative: 1/6,
-  branch:     1/6, soul:     1/6, season:     1/6,
-};
+interface HalfCharacter {
+  /** Dominant corridor tone in this half */
+  dominantTone: string | undefined;
+  /** Number of unique tones seen */
+  toneVariety: number;
+  /** Number of unique species seen */
+  speciesVariety: number;
+  /** Average sensor activity (motion proxy) if available */
+  activityLevel: number;
+  /** Whether this half has enough data to characterize */
+  isValid: boolean;
+}
 
-// ---- Archetype transition table -------------------------------------
-// Maps (early archetype) -> (late archetype) -> drift direction
+function characterizeHalf(moments: FieldMoment[]): HalfCharacter {
+  if (moments.length < 3) {
+    return { dominantTone: undefined, toneVariety: 0, speciesVariety: 0, activityLevel: 0, isValid: false };
+  }
 
-type TransitionMap = Partial<Record<ConstellationArchetype, DriftDirection>>;
-const TRANSITIONS: Record<ConstellationArchetype, TransitionMap> = {
-  wanderer:  { wanderer: 'settling', observer: 'settling', steady: 'returning', returner: 'returning', seeker: 'seeking' },
-  observer:  { observer: 'settling', wanderer: 'brightening', steady: 'settling', returner: 'returning', seeker: 'seeking' },
-  steady:    { steady: 'settling', wanderer: 'brightening', observer: 'settling', returner: 'returning', seeker: 'brightening' },
-  returner:  { returner: 'settling', steady: 'settling', observer: 'returning', wanderer: 'wandering', seeker: 'seeking' },
-  seeker:    { seeker: 'settling', wanderer: 'wandering', observer: 'brightening', steady: 'returning', returner: 'returning' },
-};
+  // Tone distribution from corridor tones stored on moments
+  const tones: string[] = [];
+  const species = new Set<string>();
+  let activitySum = 0;
+  let activityCount = 0;
+
+  for (const m of moments) {
+    if (m.corridorTone) tones.push(m.corridorTone);
+    if (m.speciesId)    species.add(m.speciesId);
+    if (m.speciesName)  species.add(m.speciesName);
+    // Motion/activity proxy: step count or sensor band if present
+    if (typeof (m as any).stepCount === 'number') {
+      activitySum  += (m as any).stepCount;
+      activityCount++;
+    }
+  }
+
+  const toneCounts: Record<string, number> = {};
+  for (const t of tones) toneCounts[t] = (toneCounts[t] ?? 0) + 1;
+  const sorted = Object.entries(toneCounts).sort((a, b) => b[1] - a[1]);
+  const dominant = sorted[0]?.[0];
+
+  return {
+    dominantTone:   dominant,
+    toneVariety:    Object.keys(toneCounts).length,
+    speciesVariety: species.size,
+    activityLevel:  activityCount > 0 ? activitySum / activityCount : 0,
+    isValid:        true,
+  };
+}
+
+// ---- Direction inference from early -> late comparison ---------------
+
+function inferDirection(early: HalfCharacter, late: HalfCharacter): DriftDirection {
+  // More species variety in late half = seeking (expanded range)
+  if (late.speciesVariety > early.speciesVariety * 1.4) return 'seeking';
+
+  // More tone variety in late half = wandering (diverse environments)
+  if (late.toneVariety > early.toneVariety * 1.3) return 'wandering';
+
+  // Less tone variety + same dominant = settling (consolidating)
+  if (
+    late.toneVariety <= early.toneVariety &&
+    late.dominantTone === early.dominantTone &&
+    early.dominantTone !== undefined
+  ) return 'settling';
+
+  // Same dominant tone but higher species = brightening (active in familiar ground)
+  if (late.dominantTone === early.dominantTone && late.speciesVariety >= early.speciesVariety) {
+    return late.activityLevel > early.activityLevel ? 'brightening' : 'returning';
+  }
+
+  // Tone changed but variety didn't grow much = returning (shifted to familiar)
+  if (late.dominantTone !== early.dominantTone && late.toneVariety <= early.toneVariety + 1) {
+    return 'returning';
+  }
+
+  // Default: field is settling
+  return 'settling';
+}
+
+// ---- Magnitude -------------------------------------------------------
+
+function computeMagnitude(early: HalfCharacter, late: HalfCharacter): number {
+  let delta = 0;
+  if (early.dominantTone !== late.dominantTone) delta += 0.35;
+  const varietyRatio = early.toneVariety > 0
+    ? Math.abs(late.toneVariety - early.toneVariety) / early.toneVariety
+    : 0;
+  delta += Math.min(0.30, varietyRatio * 0.3);
+  const speciesRatio = early.speciesVariety > 0
+    ? Math.abs(late.speciesVariety - early.speciesVariety) / early.speciesVariety
+    : 0;
+  delta += Math.min(0.25, speciesRatio * 0.25);
+  return Math.min(1, delta);
+}
 
 // ---- Main evaluator --------------------------------------------------
 
 export function evaluateFieldDrift(
   moments:       FieldMoment[],
-  currentMemory: FieldMemory,
-  currentSoul:   FieldSoul,
 ): FieldDrift {
   if (moments.length < MIN_MOMENTS_FOR_DRIFT) {
     return dormant();
   }
 
-  // Split the ring into early (first half) and late (second half)
-  const split     = Math.floor(moments.length / 2);
-  const early     = moments.slice(0, split);
-  const late      = moments.slice(split);
+  const split = Math.floor(moments.length / 2);
+  const early = characterizeHalf(moments.slice(0, split));
+  const late  = characterizeHalf(moments.slice(split));
 
-  // Derive constellation for each half
-  const earlyMem   = evaluateFieldMemory(early);
-  const earlySoul  = evaluateFieldSoul(earlyMem, early);
-  const earlyConst = evaluateFieldConstellation(earlyMem, earlySoul, NEUTRAL_EMPHASIS);
-
-  const lateMem    = evaluateFieldMemory(late);
-  const lateSoul   = evaluateFieldSoul(lateMem, late);
-  const lateConst  = evaluateFieldConstellation(lateMem, lateSoul, NEUTRAL_EMPHASIS);
-
-  // Determine drift direction from archetype transition
-  const fromArch = earlyConst.archetype;
-  const toArch   = lateConst.archetype;
-  const direction = TRANSITIONS[fromArch]?.[toArch] ?? 'settling';
-
-  // Magnitude: how different are the two halves?
-  // - Same archetype + same tone = low magnitude
-  // - Different archetype + different tone = high magnitude
-  const archetypeChanged = fromArch !== toArch ? 0.45 : 0;
-  const toneChanged      = earlyConst.tone !== lateConst.tone ? 0.30 : 0;
-  // Confidence gap between halves (low confidence = less certain = volatile)
-  const confDelta        = Math.abs(earlyConst.confidence - lateConst.confidence);
-  const magnitude        = clamp(archetypeChanged + toneChanged + confDelta * 0.25, 0, 1);
-
-  // Stability: how clear is the late constellation's confidence?
-  let stability: DriftStability;
-  if (lateConst.confidence >= 0.65 && magnitude < 0.3) {
-    stability = 'stable';
-  } else if (lateConst.confidence >= 0.50 || magnitude < 0.55) {
-    stability = 'shifting';
-  } else {
-    stability = 'volatile';
+  if (!early.isValid || !late.isValid) {
+    return dormant();
   }
+
+  const direction = inferDirection(early, late);
+  const magnitude = computeMagnitude(early, late);
+
+  let stability: DriftStability;
+  if (magnitude < 0.25)       stability = 'stable';
+  else if (magnitude < 0.55)  stability = 'shifting';
+  else                        stability = 'volatile';
 
   return {
     direction,
     magnitude,
     stability,
     chapterNote:  CHAPTER_NOTES[direction],
-    isMeasurable: lateConst.isFormed && stability !== 'volatile',
+    isMeasurable: stability !== 'volatile',
     impliedMode:  DRIFT_MODE[direction],
   };
 }
 
 // ---- Helpers ---------------------------------------------------------
-
-function clamp(v: number, lo: number, hi: number): number {
-  return Math.min(hi, Math.max(lo, v));
-}
 
 function dormant(): FieldDrift {
   return {
