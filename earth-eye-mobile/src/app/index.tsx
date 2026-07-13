@@ -73,12 +73,14 @@ function QuickLaunchTile({
             !isLastInRow && styles.tileGap,
             pressed && styles.tilePressed,
           ]}>
-          <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
-            {item.label}
-          </ThemedText>
-          <ThemedText style={styles.tileHint} numberOfLines={2} allowFontScaling={false}>
-            {item.hint}
-          </ThemedText>
+          <View style={styles.tileCard}>
+            <ThemedText style={styles.tileLabel} numberOfLines={1} allowFontScaling={false}>
+              {item.label}
+            </ThemedText>
+            <ThemedText style={styles.tileHint} numberOfLines={2} allowFontScaling={false}>
+              {item.hint}
+            </ThemedText>
+          </View>
         </Pressable>
       </Link>
     </Animated.View>
@@ -342,12 +344,15 @@ const styles = StyleSheet.create({
   // look like empty dead space instead of a second tappable card.
   // Matches Card.tsx's own surface/border tokens for consistency.
   tile: {
+    flex: 1,
+    marginBottom: Spacing.two,
+  },
+  tileCard: {
     height: 88,
     backgroundColor: '#1A1A17',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.07)',
     borderRadius: 12,
-    marginBottom: Spacing.two,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.two,
     justifyContent: 'flex-end',
