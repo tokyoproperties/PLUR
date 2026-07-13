@@ -1,12 +1,17 @@
 /**
- * SeasonalFieldCard.tsx -- Arc 20
+ * SeasonalFieldCard.tsx -- Arc 21
  *
  * Home screen season intelligence card.
- * Now surfaces: field window + alignment + presence.
+ * Signal stack (bottom to top, each optional):
+ *   1. Field Window -- always shown
+ *   2. Alignment -- shown when calibrated (3+ moments)
+ *   3. Presence -- shown when calibrated + not absent
+ *   4. Initiative -- shown when isSurfaced (confidence >= 0.55)
  *
- * Presence row appears when isCalibrated (3+ moments) AND state
- * is not 'absent' -- absent is silence, not noise.
- * Constitutional: whisper label for state, italic serif for line.
+ * Initiative is the highest-priority signal. It appears above
+ * presence and alignment in the read order -- but below the window
+ * label, so the clock/season anchor stays first.
+ * Constitutional: whisper label, italic serif directive, no shouts.
  */
 import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
@@ -15,6 +20,7 @@ import { useSeason } from '@/hooks/useSeason';
 import { useSeasonalFieldWindow } from '@/hooks/useSeasonalFieldWindow';
 import { useFieldAlignment } from '@/hooks/useFieldAlignment';
 import { useFieldPresence } from '@/hooks/useFieldPresence';
+import { useFieldInitiative } from '@/hooks/useFieldInitiative';
 
 const QUALITY_ACCENT: Record<string, string> = {
   prime:    Accents.sage,
@@ -35,18 +41,29 @@ const PRESENCE_COLOR: Record<string, string> = {
   absent:   'rgba(255,255,255,0.25)',
 };
 
+const INITIATIVE_COLOR: Record<string, string> = {
+  observe:  '#7A9AB8',
+  move:     '#7AB87A',
+  rest:     '#9A7AB8',
+  explore:  '#C4974A',
+  return:   '#C47A7A',
+};
+
 export function SeasonalFieldCard() {
-  const { label }   = useSeason();
-  const fieldWindow = useSeasonalFieldWindow();
-  const alignment   = useFieldAlignment();
-  const presence    = useFieldPresence();
+  const { label }    = useSeason();
+  const fieldWindow  = useSeasonalFieldWindow();
+  const alignment    = useFieldAlignment();
+  const presence     = useFieldPresence();
+  const initiative   = useFieldInitiative();
 
-  const accent       = QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage;
-  const alignColor   = ALIGNMENT_COLOR[alignment.state];
-  const presenceColor = PRESENCE_COLOR[presence.state];
+  const accent         = QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage;
+  const alignColor     = ALIGNMENT_COLOR[alignment.state];
+  const presenceColor  = PRESENCE_COLOR[presence.state];
+  const initColor      = INITIATIVE_COLOR[initiative.action];
 
-  const showAlignment = alignment.isCalibrated;
-  const showPresence  = presence.isCalibrated && presence.state !== 'absent';
+  const showAlignment  = alignment.isCalibrated;
+  const showPresence   = presence.isCalibrated && presence.state !== 'absent';
+  const showInitiative = initiative.isSurfaced;
 
   return (
     <View style={s.card}>
@@ -56,6 +73,18 @@ export function SeasonalFieldCard() {
         {fieldWindow.label}
       </ThemedText>
       <ThemedText style={s.suggestion}>{fieldWindow.suggestion}</ThemedText>
+
+      {showInitiative && (
+        <View style={[s.signalRow, s.initiativeRow]}>
+          <View style={[s.dot, { backgroundColor: initColor }]} />
+          <ThemedText style={[s.signalLabel, { color: initColor }]}>
+            {initiative.action.toUpperCase()}
+          </ThemedText>
+          <ThemedText style={s.signalDirective}>
+            {initiative.directive}
+          </ThemedText>
+        </View>
+      )}
 
       {showAlignment && (
         <View style={s.signalRow}>
@@ -107,6 +136,10 @@ const s = StyleSheet.create({
   suggestion: {
     fontSize: 14, fontFamily: 'Georgia', fontStyle: 'italic',
     color: 'rgba(255,255,255,0.72)', lineHeight: 22,
+  },
+  initiativeRow: {
+    marginTop: 4,
+    marginBottom: 2,
   },
   signalRow: {
     flexDirection: 'row',

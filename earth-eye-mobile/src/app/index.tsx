@@ -19,6 +19,7 @@ import { useFieldMemory } from '@/atlas/useFieldMemory';
 import { useSeasonalFieldWindow } from '@/hooks/useSeasonalFieldWindow';
 import { useFieldAlignment } from '@/hooks/useFieldAlignment';
 import { useFieldPresence } from '@/hooks/useFieldPresence';
+import { useFieldInitiative } from '@/hooks/useFieldInitiative';
 import { useSeasonalProfile } from '@/atlas/useSeasonalProfile';
 import { useSymbolicMode } from '@/contexts/mode-context';
 import { useSensors } from '@/hooks/useSensors';
@@ -122,6 +123,7 @@ export default function HomeScreen() {
   const fieldWindow  = useSeasonalFieldWindow();
   const alignment    = useFieldAlignment();
   const presence     = useFieldPresence();
+  const initiative   = useFieldInitiative();
   const lite = evaluateLiteMode(snapshot);
   const yard = evaluateYardMode(snapshot);
   const activeSummary = mode === 'plur' ? lite.summary : yard.summary;
@@ -132,30 +134,37 @@ export default function HomeScreen() {
     const misaligned = alignment.state === 'misaligned';
     const isPresent  = presence.state === 'present';
     const isDrifting = presence.state === 'drifting';
+    const act        = initiative.action;
+    const surfaced   = initiative.isSurfaced;
+
+    // Initiative sits above presence + alignment in the priority stack
     return {
-      // Species: deep presence + alignment = sage; drifting = amber nudge
-      '/species': (isPresent && aligned && presence.quality === 'deep')
+      // Species: blue when initiative=observe, sage on deep presence+aligned
+      '/species': (surfaced && act === 'observe')
+                    ? '#7A9AB8'
+                    : (isPresent && aligned && presence.quality === 'deep' ? '#7AB87A' : undefined),
+      // Trails: sage when initiative=move/explore; rose on danger/misaligned
+      '/trails':  (surfaced && (act === 'move' || act === 'explore'))
                     ? '#7AB87A'
-                    : (isDrifting ? '#C4974A' : undefined),
-      // Trails: rose when danger/misaligned; sage during present movement window
-      '/trails':  misaligned || fieldWindow.quality === 'avoid'
-                    ? '#C47A7A'
-                    : (isPresent && aligned && alignment.mode === 'movement' ? '#7AB87A' : undefined),
-      // Sensors: amber forming, sage when present+calibrated
-      '/sensors': !alignment.isCalibrated
-                    ? '#C4974A'
-                    : (isPresent && aligned ? '#7AB87A' : undefined),
-      // Field: presence-modulated soul color
-      '/field':   soul.isEstablished
-                    ? (isPresent && aligned ? '#7AB87A'
-                        : isDrifting ? '#C4974A'
-                        : misaligned ? '#C47A7A'
-                        : undefined)
-                    : undefined,
-      // Suit: amber when present + aligned movement (gear up signal)
-      '/suit':    (isPresent && aligned && alignment.mode === 'movement') ? '#C4974A' : undefined,
+                    : (misaligned || fieldWindow.quality === 'avoid' ? '#C47A7A' : undefined),
+      // Field: lavender when initiative=rest/return; soul-modulated otherwise
+      '/field':   (surfaced && (act === 'rest' || act === 'return'))
+                    ? '#9A7AB8'
+                    : (soul.isEstablished
+                        ? (isPresent && aligned ? '#7AB87A'
+                            : isDrifting ? '#C4974A'
+                            : misaligned ? '#C47A7A'
+                            : undefined)
+                        : undefined),
+      // Sensors: blue when initiative=observe+surfaced; amber forming
+      '/sensors': (surfaced && act === 'observe')
+                    ? '#7A9AB8'
+                    : (!alignment.isCalibrated ? '#C4974A'
+                        : (isPresent && aligned ? '#7AB87A' : undefined)),
+      // Suit: amber when initiative=explore or move (gear up signal)
+      '/suit':    (surfaced && (act === 'explore' || act === 'move')) ? '#C4974A' : undefined,
     };
-  }, [memory, fieldWindow.quality, soul, alignment, presence]);
+  }, [memory, fieldWindow.quality, soul, alignment, presence, initiative]);
 
   return (
     <ThemedView style={styles.container}>
