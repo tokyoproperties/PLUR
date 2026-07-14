@@ -102,6 +102,9 @@ export function SeasonalFieldCard() {
   const drift          = useFieldDrift();
   const harmony        = useFieldHarmony();
   const foresight      = useFieldForesight();
+  const atlas          = useAtlas();
+  const totalMoments   = atlas.totalMoments;
+  const latestMoment   = atlas.latest;
 
   // Arc 32: delta -- compare current slow signals to previous render
   const prevArchetypeRef = useRef<string | null>(null);
@@ -138,6 +141,47 @@ export function SeasonalFieldCard() {
   if (drift.isMeasurable)       prevDriftRef.current     = drift.direction;
   if (foresight.isActive)       prevForecastRef.current  = foresight.forecast;
 
+  // Arc 34: stable identity name (earned at 30 moments)
+  const identityReady =
+    totalMoments >= 30 &&
+    constellation.isFormed &&
+    harmony.isReadable &&
+    drift.isMeasurable &&
+    foresight.isActive;
+
+  const fieldIdentity: string | null = (() => {
+    if (!identityReady) return null;
+    // Noun from archetype
+    const NOUN: Record<string, string> = {
+      wanderer: 'Corridor',
+      observer: 'Reach',
+      steady:   'Ground',
+      returner: 'Bend',
+      seeker:   'Ridge',
+    };
+    // Adjective from harmony mood
+    const ADJ: Record<string, string> = {
+      settled:     'Settled',
+      restless:    'Restless',
+      turning:     'Turning',
+      brightening: 'Bright',
+      cooling:     'Quiet',
+    };
+    // Drift modifier: certain moods shift the adjective
+    const DRIFT_OVERRIDE: Record<string, Partial<Record<string, string>>> = {
+      settling:    { restless: 'Settling' },
+      brightening: { cooling: 'Brightening' },
+      seeking:     { settled: 'Wandering' },
+      returning:   { restless: 'Returning', turning: 'Returning' },
+      wandering:   { steady: 'Drifting' },
+    };
+    const adj = DRIFT_OVERRIDE[drift.direction]?.[harmony.mood]
+      ?? ADJ[harmony.mood]
+      ?? 'Still';
+    const noun = NOUN[constellation.archetype] ?? 'Field';
+    return `${adj} ${noun}`;
+  })();
+
   const windowColor = constellation.isFormed
     ? CONSTELLATION_TINT[constellation.archetype]
     : (QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage);
@@ -163,6 +207,14 @@ export function SeasonalFieldCard() {
 
   return (
     <View style={s.card}>
+      {/* Arc 34: Field Identity -- stable earned name */}
+      {fieldIdentity !== null && (
+        <>
+          <ThemedText style={s.identityName}>{fieldIdentity}</ThemedText>
+          <View style={s.identitySep} />
+        </>
+      )}
+
       <FieldSummaryStrip />
 
       <ThemedText style={s.whisper}>Field Window</ThemedText>
@@ -266,10 +318,13 @@ export function SeasonalFieldCard() {
       />
 
       {/* Arc 33: Locality -- where this moment occurred in field geography */}
-      <FieldLocality noteActive={
-        constellation.isFormed && drift.isMeasurable &&
-        harmony.isReadable && foresight.isActive
-      } />
+      <FieldLocality
+        noteActive={
+          constellation.isFormed && drift.isMeasurable &&
+          harmony.isReadable && foresight.isActive
+        }
+        latest={latestMoment}
+      />
     </View>
   );
 }
@@ -284,6 +339,19 @@ const s = StyleSheet.create({
     gap: 6,
     marginBottom: Spacing.three,
     width: '100%',
+  },
+  identityName: {
+    fontSize: 16,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.70)',
+    letterSpacing: 0.15,
+    marginBottom: 4,
+  },
+  identitySep: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 10,
   },
   whisper: {
     fontSize: 9, fontWeight: '700', textTransform: 'uppercase',
@@ -502,11 +570,10 @@ const SYMBOLIC_PHRASE: Record<string, string> = {
 
 interface FieldLocalityProps {
   noteActive: boolean;
+  latest: ReturnType<typeof useAtlas>['latest'];
 }
 
-function FieldLocality({ noteActive }: FieldLocalityProps) {
-  const atlas  = useAtlas();
-  const latest = atlas.latest;
+function FieldLocality({ noteActive, latest }: FieldLocalityProps) {
 
   if (!noteActive || !latest) return null;
 
