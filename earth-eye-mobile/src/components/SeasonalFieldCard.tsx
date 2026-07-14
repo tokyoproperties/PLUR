@@ -25,6 +25,7 @@ import { useFieldReweight } from '@/hooks/useFieldReweight';
 import { useFieldConstellation } from '@/hooks/useFieldConstellation';
 import { useFieldDrift } from '@/hooks/useFieldDrift';
 import { useFieldHarmony } from '@/hooks/useFieldHarmony';
+import { useFieldForesight } from '@/hooks/useFieldForesight';
 
 const QUALITY_ACCENT: Record<string, string> = {
   prime:    Accents.sage,
@@ -97,6 +98,7 @@ export function SeasonalFieldCard() {
   const constellation  = useFieldConstellation();
   const drift          = useFieldDrift();
   const harmony        = useFieldHarmony();
+  const foresight      = useFieldForesight();
 
   const windowColor = constellation.isFormed
     ? CONSTELLATION_TINT[constellation.archetype]
@@ -203,6 +205,11 @@ export function SeasonalFieldCard() {
             {harmony.moodLabel}
           </ThemedText>
         )}
+        {foresight.isActive && (
+          <ThemedText style={s.foresightLabel}>
+            {foresight.label}
+          </ThemedText>
+        )}
       </View>
     </View>
   );
@@ -280,5 +287,12 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     letterSpacing: 0.2,
+  },
+  foresightLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.18)',
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    letterSpacing: 0.25,
   },
 });
