@@ -105,6 +105,7 @@ export function SeasonalFieldCard() {
   const atlas          = useAtlas();
   const totalMoments   = atlas.totalMoments;
   const latestMoment   = atlas.latest;
+  const allMoments     = atlas.moments;
 
   // Arc 32: delta -- compare current slow signals to previous render
   const prevArchetypeRef = useRef<string | null>(null);
@@ -180,6 +181,80 @@ export function SeasonalFieldCard() {
       ?? 'Still';
     const noun = NOUN[constellation.archetype] ?? 'Field';
     return `${adj} ${noun}`;
+  })();
+
+  // Arc 35: field history -- recent pattern from last 12-20 moments
+  const HISTORY_WINDOW = 20;
+  const HISTORY_MIN    = 12;
+  const historyPhrase: string | null = (() => {
+    const noteActive =
+      constellation.isFormed && drift.isMeasurable &&
+      harmony.isReadable && foresight.isActive;
+    if (!noteActive || allMoments.length < HISTORY_MIN) return null;
+
+    const slice = allMoments.slice(-HISTORY_WINDOW);
+    const n     = slice.length;
+
+    // Tone frequency
+    const toneCounts: Record<string, number> = {};
+    for (const m of slice) {
+      if (m.corridorTone) toneCounts[m.corridorTone] = (toneCounts[m.corridorTone] ?? 0) + 1;
+    }
+    const topTone    = Object.entries(toneCounts).sort((a, b) => b[1] - a[1])[0];
+    const toneMajority = topTone && topTone[1] / n >= 0.5 ? topTone[0] : null;
+
+    // Drift direction frequency
+    const driftCounts: Record<string, number> = {};
+    for (const m of slice) {
+      // drift.direction is a slow-layer value, not per-moment;
+      // use corridorTone as proxy for recent field behavior
+    }
+    const recentDrift = drift.direction; // slow-layer value, already computed
+
+    // Species presence: any moment with species?
+    const speciesMoments = slice.filter(m => m.invitedCount > 0).length;
+    const speciesRatio   = speciesMoments / n;
+
+    // Conditions score trend: average
+    const avgConds = slice.reduce((s, m) => s + (m.conditionsScore ?? 0.5), 0) / n;
+
+    // Symbolic majority
+    const plurCount = slice.filter(m => m.symbolic === 'plur').length;
+    const symMajority = plurCount / n >= 0.6 ? 'plur' : 'love';
+
+    // Build phrase from strongest signal
+    const TONE_HIST: Record<string, string> = {
+      bright:  'mostly bright corridor moments',
+      calm:    'calm corridor moments',
+      still:   'quiet pockets',
+      mixed:   'mixed corridor tones',
+      noisy:   'busier edge moments',
+    };
+    const DRIFT_HIST: Record<string, string> = {
+      settling:    'with settling behavior',
+      brightening: 'with brightening behavior',
+      wandering:   'with widening range',
+      returning:   'with returning pattern',
+      seeking:     'with expanding territory',
+    };
+
+    let core = '';
+    if (toneMajority && TONE_HIST[toneMajority]) {
+      core = TONE_HIST[toneMajority];
+      if (speciesRatio >= 0.5) core += ', frequent species presence';
+      else if (DRIFT_HIST[recentDrift]) core += `, ${DRIFT_HIST[recentDrift]}`;
+    } else if (speciesRatio >= 0.6) {
+      core = 'frequent species pockets';
+      if (DRIFT_HIST[recentDrift]) core += `, ${DRIFT_HIST[recentDrift]}`;
+    } else if (avgConds >= 0.7) {
+      core = 'consistently good conditions';
+    } else if (avgConds < 0.35) {
+      core = 'mixed or difficult conditions';
+    } else {
+      core = `${recentDrift ?? 'variable'} pattern`;
+    }
+
+    return `Recent pattern: ${core}.`;
   })();
 
   const windowColor = constellation.isFormed
@@ -309,6 +384,11 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.deltaText}>{deltaPhrase}</ThemedText>
       )}
 
+      {/* Arc 35: Field History -- recent pattern above the note */}
+      {historyPhrase !== null && (
+        <ThemedText style={s.historyText}>{historyPhrase}</ThemedText>
+      )}
+
       {/* Arc 31: Field Note -- naturalist sentence below the footer */}
       <FieldNote
         constellation={constellation}
@@ -430,6 +510,15 @@ const s = StyleSheet.create({
     letterSpacing: 0.15,
     marginTop: 6,
     marginBottom: 2,
+  },
+  historyText: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.26)',
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    letterSpacing: 0.12,
+    marginTop: 4,
+    marginBottom: 4,
   },
   noteRow: {
     marginTop: 8,
