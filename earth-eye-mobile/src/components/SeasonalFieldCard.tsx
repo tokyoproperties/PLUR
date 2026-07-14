@@ -1122,6 +1122,156 @@ export function SeasonalFieldCard() {
     return 'Continuity: discontinuous.';
   })();
 
+  // Arc 46: field integrity -- cross-layer non-contradiction score
+  // Composition layer: reads prior-arc phrase existence + hook values
+  // + one lightweight ring scan. No new evaluator, no new hook.
+  const INTEGRITY_MIN = 220;
+  const integrityPhrase: string | null = (() => {
+    const igActive =
+      continuityPhrase !== null &&        // continuity gate (>= 200) already cleared
+      allMoments.length >= INTEGRITY_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!igActive) return null;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // Integrity = absence of contradiction between layers.
+    // Each axis measures how internally consistent one dimension is.
+    // We already have continuity (flip-rate) and coherence (gini/agreement).
+    // Integrity asks: "do the layers agree WITH EACH OTHER?" not just
+    // "does each layer agree with itself?"
+
+    // -- Cross-layer contradiction probes ----------------------------
+
+    // 1. Tone vs symbolic non-contradiction (0.18)
+    //    plur moments should trend bright/noisy; love moments calm/still.
+    //    Contradiction: plur + still/calm on same moment, or love + bright/noisy.
+    const PLUR_TONES   = new Set(['bright', 'noisy', 'mixed']);
+    const LOVE_TONES   = new Set(['calm', 'still', 'mixed']);
+    let toneSymContrad = 0;
+    for (const m of ring) {
+      if (!m.corridorTone || !m.symbolic) continue;
+      const isPlur = m.symbolic === 'plur';
+      const inSet  = isPlur ? PLUR_TONES.has(m.corridorTone)
+                            : LOVE_TONES.has(m.corridorTone);
+      if (!inSet) toneSymContrad++;
+    }
+    // Contradiction rate; invert for consistency score
+    const toneSymScore = 1 - toneSymContrad / N;
+
+    // 2. Species vs conditions non-contradiction (0.15)
+    //    High species presence should correlate with good conditions.
+    //    Contradiction: invitedCount > 0 AND conditionsScore < 0.35
+    let specCondContrad = 0;
+    for (const m of ring) {
+      if ((m.invitedCount ?? 0) > 0 && (m.conditionsScore ?? 0.5) < 0.35) {
+        specCondContrad++;
+      }
+    }
+    const specCondScore = 1 - specCondContrad / N;
+
+    // 3. Season vs tone non-contradiction (0.14)
+    //    Summer/spring should lean bright/noisy; winter/fall calm/still.
+    const WARM_TONES = new Set(['bright', 'noisy']);
+    const COOL_TONES = new Set(['calm', 'still']);
+    let seasonToneContrad = 0;
+    for (const m of ring) {
+      if (!m.season || !m.corridorTone) continue;
+      const isWarm = m.season === 'summer' || m.season === 'spring';
+      const isCool = m.season === 'fall'   || m.season === 'winter';
+      if (isWarm && COOL_TONES.has(m.corridorTone)) seasonToneContrad++;
+      if (isCool && WARM_TONES.has(m.corridorTone)) seasonToneContrad++;
+    }
+    const seasonToneScore = 1 - seasonToneContrad / N;
+
+    // 4. Drift vs orientation non-contradiction (0.13)
+    //    Already computed natural-orientation maps in Arc 42 / Arc 44.
+    //    Here: drift direction should match oriVec if both are present.
+    const DRIFT_ORI: Record<string, string> = {
+      settling:    'settling', brightening: 'brightening',
+      wandering:   'widening', returning:   'returning', seeking: 'opening',
+    };
+    const oriVec2 = orientationPhrase
+      ? orientationPhrase.replace('Orientation: leaning ','').replace('.','').trim()
+      : null;
+    const driftOri2 = drift.isMeasurable ? DRIFT_ORI[drift.direction] : null;
+    const driftOriScore = oriVec2 && driftOri2
+      ? (oriVec2 === driftOri2 ? 1.0 : 0.30) : 0.55;
+
+    // 5. Reweight vs constellation non-contradiction (0.12)
+    //    Each reweight dominant has a natural constellation archetype.
+    const RW_ARCH: Record<string, string> = {
+      alignment:  'steady',   presence:    'seeker',
+      initiative: 'seeker',   branch:      'wanderer',
+      soul:       'returner', season:      'observer',
+    };
+    const naturalArch = reweight.isMature ? RW_ARCH[reweight.dominant] : null;
+    const rwArchScore = constellation.isFormed && naturalArch
+      ? (constellation.archetype === naturalArch ? 1.0 : 0.35) : 0.55;
+
+    // 6. Harmony agreement as meta-consistency (0.15)
+    //    Harmony already aggregates cross-layer vote agreement.
+    const harmScore2 = harmony.agreement;
+
+    // 7. conditionsScore vs symbolic non-contradiction (0.08)
+    //    plur moments should skew toward higher conditions quality.
+    //    Contradiction: plur + conditionsScore < 0.40
+    let symCondContrad = 0;
+    for (const m of ring) {
+      if (m.symbolic === 'plur' && (m.conditionsScore ?? 0.5) < 0.40) {
+        symCondContrad++;
+      }
+    }
+    const symCondScore = 1 - symCondContrad / N;
+
+    // 8. Lineage origin vs current tone non-contradiction (0.05)
+    //    If lineage says 'bright' origin and current dominant is 'bright',
+    //    the field is internally consistent with its origin.
+    //    Proxy: lineagePhrase contains the dominant earlyTone label.
+    const TONE_LABELS = ['bright', 'calm', 'quiet', 'mixed', 'active'];
+    const linTone = lineagePhrase
+      ? TONE_LABELS.find(t => lineagePhrase.includes(t)) ?? null : null;
+    const TONE_NORM: Record<string,string> = {
+      bright:'bright', calm:'calm', quiet:'still', mixed:'mixed', active:'noisy'
+    };
+    const linToneNorm = linTone ? (TONE_NORM[linTone] ?? null) : null;
+    const topTone2 = (() => {
+      const c: Record<string,number> = {};
+      for (const m of ring) if (m.corridorTone) c[m.corridorTone]=(c[m.corridorTone]??0)+1;
+      return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? null;
+    })();
+    const linToneScore = linToneNorm && topTone2
+      ? (linToneNorm === topTone2 ? 1.0 : 0.40) : 0.55;
+
+    // -- Weighted integrity coefficient --------------------------------
+    const integrityCoeff =
+      toneSymScore    * 0.18 +
+      specCondScore   * 0.15 +
+      seasonToneScore * 0.14 +
+      driftOriScore   * 0.13 +
+      rwArchScore     * 0.12 +
+      harmScore2      * 0.15 +
+      symCondScore    * 0.08 +
+      linToneScore    * 0.05;
+
+    const ig = Math.max(0, Math.min(1, integrityCoeff));
+
+    const INTEGRITY_PHRASE: Array<[number, string]> = [
+      [0.86, 'Integrity: strongly whole.'],
+      [0.72, 'Integrity: moderately whole.'],
+      [0.58, 'Integrity: lightly whole.'],
+      [0.44, 'Integrity: partial.'],
+      [0.00, 'Integrity: fractured.'],
+    ];
+
+    for (const [threshold, phrase] of INTEGRITY_PHRASE) {
+      if (ig >= threshold) return phrase;
+    }
+    return 'Integrity: fractured.';
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -1326,6 +1476,10 @@ export function SeasonalFieldCard() {
           {/* Arc 45: continuity -- below alignment, above strip */}
           {continuityPhrase !== null && (
             <ThemedText style={s.continuityText}>{continuityPhrase}</ThemedText>
+          )}
+          {/* Arc 46: integrity -- below continuity, above strip */}
+          {integrityPhrase !== null && (
+            <ThemedText style={s.integrityText}>{integrityPhrase}</ThemedText>
           )}
         </>
       )}
@@ -1544,6 +1698,14 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.36)',
+    letterSpacing: 0.12,
+    marginBottom: 4,
+  },
+  integrityText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.34)',
     letterSpacing: 0.12,
     marginBottom: 10,
   },
