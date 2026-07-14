@@ -12,7 +12,7 @@
  *
  * Visibility gate: harmony.isReadable (at least one sibling active).
  */
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useRef } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Accents, Spacing } from '@/constants/theme';
 import { useSeason } from '@/hooks/useSeason';
@@ -100,6 +100,41 @@ export function SeasonalFieldCard() {
   const drift          = useFieldDrift();
   const harmony        = useFieldHarmony();
   const foresight      = useFieldForesight();
+
+  // Arc 32: delta -- compare current slow signals to previous render
+  const prevArchetypeRef = useRef<string | null>(null);
+  const prevDriftRef     = useRef<string | null>(null);
+  const prevForecastRef  = useRef<string | null>(null);
+
+  const archChanged  = prevArchetypeRef.current !== null && prevArchetypeRef.current !== constellation.archetype;
+  const driftChanged = prevDriftRef.current     !== null && prevDriftRef.current     !== drift.direction;
+  const foreChanged  = prevForecastRef.current  !== null && prevForecastRef.current  !== foresight.forecast;
+  const anyChanged   = archChanged || driftChanged || foreChanged;
+
+  // Compute delta phrase (before updating refs)
+  const deltaPhrase: string | null = (() => {
+    const stripActive = constellation.isFormed && drift.isMeasurable && foresight.isActive;
+    if (!stripActive || !anyChanged) return null;
+    // Behavior shift gets a direction-aware label
+    if (driftChanged) {
+      const driftLabels: Record<string, string> = {
+        settling:    'Field settling.',
+        brightening: 'Field brightening.',
+        seeking:     'Field turning.',
+        returning:   'Field cooling.',
+        wandering:   'Behavior shifted.',
+      };
+      return driftLabels[drift.direction] ?? 'Behavior shifted.';
+    }
+    if (archChanged)  return 'Character shifted.';
+    if (foreChanged)  return 'Trajectory shifted.';
+    return null;
+  })();
+
+  // Update refs AFTER computing delta (so we compare against previous values)
+  if (constellation.isFormed)   prevArchetypeRef.current = constellation.archetype;
+  if (drift.isMeasurable)       prevDriftRef.current     = drift.direction;
+  if (foresight.isActive)       prevForecastRef.current  = foresight.forecast;
 
   const windowColor = constellation.isFormed
     ? CONSTELLATION_TINT[constellation.archetype]
@@ -215,6 +250,11 @@ export function SeasonalFieldCard() {
         )}
       </View>
 
+      {/* Arc 32: delta -- one-line shift summary above the note */}
+      {deltaPhrase !== null && (
+        <ThemedText style={s.deltaText}>{deltaPhrase}</ThemedText>
+      )}
+
       {/* Arc 31: Field Note -- naturalist sentence below the footer */}
       <FieldNote
         constellation={constellation}
@@ -305,6 +345,15 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     letterSpacing: 0.25,
+  },
+  deltaText: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.22)',
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    letterSpacing: 0.15,
+    marginTop: 6,
+    marginBottom: 2,
   },
   noteRow: {
     marginTop: 8,
