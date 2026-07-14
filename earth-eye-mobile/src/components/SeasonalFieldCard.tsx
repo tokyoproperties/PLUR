@@ -30,6 +30,7 @@ import { FieldSummaryStrip } from '@/components/FieldSummaryStrip';
 import { useFieldForesight } from '@/hooks/useFieldForesight';
 import { useNarrator } from '@/contexts/narrator-context';
 import { useFieldSky } from '@/hooks/useFieldSky';
+import { useFieldEar } from '@/hooks/useFieldEar';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -128,6 +129,9 @@ export function SeasonalFieldCard() {
 
   // Arc 55: sky intelligence
   const sky = useFieldSky();
+
+  // Arc 57: ear intelligence -- aural field derived from moment ring
+  const ear = useFieldEar();
 
   // Arc 32: delta -- compare current slow signals to previous render
 
@@ -1916,6 +1920,41 @@ export function SeasonalFieldCard() {
     return `${SKY_ADJ[sky.skyTone] ?? 'the sky'}, ${skyVerb}, above a ${groundAdj} field.`;
   })();
 
+  // Arc 57: aural field phrase
+  // Integrates ear identity + foresight into the narrator voice.
+  // Not a strip row -- expressed as a quiet naturalist clause.
+  const earPhrase: string | null = (() => {
+    if (!ear.isCalibrated || narratorSilenced) return null;
+    if (ear.earTone === 'unknown') return null;
+
+    const EAR_ADJ: Record<string, string> = {
+      quiet:  'quiet',
+      soft:   'soft',
+      active: 'active',
+      dense:  'dense',
+      still:  'still',
+      mixed:  'variable',
+    };
+    const adj = EAR_ADJ[ear.earTone] ?? ear.earTone;
+
+    const FORESIGHT_TAIL: Record<string, string> = {
+      'quiet -> active': ', opening',
+      'active -> quiet': ', settling',
+      'soft -> dense':   ', deepening',
+      'dense -> soft':   ', clearing',
+      holding:           '',
+    };
+    const tail = FORESIGHT_TAIL[ear.foresight] ?? '';
+
+    // Only surface ear phrase when it adds information not in atmospherePhrase
+    // i.e. when sky is not active, or when ear meaningfully differs from sky tone
+    const skyAlreadySpeaks = sky.isActive && sky.isCalibrated && sky.skyTone !== 'unknown';
+    if (skyAlreadySpeaks && ear.earTone === 'quiet' && sky.skyTone === 'still') return null;
+    if (skyAlreadySpeaks && ear.earTone === 'active' && sky.skyTone === 'bright') return null;
+
+    return `A ${adj} corridor${tail}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2105,11 +2144,13 @@ export function SeasonalFieldCard() {
 
   // Arc 56: advance narrator thread -- commit smoothed values for next render
   const skyToneContinuity = sky.isActive ? sky.continuity : 0.50;
+  // Arc 57: ear continuity also enters the thread as an aural stability signal
+  const earContinuityProxy = ear.isCalibrated ? ear.continuity : 0.50;
   threadRef.current = _advanceThread(
     threadRef.current,
     smoothedClarity,          // smoothed reflectionClarity
     COMPRESS_THRESHOLD,       // final threshold (echo + thread blended)
-    skyToneContinuity,        // sky.continuity proxy (0-1)
+    (skyToneContinuity + earContinuityProxy) * 0.50,  // blended vertical+aural
   );
 
   // Arc 53: consume FirstRenderMode after all narrator state is committed.
@@ -2248,6 +2289,11 @@ export function SeasonalFieldCard() {
       {/* Arc 55: atmosphere -- sky + field synthesis */}
       {atmospherePhrase !== null && (
         <ThemedText style={s.atmosphereText}>{atmospherePhrase}</ThemedText>
+      )}
+
+      {/* Arc 57: ear phrase -- aural field, quiet naturalist clause */}
+      {earPhrase !== null && (
+        <ThemedText style={s.earText}>{earPhrase}</ThemedText>
       )}
 
       {/* Arc 37: Field Structure -- chapter distribution */}
@@ -2479,6 +2525,15 @@ const s = StyleSheet.create({
     fontStyle: 'italic',
     letterSpacing: 0.15,
     marginTop: 4,
+    marginBottom: 2,
+  },
+  earText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.34)',
+    letterSpacing: 0.15,
+    marginTop: 3,
     marginBottom: 2,
   },
   structureText: {
