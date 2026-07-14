@@ -19,17 +19,34 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  createContext, useCallback, useContext, useEffect, useState,
-  type ReactNode,
+  createContext, useCallback, useContext, useEffect, useRef, useState,
+  type ReactNode, type MutableRefObject,
 } from 'react';
 import { useResonance } from '@/hooks/useResonance';
-import type { ResonanceHandle, StyleProfile } from '@/hooks/useResonance';
+import type { ResonanceHandle } from '@/hooks/useResonance';
+import { useNarratorRebirth } from '@/hooks/useNarratorRebirth';
+import type { RebirthHandle, EchoRefs } from '@/hooks/useNarratorRebirth';
 
 const FIELD_ONLY_KEY = 'earthEye.narrator.fieldOnlyMode';
 const SKY_MODE_KEY   = 'earthEye.narrator.skyMode';
 
+/** Echo refs shared between SeasonalFieldCard and NarratorProvider. */
+export interface NarratorEchoRefs {
+  essenceRef:    MutableRefObject<string | null>;
+  oriVecRef:     MutableRefObject<string | null>;
+  toneRef:       MutableRefObject<string | null>;
+  clarityRef:    MutableRefObject<number>;
+  thresholdRef:  MutableRefObject<number>;
+  visibleSetRef: MutableRefObject<string>;
+  archetypeRef:  MutableRefObject<string | null>;
+  driftRef:      MutableRefObject<string | null>;
+  forecastRef:   MutableRefObject<string | null>;
+}
+
 interface NarratorContextValue {
   resonance:       ResonanceHandle;
+  rebirth:         RebirthHandle;
+  echoRefs:        NarratorEchoRefs;
   fieldOnlyMode:   boolean;
   setFieldOnly:    (v: boolean) => void;
   skyModeEnabled:  boolean;
@@ -40,6 +57,24 @@ const NarratorContext = createContext<NarratorContextValue | null>(null);
 
 export function NarratorProvider({ children }: { children: ReactNode }) {
   const resonance = useResonance();
+
+  // Echo refs -- owned here so both SeasonalFieldCard (renderer) and
+  // useNarratorRebirth (resetter) share the exact same ref objects.
+  const echoRefs: NarratorEchoRefs = {
+    essenceRef:    useRef<string | null>(null),
+    oriVecRef:     useRef<string | null>(null),
+    toneRef:       useRef<string | null>(null),
+    clarityRef:    useRef<number>(0.70),
+    thresholdRef:  useRef<number>(0.55),
+    visibleSetRef: useRef<string>(''),
+    archetypeRef:  useRef<string | null>(null),
+    driftRef:      useRef<string | null>(null),
+    forecastRef:   useRef<string | null>(null),
+  };
+
+  // Rebirth hook -- called unconditionally at provider level, never
+  // inside a lazily-mounted route. Fixes Arc 53 rules-of-hooks violation.
+  const rebirth = useNarratorRebirth(echoRefs as EchoRefs, resonance);
 
   const [fieldOnlyMode,  setFieldOnlyMode]  = useState(false);
   const [skyModeEnabled, setSkyModeEnabled] = useState(false);
@@ -65,7 +100,8 @@ export function NarratorProvider({ children }: { children: ReactNode }) {
 
   return (
     <NarratorContext.Provider value={{
-      resonance, fieldOnlyMode, setFieldOnly,
+      resonance, rebirth, echoRefs,
+      fieldOnlyMode, setFieldOnly,
       skyModeEnabled, setSkyMode,
     }}>
       {children}

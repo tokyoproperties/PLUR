@@ -29,7 +29,6 @@ import { useFieldHarmony } from '@/hooks/useFieldHarmony';
 import { FieldSummaryStrip } from '@/components/FieldSummaryStrip';
 import { useFieldForesight } from '@/hooks/useFieldForesight';
 import { useNarrator } from '@/contexts/narrator-context';
-import { useNarratorRebirth } from '@/hooks/useNarratorRebirth';
 import { useFieldSky } from '@/hooks/useFieldSky';
 import { useAtlas } from '@/atlas/useAtlas';
 
@@ -110,48 +109,28 @@ export function SeasonalFieldCard() {
   const latestMoment   = atlas.latest;
   const allMoments     = atlas.moments;
 
-  // Arc 52/54: resonance via NarratorContext (shared with settings screen)
+  // Arc 52/54/53: narrator state from shared context
+  // Hooks called at provider level -- never inside a lazily-mounted route.
   const narrator  = useNarrator();
   const resonance = narrator.resonance;
   const { profile: rProfile, isCalibrated: rCalibrated } = resonance;
-  const fieldOnlyMode    = narrator.fieldOnlyMode;
+  const fieldOnlyMode = narrator.fieldOnlyMode;
+  const rebirth       = narrator.rebirth;
+  const isFirstRender = rebirth.isFirstRender;
+
+  // Echo refs from context -- same objects that rebirth will zero on reset
+  const echoRefs = narrator.echoRefs;
 
   // Arc 55: sky intelligence
   const sky = useFieldSky();
 
-  // Arc 53: rebirth -- narrator reset without touching the field
-  const rebirth = useNarratorRebirth(
-    {
-      essenceRef:   echoEssenceRef,
-      oriVecRef:    echoOriVecRef,
-      toneRef:      echoToneRef,
-      clarityRef:   echoClarityRef,
-      thresholdRef: echoThresholdRef,
-      visibleSetRef: echoVisibleSetRef,
-      archetypeRef: prevArchetypeRef,
-      driftRef:     prevDriftRef,
-      forecastRef:  prevForecastRef,
-    },
-    resonance,
-  );
-  const isFirstRender = rebirth.isFirstRender;
-
   // Arc 32: delta -- compare current slow signals to previous render
-  const prevArchetypeRef = useRef<string | null>(null);
-  const prevDriftRef     = useRef<string | null>(null);
-  const prevForecastRef  = useRef<string | null>(null);
 
   // Arc 50: echo -- card's own self-history for narrative continuity
-  const echoEssenceRef     = useRef<string | null>(null);
-  const echoOriVecRef      = useRef<string | null>(null);
-  const echoToneRef        = useRef<string | null>(null);
-  const echoClarityRef     = useRef<number>(0.70);
-  const echoThresholdRef   = useRef<number>(0.55);
-  const echoVisibleSetRef  = useRef<string>('');
 
-  const archChanged  = prevArchetypeRef.current !== null && prevArchetypeRef.current !== constellation.archetype;
-  const driftChanged = prevDriftRef.current     !== null && prevDriftRef.current     !== drift.direction;
-  const foreChanged  = prevForecastRef.current  !== null && prevForecastRef.current  !== foresight.forecast;
+  const archChanged  = echoRefs.archetypeRef.current !== null && echoRefs.archetypeRef.current !== constellation.archetype;
+  const driftChanged = echoRefs.driftRef.current     !== null && echoRefs.driftRef.current     !== drift.direction;
+  const foreChanged  = echoRefs.forecastRef.current  !== null && echoRefs.forecastRef.current  !== foresight.forecast;
   const anyChanged   = archChanged || driftChanged || foreChanged;
 
   // Compute delta phrase (before updating refs)
@@ -175,9 +154,9 @@ export function SeasonalFieldCard() {
   })();
 
   // Update refs AFTER computing delta (so we compare against previous values)
-  if (constellation.isFormed)   prevArchetypeRef.current = constellation.archetype;
-  if (drift.isMeasurable)       prevDriftRef.current     = drift.direction;
-  if (foresight.isActive)       prevForecastRef.current  = foresight.forecast;
+  if (constellation.isFormed)   echoRefs.archetypeRef.current = constellation.archetype;
+  if (drift.isMeasurable)       echoRefs.driftRef.current     = drift.direction;
+  if (foresight.isActive)       echoRefs.forecastRef.current  = foresight.forecast;
 
   // Arc 34: stable identity name (earned at 30 moments)
   const identityReady =
@@ -1355,7 +1334,7 @@ export function SeasonalFieldCard() {
     if (!anticipActive) return neutral;
 
     // Read echo deltas -- compare current computed values to prior stored values
-    // echoClarityRef / echoThresholdRef / echoOriVecRef hold LAST render values.
+    // echoRefs.clarityRef / echoRefs.thresholdRef / echoRefs.oriVecRef hold LAST render values.
 
     // -- Delta: clarity trend ----------------------------------------
     // Current clarity not yet computed; approximate from tone stability proxy
@@ -1366,10 +1345,10 @@ export function SeasonalFieldCard() {
       if (ring[i].corridorTone !== ring[i-1].corridorTone) toneFlips++;
     }
     const approxClarity = 1 - toneFlips / Math.max(1, N - 1);
-    const deltaClarity  = approxClarity - echoClarityRef.current;
+    const deltaClarity  = approxClarity - echoRefs.clarityRef.current;
 
     // -- Delta: threshold trend --------------------------------------
-    const priorThreshold = echoThresholdRef.current; // 0.50 / 0.55 / 0.62
+    const priorThreshold = echoRefs.thresholdRef.current; // 0.50 / 0.55 / 0.62
     // Current threshold not yet computed; use prior clarity to anticipate
     const anticipatedRaw =
       approxClarity >= 0.75 ? 0.50 :
@@ -1377,7 +1356,7 @@ export function SeasonalFieldCard() {
     const deltaThreshold = anticipatedRaw - priorThreshold;
 
     // -- Delta: orientation trend ------------------------------------
-    const priorOri  = echoOriVecRef.current;
+    const priorOri  = echoRefs.oriVecRef.current;
     // Approximate current orientation from dominant reweight + drift signals
     const REWEIGHT_ORI: Record<string, string> = {
       alignment: 'settling', presence: 'opening', initiative: 'brightening',
@@ -1394,8 +1373,8 @@ export function SeasonalFieldCard() {
     const oriChanged = priorOri !== null && priorOri !== approxOri;
 
     // -- Delta: visible layer count trend ----------------------------
-    const priorVisible = echoVisibleSetRef.current
-      ? echoVisibleSetRef.current.split(',').filter(Boolean).length : 0;
+    const priorVisible = echoRefs.visibleSetRef.current
+      ? echoRefs.visibleSetRef.current.split(',').filter(Boolean).length : 0;
     // Approximate current visible count from existing phrase count
     const existingCount = [
       signaturePhrase, resiliencePhrase, lineagePhrase, rhythmPhrase,
@@ -1438,7 +1417,7 @@ export function SeasonalFieldCard() {
   })();
 
   // Arc 50: echo -- read prior state BEFORE reflection so clarity
-  // can dampen its own swing (echoClarityRef holds last render value).
+  // can dampen its own swing (echoRefs.clarityRef holds last render value).
   const ECHO_MIN = 320;
   // FirstRenderMode or Field-Only: echo inertia disabled
   const echoActive =
@@ -1516,7 +1495,7 @@ export function SeasonalFieldCard() {
 
     const raw = Math.max(0, Math.min(1, clarity));
     // Echo inertia: blend 70% new + 30% prior to prevent swing
-    const prior = echoClarityRef.current;
+    const prior = echoRefs.clarityRef.current;
     return echoActive ? raw * 0.70 + prior * 0.30 : raw;
   })();
 
@@ -1544,7 +1523,7 @@ export function SeasonalFieldCard() {
   ));
   // Echo inertia: blend new threshold 80% / prior 20% to prevent oscillation
   const COMPRESS_THRESHOLD = echoActive
-    ? resonancedThreshold * 0.80 + echoThresholdRef.current * 0.20
+    ? resonancedThreshold * 0.80 + echoRefs.thresholdRef.current * 0.20
     : resonancedThreshold;
 
   type PhraseKey =
@@ -1778,7 +1757,7 @@ export function SeasonalFieldCard() {
         const newVec = match[1];
         // Echo drift guard: if orientation changed but underlying ring
         // hasn't shifted significantly, hold the prior vector.
-        const priorVec = echoOriVecRef.current;
+        const priorVec = echoRefs.oriVecRef.current;
         const toneFlipProxy = (() => {
           // Quick: compare dominant tone of first half vs second half
           const half = Math.floor(ring.length / 2);
@@ -1848,7 +1827,7 @@ export function SeasonalFieldCard() {
     if (sentence.length > 90) sentence = `A ${toneAdj} field, ${directionalClause || archNoun}.`;
 
     // Echo continuity: if new sentence differs markedly from last, soften the verb
-    const priorEssence = echoEssenceRef.current;
+    const priorEssence = echoRefs.essenceRef.current;
     if (echoActive && priorEssence !== null) {
       // Detect direction reversal by checking if both sentences contain
       // opposite orientation vectors (opening vs settling, brightening vs cooling)
@@ -2088,24 +2067,24 @@ export function SeasonalFieldCard() {
 
   // Arc 50: commit echo state after all phrases are computed
   // (refs update silently -- no re-render triggered)
-  echoEssenceRef.current    = essencePhrase;
-  echoOriVecRef.current     = (() => {
-    if (!orientationPhrase) return echoOriVecRef.current;
+  echoRefs.essenceRef.current    = essencePhrase;
+  echoRefs.oriVecRef.current     = (() => {
+    if (!orientationPhrase) return echoRefs.oriVecRef.current;
     const m = orientationPhrase.match(/leaning ([a-z]+)\./);
-    return m ? m[1] : echoOriVecRef.current;
+    return m ? m[1] : echoRefs.oriVecRef.current;
   })();
-  echoToneRef.current       = (() => {
+  echoRefs.toneRef.current       = (() => {
     const c: Record<string,number> = {};
     for (const m of allMoments) if (m.corridorTone) c[m.corridorTone]=(c[m.corridorTone]??0)+1;
-    return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? echoToneRef.current;
+    return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? echoRefs.toneRef.current;
   })();
-  echoClarityRef.current    = reflectionClarity;
-  echoThresholdRef.current  = COMPRESS_THRESHOLD;
-  echoVisibleSetRef.current = Object.entries(compressed)
+  echoRefs.clarityRef.current    = reflectionClarity;
+  echoRefs.thresholdRef.current  = COMPRESS_THRESHOLD;
+  echoRefs.visibleSetRef.current = Object.entries(compressed)
     .filter(([,v]) => v).map(([k]) => k).sort().join(',');
-  prevArchetypeRef.current  = constellation.archetype;
-  prevDriftRef.current      = drift.direction;
-  prevForecastRef.current   = foresight.forecast;
+  echoRefs.archetypeRef.current  = constellation.archetype;
+  echoRefs.driftRef.current      = drift.direction;
+  echoRefs.forecastRef.current   = foresight.forecast;
 
   // Arc 53: consume FirstRenderMode after all narrator state is committed.
   // On the render after trigger(), isFirstRender was true (all subsystems
@@ -2587,7 +2566,6 @@ function capitalizeFirst(str: string): string {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-
 
 // ---- FieldLocality (Arc 33) -- where this moment occurred ----------
 // Pure composition: reads atlas.latest, maps raw moment fields to

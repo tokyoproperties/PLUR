@@ -12,7 +12,6 @@
  *   5. Calibration status
  */
 
-import { useRef } from 'react';
 import {
   Pressable, ScrollView, StyleSheet, Switch, View,
 } from 'react-native';
@@ -20,39 +19,13 @@ import { router } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { useNarrator } from '@/contexts/narrator-context';
 import { useFieldSky } from '@/hooks/useFieldSky';
-import { useNarratorRebirth } from '@/hooks/useNarratorRebirth';
 import { useAtlas } from '@/atlas/useAtlas';
 import { useFieldHarmony } from '@/hooks/useFieldHarmony';
 import { useFieldConstellation } from '@/hooks/useFieldConstellation';
 import { useFieldDrift } from '@/hooks/useFieldDrift';
 import { useFieldReweight } from '@/hooks/useFieldReweight';
 
-// Stub echo refs for the settings screen -- rebirth only needs the refs
-// that live in SeasonalFieldCard. Since the card's refs are not shareable
-// across components, rebirth triggered from settings uses a lightweight
-// path: it calls resonance.reset() + clears AsyncStorage keys directly.
-// The card's own echo refs reset on its next mount via the context flag.
-// This is architecturally clean: settings owns the persistent state;
-// the card owns the render-cycle refs.
-function useSettingsRebirth() {
-  const { resonance } = useNarrator();
-  // Stub refs matching EchoRefs shape -- values don't matter here
-  // because the card's refs reset when it re-reads from the cleared context.
-  const stub = {
-    essenceRef:    useRef<string | null>(null),
-    oriVecRef:     useRef<string | null>(null),
-    toneRef:       useRef<string | null>(null),
-    clarityRef:    useRef<number>(0.70),
-    thresholdRef:  useRef<number>(0.55),
-    visibleSetRef: useRef<string>(''),
-    archetypeRef:  useRef<string | null>(null),
-    driftRef:      useRef<string | null>(null),
-    forecastRef:   useRef<string | null>(null),
-  };
-  return useNarratorRebirth(stub, resonance);
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// -- Helpers ------------------------------------------------------------------
 
 function biasLabel(v: number): string {
   if (v >= 0.75) return 'strong';
@@ -71,7 +44,7 @@ function biasBar(v: number) {
   return dots;
 }
 
-// ── Sub-components ───────────────────────────────────────────────────────────
+// -- Sub-components -----------------------------------------------------------
 
 function Whisper({ children }: { children: string }) {
   return (
@@ -100,13 +73,12 @@ function Row({ label, value, onIncrease, onDecrease }: {
   );
 }
 
-// ── Main screen ──────────────────────────────────────────────────────────────
+// -- Main screen --------------------------------------------------------------
 
 export default function CompanionSettingsScreen() {
   const narrator = useNarrator();
-  const { resonance, fieldOnlyMode, setFieldOnly } = narrator;
+  const { resonance, rebirth, fieldOnlyMode, setFieldOnly } = narrator;
   const sky = useFieldSky();
-  const rebirth = useSettingsRebirth();
   const atlas = useAtlas();
   const harmony = useFieldHarmony(atlas.moments);
   const constellation = useFieldConstellation(atlas.moments);
@@ -155,7 +127,7 @@ export default function CompanionSettingsScreen() {
         {'Shape the voice that reads the field.'}
       </ThemedText>
 
-      {/* ── 1. Narrator Identity Capsule ─────────────────────────────── */}
+      {/* -- 1. Narrator Identity Capsule ------------------------------- */}
       <View style={s.card}>
         <Whisper>NARRATOR IDENTITY</Whisper>
         <ThemedText style={s.identityLine}>
@@ -175,7 +147,7 @@ export default function CompanionSettingsScreen() {
         </ThemedText>
       </View>
 
-      {/* ── 2. Depth & Tone ──────────────────────────────────────────── */}
+      {/* -- 2. Depth & Tone -------------------------------------------- */}
       <View style={s.card}>
         <Whisper>NARRATIVE PREFERENCES</Whisper>
         <ThemedText style={s.micro}>
@@ -213,7 +185,7 @@ export default function CompanionSettingsScreen() {
         />
       </View>
 
-      {/* ── 3. Field-Only Mode ───────────────────────────────────────── */}
+      {/* -- 3. Field-Only Mode ----------------------------------------- */}
       <View style={s.card}>
         <Whisper>FIELD-ONLY MODE</Whisper>
         <View style={s.toggleRow}>
@@ -232,7 +204,7 @@ export default function CompanionSettingsScreen() {
         </View>
       </View>
 
-      {/* ── 3b. Sky Intelligence toggle ──────────────────────────────── */}
+      {/* -- 3b. Sky Intelligence toggle -------------------------------- */}
       <View style={s.card}>
         <Whisper>SKY INTELLIGENCE</Whisper>
         <View style={s.toggleRow}>
@@ -258,7 +230,7 @@ export default function CompanionSettingsScreen() {
         )}
       </View>
 
-      {/* ── 4. Reset Companion Voice ─────────────────────────────────── */}
+      {/* -- 4. Reset Companion Voice ----------------------------------- */}
       <View style={s.card}>
         <Whisper>REBIRTH</Whisper>
         <ThemedText style={s.micro}>
@@ -284,7 +256,7 @@ export default function CompanionSettingsScreen() {
   );
 }
 
-// ── Styles ────────────────────────────────────────────────────────────────────
+// -- Styles --------------------------------------------------------------------
 
 const s = StyleSheet.create({
   page:    { flex: 1, backgroundColor: '#0F0F0D' },
