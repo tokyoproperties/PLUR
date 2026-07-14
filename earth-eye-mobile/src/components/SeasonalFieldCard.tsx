@@ -121,6 +121,11 @@ export function SeasonalFieldCard() {
   // Echo refs from context -- same objects that rebirth will zero on reset
   const echoRefs = narrator.echoRefs;
 
+  // Arc 56: narrator thread -- continuity across renders/screens
+  const threadRef        = narrator.threadRef;
+  const _advanceThread   = narrator.advanceThread;
+  const _blendWithThread = narrator.blendWithThread;
+
   // Arc 55: sky intelligence
   const sky = useFieldSky();
 
@@ -1503,9 +1508,10 @@ export function SeasonalFieldCard() {
   //   high clarity (>= 0.75) -> 0.50 (more layers visible)
   //   balanced (0.55-0.75)   -> 0.55 (default)
   //   low clarity (< 0.55)   -> 0.62 (fewer layers visible)
+  // Arc 56: use smoothedClarity (thread-blended) for threshold, not raw
   const rawThreshold =
-    reflectionClarity >= 0.75 ? 0.50 :
-    reflectionClarity >= 0.55 ? 0.55 : 0.62;
+    smoothedClarity >= 0.75 ? 0.50 :
+    smoothedClarity >= 0.55 ? 0.55 : 0.62;
   // Apply anticipation threshold bias (clamped to valid range 0.46-0.65)
   const biasedThreshold = Math.max(0.46, Math.min(0.65,
     rawThreshold + anticipation.thresholdBias
@@ -1522,9 +1528,14 @@ export function SeasonalFieldCard() {
     biasedThreshold + resonanceBias
   ));
   // Echo inertia: blend new threshold 80% / prior 20% to prevent oscillation
-  const COMPRESS_THRESHOLD = echoActive
+  const echoBlendedThreshold = echoActive
     ? resonancedThreshold * 0.80 + echoRefs.thresholdRef.current * 0.20
     : resonancedThreshold;
+
+  // Arc 56: blend echo-blended threshold toward thread (cross-screen continuity)
+  const COMPRESS_THRESHOLD = (threadRef.current.isWarm && !isFirstRender)
+    ? _blendWithThread(echoBlendedThreshold, threadRef.current.threadThreshold)
+    : echoBlendedThreshold;
 
   type PhraseKey =
     'signature' | 'resilience' | 'lineage' | 'rhythm' |
@@ -2085,6 +2096,15 @@ export function SeasonalFieldCard() {
   echoRefs.archetypeRef.current  = constellation.archetype;
   echoRefs.driftRef.current      = drift.direction;
   echoRefs.forecastRef.current   = foresight.forecast;
+
+  // Arc 56: advance narrator thread -- commit smoothed values for next render
+  const skyToneContinuity = sky.isActive ? sky.continuity : 0.50;
+  threadRef.current = _advanceThread(
+    threadRef.current,
+    smoothedClarity,          // smoothed reflectionClarity
+    COMPRESS_THRESHOLD,       // final threshold (echo + thread blended)
+    skyToneContinuity,        // sky.continuity proxy (0-1)
+  );
 
   // Arc 53: consume FirstRenderMode after all narrator state is committed.
   // On the render after trigger(), isFirstRender was true (all subsystems

@@ -18,7 +18,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
+import React, {
   createContext, useCallback, useContext, useEffect, useRef, useState,
   type ReactNode, type MutableRefObject,
 } from 'react';
@@ -26,6 +26,10 @@ import { useResonance } from '@/hooks/useResonance';
 import type { ResonanceHandle } from '@/hooks/useResonance';
 import { useNarratorRebirth } from '@/hooks/useNarratorRebirth';
 import type { RebirthHandle, EchoRefs } from '@/hooks/useNarratorRebirth';
+import {
+  THREAD_NEUTRAL, advanceThread, blendWithThread,
+  type NarratorThreadState,
+} from '@/atlas/narratorThread';
 
 const FIELD_ONLY_KEY = 'earthEye.narrator.fieldOnlyMode';
 const SKY_MODE_KEY   = 'earthEye.narrator.skyMode';
@@ -47,6 +51,9 @@ interface NarratorContextValue {
   resonance:       ResonanceHandle;
   rebirth:         RebirthHandle;
   echoRefs:        NarratorEchoRefs;
+  threadRef:       React.MutableRefObject<NarratorThreadState>;
+  advanceThread:   typeof advanceThread;
+  blendWithThread: typeof blendWithThread;
   fieldOnlyMode:   boolean;
   setFieldOnly:    (v: boolean) => void;
   skyModeEnabled:  boolean;
@@ -72,9 +79,13 @@ export function NarratorProvider({ children }: { children: ReactNode }) {
     forecastRef:   useRef<string | null>(null),
   };
 
+  // Arc 56: narrator thread -- smoothed continuity across renders/screens.
+  // Declared before rebirth so threadRef can be passed in.
+  const threadRef = useRef<NarratorThreadState>({ ...THREAD_NEUTRAL });
+
   // Rebirth hook -- called unconditionally at provider level, never
   // inside a lazily-mounted route. Fixes Arc 53 rules-of-hooks violation.
-  const rebirth = useNarratorRebirth(echoRefs as EchoRefs, resonance);
+  const rebirth = useNarratorRebirth(echoRefs as EchoRefs, resonance, threadRef);
 
   const [fieldOnlyMode,  setFieldOnlyMode]  = useState(false);
   const [skyModeEnabled, setSkyModeEnabled] = useState(false);
@@ -100,7 +111,8 @@ export function NarratorProvider({ children }: { children: ReactNode }) {
 
   return (
     <NarratorContext.Provider value={{
-      resonance, rebirth, echoRefs,
+      resonance, rebirth, echoRefs, threadRef,
+      advanceThread, blendWithThread,
       fieldOnlyMode, setFieldOnly,
       skyModeEnabled, setSkyMode,
     }}>

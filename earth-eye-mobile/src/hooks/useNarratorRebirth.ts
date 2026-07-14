@@ -29,6 +29,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MutableRefObject, useCallback, useRef, useState } from 'react';
 import type { ResonanceHandle } from './useResonance';
+import { THREAD_NEUTRAL, type NarratorThreadState } from '@/atlas/narratorThread';
 
 const RESONANCE_PROFILE_KEY      = 'earthEye.resonance.profile';
 const RESONANCE_INTERACTION_KEY  = 'earthEye.resonance.interactions';
@@ -59,6 +60,7 @@ export interface RebirthHandle {
 export function useNarratorRebirth(
   echoRefs:  EchoRefs,
   resonance: ResonanceHandle,
+  threadRef?: MutableRefObject<NarratorThreadState>,
 ): RebirthHandle {
   const [isFirstRender,     setIsFirstRender]     = useState(false);
   const [hasPendingRebirth, setHasPendingRebirth] = useState(false);
@@ -88,6 +90,11 @@ export function useNarratorRebirth(
 
     // 2. Reset resonance profile synchronously via its own reset()
     resonance.reset();
+
+    // 2b. Arc 56: reset narrator thread to neutral
+    if (threadRef) {
+      threadRef.current = { ...THREAD_NEUTRAL };
+    }
 
     // 3. Enter FirstRenderMode
     firstRenderConsumedRef.current = false;
