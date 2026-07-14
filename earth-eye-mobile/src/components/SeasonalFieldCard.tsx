@@ -257,6 +257,54 @@ export function SeasonalFieldCard() {
     return `Recent pattern: ${core}.`;
   })();
 
+  // Arc 36: field invitation -- one quiet "next moment" line
+  const invitationPhrase: string | null = (() => {
+    const invitationActive =
+      reweight.isMature &&
+      foresight.isActive &&
+      allMoments.length >= HISTORY_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!invitationActive) return null;
+
+    // Foresight adjective (where the field is heading)
+    const FORECAST_ADJ: Record<string, string> = {
+      opening:    'opening',
+      deepening:  'quiet',
+      turning:    'turning',
+      brightening:'bright',
+      cooling:    'cooling',
+    };
+
+    // Reweight moment-type (what kind of experience the field wants)
+    const SIGNAL_MOMENT: Record<string, string> = {
+      alignment: 'corridor moment',
+      presence:  'species pocket',
+      initiative:'ridge moment',
+      branch:    'different trail',
+      soul:      'open ground moment',
+      season:    'seasonal trail moment',
+    };
+
+    // History tone shades the adjective (override if recent pattern
+    // contradicts foresight -- e.g. noisy history + deepening foresight
+    // means the field is asking for quiet, not just deepening)
+    const HISTORY_SHADE: Record<string, Partial<Record<string, string>>> = {
+      noisy:  { deepening: 'quiet', cooling: 'still' },
+      mixed:  { opening: 'easy',  brightening: 'gentle' },
+      bright: { cooling: 'bright-to-quiet', deepening: 'still' },
+      still:  { opening: 'gentle', brightening: 'easy' },
+      calm:   {},  // calm history -- no override, trust foresight
+    };
+
+    const adj     = HISTORY_SHADE[toneMajority ?? '']?.[foresight.forecast]
+                 ?? FORECAST_ADJ[foresight.forecast]
+                 ?? 'quiet';
+    const moment  = SIGNAL_MOMENT[reweight.dominant] ?? 'field moment';
+
+    return `Next: a ${adj} ${moment}.`;
+  })();
+
   const windowColor = constellation.isFormed
     ? CONSTELLATION_TINT[constellation.archetype]
     : (QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage);
@@ -291,6 +339,11 @@ export function SeasonalFieldCard() {
       )}
 
       <FieldSummaryStrip />
+
+      {/* Arc 36: Field Invitation -- next moment line */}
+      {invitationPhrase !== null && (
+        <ThemedText style={s.invitationText}>{invitationPhrase}</ThemedText>
+      )}
 
       <ThemedText style={s.whisper}>Field Window</ThemedText>
 
@@ -432,6 +485,15 @@ const s = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.06)',
     marginBottom: 10,
+  },
+  invitationText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.32)',
+    letterSpacing: 0.12,
+    marginTop: 6,
+    marginBottom: 2,
   },
   whisper: {
     fontSize: 9, fontWeight: '700', textTransform: 'uppercase',
