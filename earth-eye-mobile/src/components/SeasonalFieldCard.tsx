@@ -817,6 +817,95 @@ export function SeasonalFieldCard() {
     return `Orientation: leaning ${dominant}.`;
   })();
 
+  // Arc 43: field coherence -- cross-layer agreement score
+  // Reads already-computed hook values + a single lightweight ring scan.
+  // No new evaluator, no new hook.
+  const COHERENCE_MIN = 160;
+  const coherencePhrase: string | null = (() => {
+    const cActive =
+      orientationPhrase !== null &&       // orientation gate (>= 140) already cleared
+      allMoments.length >= COHERENCE_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!cActive) return null;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // -- Layer agreement scores (all normalized to [0, 1]) ------------
+
+    // 1. Harmony agreement (0.20 weight) -- direct scalar from hook
+    const harmScore = harmony.agreement;                           // [0,1]
+
+    // 2. Drift consistency (0.15) -- isMeasurable = has stable signal
+    const driftScore = drift.isMeasurable ? 0.80 : 0.40;
+
+    // 3. Reweight consistency (0.15) -- isMature = dominant is stable
+    const reweightScore = reweight.isMature ? 0.80 : 0.40;
+
+    // 4. Constellation coherence (0.10) -- isFormed = archetype stable
+    const constellScore = constellation.isFormed ? 0.80 : 0.35;
+
+    // 5. Tone stability (0.15) -- gini concentration of corridorTone
+    //    High concentration = one tone dominates = high stability
+    const toneCnt: Record<string, number> = {};
+    for (const m of ring) if (m.corridorTone) {
+      toneCnt[m.corridorTone] = (toneCnt[m.corridorTone] ?? 0) + 1;
+    }
+    const toneSorted = Object.values(toneCnt).sort((a, b) => b - a);
+    const toneGini = toneSorted.length > 0 ? toneSorted[0] / N : 0;
+    const toneScore = Math.min(1, toneGini * 2);  // [0,1], top tone > 50% -> max
+
+    // 6. Symbolic stability (0.10) -- majority strength of plur/love
+    const plurCount = ring.filter(m => m.symbolic === 'plur').length;
+    const symMaj    = Math.abs(plurCount / N - 0.5) * 2;  // 0 = split, 1 = unanimous
+    const symScore  = symMaj;
+
+    // 7. Species stability (0.10) -- concentration of presence/absence pattern
+    const specPresent  = ring.filter(m => (m.invitedCount ?? 0) > 0).length;
+    const specMaj      = Math.abs(specPresent / N - 0.5) * 2;
+    const specScore    = specMaj;
+
+    // 8. Season entropy stability (0.05) -- low entropy = one season dominates
+    const seasonCnt: Record<string, number> = {};
+    for (const m of ring) if (m.season) {
+      seasonCnt[m.season] = (seasonCnt[m.season] ?? 0) + 1;
+    }
+    const LOG4 = Math.log(4);
+    let H = 0;
+    for (const v of Object.values(seasonCnt)) {
+      const p = v / N; if (p > 0) H -= p * Math.log(p);
+    }
+    const seasonScore = 1 - (H / LOG4);  // 0 = fragmented, 1 = one season
+
+    // -- Weighted mean ------------------------------------------------
+    const coherenceCoeff =
+      harmScore     * 0.20 +
+      driftScore    * 0.15 +
+      reweightScore * 0.15 +
+      constellScore * 0.10 +
+      toneScore     * 0.15 +
+      symScore      * 0.10 +
+      specScore     * 0.10 +
+      seasonScore   * 0.05;
+
+    // Clamp (weights already sum to 1.0)
+    const c = Math.max(0, Math.min(1, coherenceCoeff));
+
+    const COHERENCE_PHRASE: Array<[number, string]> = [
+      [0.80, 'Coherence: strongly aligned.'],
+      [0.65, 'Coherence: moderately aligned.'],
+      [0.50, 'Coherence: lightly aligned.'],
+      [0.35, 'Coherence: mixed.'],
+      [0.00, 'Coherence: divergent.'],
+    ];
+
+    for (const [threshold, phrase] of COHERENCE_PHRASE) {
+      if (c >= threshold) return phrase;
+    }
+    return 'Coherence: divergent.';
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -1009,6 +1098,10 @@ export function SeasonalFieldCard() {
           {/* Arc 42: orientation -- below rhythm, above strip */}
           {orientationPhrase !== null && (
             <ThemedText style={s.orientationText}>{orientationPhrase}</ThemedText>
+          )}
+          {/* Arc 43: coherence -- below orientation, above strip */}
+          {coherencePhrase !== null && (
+            <ThemedText style={s.coherenceText}>{coherencePhrase}</ThemedText>
           )}
         </>
       )}
@@ -1203,6 +1296,14 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.42)',
+    letterSpacing: 0.12,
+    marginBottom: 4,
+  },
+  coherenceText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.40)',
     letterSpacing: 0.12,
     marginBottom: 10,
   },
