@@ -12,7 +12,8 @@
  *
  * Visibility gate: harmony.isReadable (at least one sibling active).
  */
-import { StyleSheet, View, useRef } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { useRef } from 'react';
 import { ThemedText } from '@/components/themed-text';
 import { Accents, Spacing } from '@/constants/theme';
 import { useSeason } from '@/hooks/useSeason';
