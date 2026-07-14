@@ -320,6 +320,86 @@ export function SeasonalFieldCard() {
     return `Next: a ${adj} ${moment}.`;
   })();
 
+  // Arc 37: field structure -- chapter distribution over last 40 moments
+  // Uses `season` as the structural backbone (4 values: spring/summer/fall/winter).
+  // Entropy-based classification keeps Arc 26 purity: reads ring only.
+  const STRUCTURE_WINDOW = 40;
+  const structurePhrase: string | null = (() => {
+    const structActive =
+      identityReady &&            // identity threshold (>= 30 moments) already passed
+      allMoments.length >= STRUCTURE_WINDOW &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!structActive) return null;
+
+    const slice = allMoments.slice(-STRUCTURE_WINDOW);
+    const n     = slice.length;  // always STRUCTURE_WINDOW when structActive
+
+    // Chapter frequencies (season as structural backbone)
+    const chCounts: Record<string, number> = {};
+    for (const m of slice) {
+      if (m.season) chCounts[m.season] = (chCounts[m.season] ?? 0) + 1;
+    }
+    const chapters = Object.entries(chCounts).sort((a, b) => b[1] - a[1]);
+    const numChapters = chapters.length;
+
+    // Shannon entropy (normalized to [0,1] over 4 possible chapters)
+    const LOG4 = Math.log(4);
+    let entropy = 0;
+    for (const [, count] of chapters) {
+      const p = count / n;
+      if (p > 0) entropy -= p * Math.log(p);
+    }
+    const normEntropy = entropy / LOG4;  // 0 = one chapter dominates, 1 = fully fragmented
+
+    // Recent chapter transition: did the dominant chapter change in the
+    // last 10 moments vs the 10 before that?
+    const recentSlice = slice.slice(-10);
+    const olderSlice  = slice.slice(-20, -10);
+    const recentDom   = mostCommonSeason(recentSlice);
+    const olderDom    = mostCommonSeason(olderSlice);
+    const shifting    = recentDom !== null && olderDom !== null && recentDom !== olderDom;
+
+    // Classify structure
+    let structure: 'stable' | 'mixed' | 'shifting' | 'fragmented';
+    if (shifting) {
+      structure = 'shifting';
+    } else if (normEntropy < 0.25 && numChapters <= 2) {
+      structure = 'stable';
+    } else if (normEntropy < 0.55) {
+      structure = 'mixed';
+    } else {
+      structure = 'fragmented';
+    }
+
+    // Top chapter label for phrase coloring
+    const topChapter  = chapters[0]?.[0] ?? null;
+    const topRatio    = chapters[0]?.[1] != null ? chapters[0][1] / n : 0;
+
+    const STRUCT_PHRASE: Record<string, string> = {
+      stable:     topChapter && topRatio >= 0.7
+        ? `Structurally settled -- ${topChapter} pattern.`
+        : 'Structurally settled.',
+      mixed:      chapters.length >= 2
+        ? `Mixed structure -- ${chapters[0][0]} and ${chapters[1][0]} in play.`
+        : 'Mixed chapter structure.',
+      shifting:   recentDom
+        ? `Structure shifting toward ${recentDom}.`
+        : 'Structure in transition.',
+      fragmented: 'No clear structural pattern.',
+    };
+
+    return STRUCT_PHRASE[structure] ?? null;
+  })();
+
+  // Helper: most common season in a moment slice
+  function mostCommonSeason(ms: typeof allMoments): string | null {
+    const c: Record<string, number> = {};
+    for (const m of ms) if (m.season) c[m.season] = (c[m.season] ?? 0) + 1;
+    const top = Object.entries(c).sort((a, b) => b[1] - a[1])[0];
+    return top ? top[0] : null;
+  }
+
   const windowColor = constellation.isFormed
     ? CONSTELLATION_TINT[constellation.archetype]
     : (QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage);
@@ -450,6 +530,11 @@ export function SeasonalFieldCard() {
       {/* Arc 32: delta -- one-line shift summary above the note */}
       {deltaPhrase !== null && (
         <ThemedText style={s.deltaText}>{deltaPhrase}</ThemedText>
+      )}
+
+      {/* Arc 37: Field Structure -- chapter distribution */}
+      {structurePhrase !== null && (
+        <ThemedText style={s.structureText}>{structurePhrase}</ThemedText>
       )}
 
       {/* Arc 35: Field History -- recent pattern above the note */}
@@ -586,6 +671,15 @@ const s = StyleSheet.create({
     fontStyle: 'italic',
     letterSpacing: 0.15,
     marginTop: 6,
+    marginBottom: 2,
+  },
+  structureText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.27)',
+    letterSpacing: 0.12,
+    marginTop: 4,
     marginBottom: 2,
   },
   historyText: {
