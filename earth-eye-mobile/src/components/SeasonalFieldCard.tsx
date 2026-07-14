@@ -31,6 +31,7 @@ import { useFieldForesight } from '@/hooks/useFieldForesight';
 import { useNarrator } from '@/contexts/narrator-context';
 import { useFieldSky } from '@/hooks/useFieldSky';
 import { useFieldEar } from '@/hooks/useFieldEar';
+import { useFieldCelestial } from '@/hooks/useFieldCelestial';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -132,6 +133,9 @@ export function SeasonalFieldCard() {
 
   // Arc 57: ear intelligence -- aural field derived from moment ring
   const ear = useFieldEar();
+
+  // Arc 60: celestial -- time-of-day vertical intelligence
+  const celestial = useFieldCelestial();
 
   // Arc 32: delta -- compare current slow signals to previous render
 
@@ -2047,6 +2051,40 @@ export function SeasonalFieldCard() {
     return `A ${groundAdj} corridor${earClause ? `, ${earClause.trim()}` : ''} beneath a ${skyAdj} sky${foresightTail !== '' ? `${foresightTail}` : ''}.`;
   })();
 
+  // Arc 60: celestial phrase -- temporal naturalist line
+  // A quiet temporal clause that surfaces when the field is in a meaningful
+  // transitional phase (dawn, dusk, pre-dawn, evening) and gradient is high.
+  // Only renders when mouthPhrase is absent -- avoids stacking with the
+  // tri-field synthesis line.
+  const celestialPhrase: string | null = (() => {
+    if (!celestial.isActive || !celestial.isCalibrated || narratorSilenced) return null;
+    if (celestial.phase === 'unknown') return null;
+    // Only surface in transitional phases (high gradient)
+    if (celestial.gradient < 0.30) return null;
+
+    const PHASE_DESC: Record<string, string> = {
+      'pre-dawn': 'The field holds the last of the dark.',
+      'dawn':     'A quiet light entering the corridor.',
+      'dusk':     'The field leaning toward dark.',
+      'evening':  'Light pulling back from the corridor.',
+    };
+    const desc = PHASE_DESC[celestial.phase];
+    if (!desc) return null;
+
+    // Append foresight tail when gradient is strong (>= 0.55)
+    if (celestial.gradient >= 0.55 && celestial.foresight !== 'stable' && celestial.foresight !== 'unknown') {
+      const FORE_SHORT: Record<string, string> = {
+        'brightening toward day':   ' Brightening toward day.',
+        'clearing into morning':    ' Clearing into morning.',
+        'settling toward dusk':     ' Settling toward dusk.',
+        'dimming toward night':     ' Dimming toward night.',
+      };
+      const tail = FORE_SHORT[celestial.foresight];
+      if (tail) return `${desc}${tail}`;
+    }
+    return desc;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2396,6 +2434,11 @@ export function SeasonalFieldCard() {
         </>
       )}
 
+      {/* Arc 60: celestial phrase -- transitional temporal line */}
+      {celestialPhrase !== null && mouthPhrase === null && (
+        <ThemedText style={s.celestialText}>{celestialPhrase}</ThemedText>
+      )}
+
       {/* Arc 37: Field Structure -- chapter distribution */}
       {structurePhrase !== null && (
         <ThemedText style={s.structureText}>{structurePhrase}</ThemedText>
@@ -2641,6 +2684,15 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.34)',
+    letterSpacing: 0.15,
+    marginTop: 3,
+    marginBottom: 2,
+  },
+  celestialText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(180,160,120,0.38)',
     letterSpacing: 0.15,
     marginTop: 3,
     marginBottom: 2,
