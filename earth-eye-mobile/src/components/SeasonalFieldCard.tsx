@@ -906,6 +906,133 @@ export function SeasonalFieldCard() {
     return 'Coherence: divergent.';
   })();
 
+  // Arc 44: field alignment -- structural-directional agreement
+  // Composition layer: reads already-computed values + one ring scan.
+  // No new evaluator, no new hook.
+  const ALIGNMENT_MIN = 180;
+  const alignmentPhrase: string | null = (() => {
+    const aActive =
+      coherencePhrase !== null &&         // coherence gate (>= 160) already cleared
+      allMoments.length >= ALIGNMENT_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!aActive) return null;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // -- Orientation vector (extracted from orientationPhrase) ---------
+    // orientationPhrase = 'Orientation: leaning {vector}.' or null
+    // We need the vector string to compare against structure signals.
+    // Parse it directly -- safer than re-deriving.
+    const oriVec = orientationPhrase
+      ? orientationPhrase.replace('Orientation: leaning ', '').replace('.', '').trim()
+      : null;
+
+    // Structural backbone signals -- what does each structural layer say
+    // the field IS, and does that match the orientation?
+
+    // 1. Tone-to-orientation match (0.20)
+    //    dominant tone maps to a natural orientation; compare to oriVec
+    const TONE_NAT_ORI: Record<string, string> = {
+      bright: 'opening', calm: 'deepening', noisy: 'widening',
+      still:  'cooling', mixed: 'turning',
+    };
+    const toneCnt: Record<string, number> = {};
+    for (const m of ring) if (m.corridorTone) {
+      toneCnt[m.corridorTone] = (toneCnt[m.corridorTone] ?? 0) + 1;
+    }
+    const topTone = Object.entries(toneCnt).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    const toneNatOri = topTone ? TONE_NAT_ORI[topTone] : null;
+    const toneMatch = oriVec && toneNatOri
+      ? (oriVec === toneNatOri ? 1.0 : 0.3) : 0.5;
+
+    // 2. Drift-to-orientation match (0.18)
+    const DRIFT_NAT_ORI: Record<string, string> = {
+      settling:    'settling',    brightening: 'brightening',
+      wandering:   'widening',    returning:   'returning',
+      seeking:     'opening',
+    };
+    const driftNatOri = drift.isMeasurable ? DRIFT_NAT_ORI[drift.direction] : null;
+    const driftMatch = oriVec && driftNatOri
+      ? (oriVec === driftNatOri ? 1.0 : 0.35) : 0.5;
+
+    // 3. Reweight-to-orientation match (0.18)
+    const REWEIGHT_NAT_ORI: Record<string, string> = {
+      alignment:  'settling',    presence:    'opening',
+      initiative: 'brightening', branch:      'widening',
+      soul:       'returning',   season:      'turning',
+    };
+    const rwNatOri = reweight.isMature ? REWEIGHT_NAT_ORI[reweight.dominant] : null;
+    const rwMatch = oriVec && rwNatOri
+      ? (oriVec === rwNatOri ? 1.0 : 0.35) : 0.5;
+
+    // 4. Constellation-to-orientation match (0.14)
+    const ARCHETYPE_NAT_ORI: Record<string, string> = {
+      wanderer:  'widening',  observer:  'deepening',
+      steady:    'settling',  returner:  'returning',
+      seeker:    'opening',
+    };
+    const archNatOri = constellation.isFormed
+      ? ARCHETYPE_NAT_ORI[constellation.archetype] : null;
+    const archMatch = oriVec && archNatOri
+      ? (oriVec === archNatOri ? 1.0 : 0.30) : 0.5;
+
+    // 5. Harmony agreement as structural backing (0.15)
+    //    High harmony agreement = structure is internally consistent,
+    //    which supports any orientation being "real"
+    const harmMatch = harmony.agreement;                          // [0,1]
+
+    // 6. Symbolic-to-orientation match (0.08)
+    //    love -> deepening/settling/returning; plur -> widening/opening/brightening
+    const plurCount = ring.filter(m => m.symbolic === 'plur').length;
+    const plurRatio = plurCount / N;
+    const symNatOri = plurRatio >= 0.55 ? 'widening'
+                    : plurRatio <= 0.45 ? 'deepening' : null;
+    const symMatch = oriVec && symNatOri
+      ? (oriVec === symNatOri || oriVec === 'opening' || oriVec === 'brightening'
+          ? (plurRatio >= 0.55 ? 1.0 : 0.4)
+          : (plurRatio <= 0.45 ? 1.0 : 0.4))
+      : 0.5;
+
+    // 7. Species-to-orientation match (0.07)
+    const specPresent = ring.filter(m => (m.invitedCount ?? 0) > 0).length;
+    const specRatio   = specPresent / N;
+    // High species presence aligns with opening/brightening/widening orientations
+    const SPECIES_OPEN = ['opening', 'brightening', 'widening'];
+    const SPECIES_CLOSE = ['cooling', 'settling', 'deepening'];
+    const specMatch = oriVec
+      ? specRatio >= 0.55 && SPECIES_OPEN.includes(oriVec)  ? 1.0
+      : specRatio <= 0.45 && SPECIES_CLOSE.includes(oriVec) ? 1.0
+      : 0.45
+      : 0.5;
+
+    // -- Weighted mean -------------------------------------------------
+    const alignCoeff =
+      toneMatch  * 0.20 +
+      driftMatch * 0.18 +
+      rwMatch    * 0.18 +
+      archMatch  * 0.14 +
+      harmMatch  * 0.15 +
+      symMatch   * 0.08 +
+      specMatch  * 0.07;
+
+    const a = Math.max(0, Math.min(1, alignCoeff));
+
+    const ALIGN_PHRASE: Array<[number, string]> = [
+      [0.82, 'Alignment: strongly aligned.'],
+      [0.68, 'Alignment: moderately aligned.'],
+      [0.54, 'Alignment: lightly aligned.'],
+      [0.40, 'Alignment: partially aligned.'],
+      [0.00, 'Alignment: misaligned.'],
+    ];
+
+    for (const [threshold, phrase] of ALIGN_PHRASE) {
+      if (a >= threshold) return phrase;
+    }
+    return 'Alignment: misaligned.';
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -1102,6 +1229,10 @@ export function SeasonalFieldCard() {
           {/* Arc 43: coherence -- below orientation, above strip */}
           {coherencePhrase !== null && (
             <ThemedText style={s.coherenceText}>{coherencePhrase}</ThemedText>
+          )}
+          {/* Arc 44: alignment -- below coherence, above strip */}
+          {alignmentPhrase !== null && (
+            <ThemedText style={s.alignmentText}>{alignmentPhrase}</ThemedText>
           )}
         </>
       )}
@@ -1304,6 +1435,14 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 0.12,
+    marginBottom: 4,
+  },
+  alignmentText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.38)',
     letterSpacing: 0.12,
     marginBottom: 10,
   },
