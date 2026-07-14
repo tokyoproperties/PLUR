@@ -704,6 +704,119 @@ export function SeasonalFieldCard() {
     }
   })();
 
+  // Arc 42: field orientation -- long-scale directional lean
+  // Pure ring read. No evaluator, no hook.
+  const ORIENTATION_MIN = 140;
+  const orientationPhrase: string | null = (() => {
+    const oActive =
+      rhythmPhrase !== null &&            // rhythm gate (>= 120) already cleared
+      allMoments.length >= ORIENTATION_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!oActive) return null;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // Orientation vectors: 8 named directions matching spec + foresight vocabulary
+    type OrientVec =
+      'opening' | 'deepening' | 'turning' | 'brightening' |
+      'cooling'  | 'settling'  | 'widening' | 'returning';
+
+    const tally: Record<OrientVec, number> = {
+      opening:    0, deepening: 0, turning:    0, brightening: 0,
+      cooling:    0, settling:  0, widening:   0, returning:   0,
+    };
+
+    // -- Tone directional bias (per moment, weight 0.20 total) --------
+    const TONE_VEC: Record<string, OrientVec> = {
+      bright: 'opening', calm: 'deepening', noisy: 'widening',
+      still:  'cooling', mixed: 'turning',
+    };
+    const toneW = 0.20 / N;
+    for (const m of ring) {
+      const v = m.corridorTone ? TONE_VEC[m.corridorTone] : null;
+      if (v) tally[v] += toneW;
+    }
+
+    // -- Symbolic directional bias (plur -> widening, love -> deepening) --
+    const symW = 0.15 / N;
+    for (const m of ring) {
+      tally[m.symbolic === 'plur' ? 'widening' : 'deepening'] += symW;
+    }
+
+    // -- Species directional bias (presence -> opening, absence -> cooling) --
+    const specW = 0.10 / N;
+    for (const m of ring) {
+      tally[(m.invitedCount ?? 0) > 0 ? 'opening' : 'cooling'] += specW;
+    }
+
+    // -- conditionsScore directional trend (linear regression slope) --
+    // slope > 0 -> brightening, slope < 0 -> cooling
+    const scoreW = 0.15;
+    const scores = ring.map(m => m.conditionsScore ?? 0.5);
+    const xs = scores.map((_, i) => i);
+    const xMean = (N - 1) / 2;
+    const yMean = scores.reduce((s, v) => s + v, 0) / N;
+    const num   = xs.reduce((s, x, i) => s + (x - xMean) * (scores[i] - yMean), 0);
+    const den   = xs.reduce((s, x) => s + (x - xMean) ** 2, 0);
+    const slope = den > 0 ? num / den : 0;
+    // slope is tiny (change per moment); amplify to [0,1] range
+    const normSlope = Math.max(-1, Math.min(1, slope * N * 2));
+    if (normSlope > 0.05) tally['brightening'] += scoreW * normSlope;
+    else if (normSlope < -0.05) tally['cooling'] += scoreW * (-normSlope);
+    else tally['settling'] += scoreW * 0.5;
+
+    // -- Season transition direction (spring->summer->fall->winter = forward) --
+    const SEASON_ORDER: Record<string, number> = {
+      spring: 0, summer: 1, fall: 2, winter: 3,
+    };
+    const seasonW = 0.15 / Math.max(1, N - 1);
+    for (let i = 1; i < N; i++) {
+      const prev = SEASON_ORDER[ring[i - 1].season] ?? -1;
+      const curr = SEASON_ORDER[ring[i].season]     ?? -1;
+      if (prev < 0 || curr < 0 || prev === curr) continue;
+      const delta = curr - prev;
+      // Forward cycle (spring->summer, summer->fall, fall->winter, winter->spring = -3)
+      const forward = delta > 0 || delta === -3;
+      tally[forward ? 'turning' : 'returning'] += seasonW;
+    }
+
+    // -- Reweight directional bias (mature only, weight 0.15) ---------
+    const REWEIGHT_VEC: Record<string, OrientVec> = {
+      alignment:  'settling',  presence: 'opening',
+      initiative: 'brightening', branch: 'widening',
+      soul:       'returning',  season:  'turning',
+    };
+    if (reweight.isMature) {
+      const rv = REWEIGHT_VEC[reweight.dominant];
+      if (rv) tally[rv] += 0.15;
+    }
+
+    // -- Drift directional bias (measurable only, weight 0.10) --------
+    const DRIFT_VEC: Record<string, OrientVec> = {
+      settling:    'settling',    brightening: 'brightening',
+      wandering:   'widening',    returning:   'returning',
+      seeking:     'opening',
+    };
+    if (drift.isMeasurable) {
+      const dv = DRIFT_VEC[drift.direction];
+      if (dv) tally[dv] += 0.10;
+    }
+
+    // -- Resolve: winning vector with its weight ----------------------
+    const sorted = (Object.entries(tally) as [OrientVec, number][])
+      .sort((a, b) => b[1] - a[1]);
+    const winner     = sorted[0][0];
+    const winnerVal  = sorted[0][1];
+    const runnerVal  = sorted[1]?.[1] ?? 0;
+    // If top two are very close (within 10% of winner), call it 'turning'
+    const dominant = (winnerVal - runnerVal) / Math.max(winnerVal, 0.001) >= 0.10
+      ? winner : 'turning';
+
+    return `Orientation: leaning ${dominant}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -893,6 +1006,10 @@ export function SeasonalFieldCard() {
           {rhythmPhrase !== null && (
             <ThemedText style={s.rhythmText}>{rhythmPhrase}</ThemedText>
           )}
+          {/* Arc 42: orientation -- below rhythm, above strip */}
+          {orientationPhrase !== null && (
+            <ThemedText style={s.orientationText}>{orientationPhrase}</ThemedText>
+          )}
         </>
       )}
 
@@ -1078,6 +1195,14 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.44)',
+    letterSpacing: 0.12,
+    marginBottom: 4,
+  },
+  orientationText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.42)',
     letterSpacing: 0.12,
     marginBottom: 10,
   },
