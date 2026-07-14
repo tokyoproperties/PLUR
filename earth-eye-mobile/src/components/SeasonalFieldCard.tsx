@@ -1970,6 +1970,83 @@ export function SeasonalFieldCard() {
     return `A ${adj} corridor${tail}.`;
   })();
 
+  // Arc 59: EarthMouth -- tri-field expression synthesis
+  // Composes a single compound naturalist sentence when field + sky + ear
+  // are all calibrated and coherent. When mouthPhrase is non-null it
+  // REPLACES atmospherePhrase + earPhrase (reduces clutter to one line).
+  // Requires: atmosphere active + ear calibrated + sky drift measurable
+  //           + harmony >= 0.6 + >= 80 moments (lower than essence).
+  const MOUTH_MIN = 80;
+  const mouthPhrase: string | null = (() => {
+    const mActive =
+      sky.isActive && sky.isCalibrated &&
+      ear.isCalibrated &&
+      ear.earTone !== 'unknown' &&
+      sky.skyTone !== 'unknown' &&
+      !narratorSilenced &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6 &&
+      allMoments.length >= MOUTH_MIN;
+    if (!mActive) return null;
+
+    // Ground adjective: from ear identity
+    const EAR_SHORT: Record<string, string> = {
+      quiet: 'quiet', soft: 'soft', active: 'active',
+      dense: 'dense', still: 'still', mixed: 'open', unknown: 'open',
+    };
+    const groundAdj = EAR_SHORT[ear.earTone] ?? 'open';
+
+    // Sky adjective: from skyTone
+    const SKY_SHORT: Record<string, string> = {
+      bright: 'bright', dim: 'dim', shifting: 'shifting',
+      still: 'still', twilight: 'fading', dark: 'dark', unknown: 'present',
+    };
+    const skyAdj = SKY_SHORT[sky.skyTone] ?? 'present';
+
+    // Connector verb: from sky orientation
+    const ORI_CONN: Record<string, string> = {
+      brightening: 'widening', dimming: 'pulling back',
+      open: 'open', settling: 'settling', stable: 'steady', unknown: 'present',
+    };
+    const skyVerb = ORI_CONN[sky.orientation] ?? 'present';
+
+    // Foresight tail: only when sky.drift is meaningful
+    const FORESIGHT_SHORT: Record<string, string> = {
+      brightening: ' and brightening', opening: ' and opening',
+      clearing: ' and clearing', softening: ' and softening',
+      settling: ' and settling', dimming: ' and pulling back',
+      stable: '', unknown: '',
+    };
+    const foresightTail = Math.abs(sky.drift) > 0.08
+      ? (FORESIGHT_SHORT[sky.foresight] ?? '')
+      : '';
+
+    // Ear orientation tail: only when ear foresight adds new info
+    const EAR_FORE: Record<string, string> = {
+      'quiet -> active': ', opening',
+      'active -> quiet': ', settling',
+      'soft -> dense':   ', deepening',
+      'dense -> soft':   ', clearing',
+      holding:           '',
+      unknown:           '',
+    };
+    const earTail = EAR_FORE[ear.foresight] ?? '';
+
+    // Suppress if ear and sky say the same thing (deduplication)
+    const sameCharacter =
+      (groundAdj === 'quiet' && skyAdj === 'still') ||
+      (groundAdj === 'active' && skyAdj === 'bright') ||
+      (groundAdj === 'still' && skyAdj === 'still');
+
+    if (sameCharacter && !foresightTail && !earTail) return null;
+
+    // Compose tri-field sentence
+    // Form: "A {groundAdj} corridor, {earTail?} beneath a {skyAdj} sky{skyVerb?}{foresightTail?}."
+    // Simplify: ear orientation appears as a comma clause before the sky
+    const earClause = earTail && earTail !== '' ? `${earTail.trim()}, ` : '';
+    return `A ${groundAdj} corridor${earClause ? `, ${earClause.trim()}` : ''} beneath a ${skyAdj} sky${foresightTail !== '' ? `${foresightTail}` : ''}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2303,14 +2380,20 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.deltaText}>{deltaPhrase}</ThemedText>
       )}
 
-      {/* Arc 55: atmosphere -- sky + field synthesis */}
-      {atmospherePhrase !== null && (
-        <ThemedText style={s.atmosphereText}>{atmospherePhrase}</ThemedText>
-      )}
-
-      {/* Arc 57: ear phrase -- aural field, quiet naturalist clause */}
-      {earPhrase !== null && (
-        <ThemedText style={s.earText}>{earPhrase}</ThemedText>
+      {/* Arc 59: EarthMouth -- unified tri-field sentence (replaces atmosphere+ear) */}
+      {mouthPhrase !== null ? (
+        <ThemedText style={s.mouthText}>{mouthPhrase}</ThemedText>
+      ) : (
+        <>
+          {/* Arc 55: atmosphere -- sky + field synthesis (shown when mouth inactive) */}
+          {atmospherePhrase !== null && (
+            <ThemedText style={s.atmosphereText}>{atmospherePhrase}</ThemedText>
+          )}
+          {/* Arc 57: ear phrase -- aural (shown when mouth inactive) */}
+          {earPhrase !== null && (
+            <ThemedText style={s.earText}>{earPhrase}</ThemedText>
+          )}
+        </>
       )}
 
       {/* Arc 37: Field Structure -- chapter distribution */}
@@ -2540,6 +2623,15 @@ const s = StyleSheet.create({
     color: 'rgba(122,184,184,0.38)',
     fontFamily: 'Georgia',
     fontStyle: 'italic',
+    letterSpacing: 0.15,
+    marginTop: 4,
+    marginBottom: 2,
+  },
+  mouthText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.42)',
     letterSpacing: 0.15,
     marginTop: 4,
     marginBottom: 2,
