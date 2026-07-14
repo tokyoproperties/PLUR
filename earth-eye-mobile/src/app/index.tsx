@@ -54,7 +54,8 @@ const LAUNCH_ITEMS: LaunchItem[] = [
   { href: '/atlas',   label: 'Atlas',   hint: 'Cosmology stack' },
   { href: '/ecosystem', label: 'Field', hint: 'Living ecosystem' },
   { href: '/suit',    label: 'Suit',    hint: 'Sensor bands' },
-  { href: '/sensors', label: 'Sensors', hint: 'Live readings' },
+  { href: '/sensors',   label: 'Sensors',   hint: 'Live readings' },
+  { href: '/companion', label: 'Companion', hint: 'Voice & narrator' },
 ];
 
 function QuickLaunchTile({

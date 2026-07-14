@@ -7,6 +7,7 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import PLUROverlay from '@/components/PLUROverlay';
 import AppTabs from '@/components/app-tabs';
 import { FieldDataProvider } from '@/contexts/field-data-context';
+import { NarratorProvider } from '@/contexts/narrator-context';
 import { ModeProvider } from '@/contexts/mode-context';
 
 enableFreeze();
@@ -17,8 +18,10 @@ export default function TabLayout() {
     <ThemeProvider value={DarkTheme}>
       <ModeProvider>
         <FieldDataProvider>
-          <AppTabs />
-          <PLUROverlay />
+          <NarratorProvider>
+            <AppTabs />
+            <PLUROverlay />
+          </NarratorProvider>
         </FieldDataProvider>
       </ModeProvider>
       {/*

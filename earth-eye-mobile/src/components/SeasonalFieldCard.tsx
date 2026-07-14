@@ -28,7 +28,7 @@ import { useFieldDrift } from '@/hooks/useFieldDrift';
 import { useFieldHarmony } from '@/hooks/useFieldHarmony';
 import { FieldSummaryStrip } from '@/components/FieldSummaryStrip';
 import { useFieldForesight } from '@/hooks/useFieldForesight';
-import { useResonance } from '@/hooks/useResonance';
+import { useNarrator } from '@/contexts/narrator-context';
 import { useNarratorRebirth } from '@/hooks/useNarratorRebirth';
 import { useAtlas } from '@/atlas/useAtlas';
 
@@ -109,9 +109,11 @@ export function SeasonalFieldCard() {
   const latestMoment   = atlas.latest;
   const allMoments     = atlas.moments;
 
-  // Arc 52: resonance -- local style tuner, device-only
-  const resonance = useResonance();
+  // Arc 52/54: resonance via NarratorContext (shared with settings screen)
+  const narrator  = useNarrator();
+  const resonance = narrator.resonance;
   const { profile: rProfile, isCalibrated: rCalibrated } = resonance;
+  const fieldOnlyMode = narrator.fieldOnlyMode;
 
   // Arc 53: rebirth -- narrator reset without touching the field
   const rebirth = useNarratorRebirth(
@@ -1313,14 +1315,19 @@ export function SeasonalFieldCard() {
   // Below 220 moments the stack renders as-is (no compression needed --
   // fewer layers are active anyway).
 
+  // Arc 54: Field-Only Mode -- skip narrator stack entirely
+  // Identity, strip, field window, constellation, drift, foresight
+  // all render normally. Only the narrator-voice layers are silenced.
+  const narratorSilenced = fieldOnlyMode;
+
   // Arc 51: field anticipation -- narrative trajectory from echo deltas
   // Runs FIRST so reflection and compression can read anticipated outputs.
   // Activation: >= 360 moments AND harmony >= 0.6.
   // Below threshold all anticipated values are neutral (no pre-shaping).
   const ANTICIP_MIN = 360;
-  // FirstRenderMode: anticipation disabled -- narrator starts neutral
+  // FirstRenderMode or Field-Only: anticipation disabled
   const anticipActive =
-    !isFirstRender &&
+    !isFirstRender && !narratorSilenced &&
     allMoments.length >= ANTICIP_MIN &&
     harmony.isReadable &&
     harmony.agreement >= 0.6;
@@ -1429,9 +1436,9 @@ export function SeasonalFieldCard() {
   // Arc 50: echo -- read prior state BEFORE reflection so clarity
   // can dampen its own swing (echoClarityRef holds last render value).
   const ECHO_MIN = 320;
-  // FirstRenderMode: echo inertia disabled -- refs were just wiped to neutral
+  // FirstRenderMode or Field-Only: echo inertia disabled
   const echoActive =
-    !isFirstRender &&
+    !isFirstRender && !narratorSilenced &&
     allMoments.length >= ECHO_MIN &&
     harmony.isReadable &&
     harmony.agreement >= 0.6;
@@ -1443,8 +1450,8 @@ export function SeasonalFieldCard() {
   // Below 300 moments reflectionClarity = 0.70 (neutral -- no modulation).
   const REFLECT_MIN = 300;
   const reflectionClarity: number = (() => {
-    // FirstRenderMode: reflection returns neutral (0.70) -- fresh narrator
-    if (isFirstRender || allMoments.length < REFLECT_MIN || !harmony.isReadable) return 0.70;
+    // FirstRenderMode or Field-Only: return neutral (0.70)
+    if (isFirstRender || narratorSilenced || allMoments.length < REFLECT_MIN || !harmony.isReadable) return 0.70;
 
     const ring = allMoments;
     const N    = ring.length;
@@ -1524,8 +1531,8 @@ export function SeasonalFieldCard() {
   // depthBias > 0.5 -> user prefers more layers -> lower threshold
   // depthBias < 0.5 -> user prefers compressed   -> raise threshold
   // Max effect: +/- 0.05 (kept small so resonance nudges, not overrides)
-  // FirstRenderMode: resonance ignored -- narrator starts untrained
-  const resonanceBias = (!isFirstRender && rCalibrated)
+  // FirstRenderMode or Field-Only: resonance ignored
+  const resonanceBias = (!isFirstRender && !narratorSilenced && rCalibrated)
     ? (0.5 - rProfile.depthBias) * 0.10   // 0.5->0, 0->+0.05, 1->-0.05
     : 0;
   const resonancedThreshold = Math.max(0.44, Math.min(0.67,
@@ -1725,7 +1732,7 @@ export function SeasonalFieldCard() {
     const TONE_BRIGHT: Record<string, string> = {
       calm: 'bright', quiet: 'bright', mixed: 'active', bright: 'bright', active: 'active',
     };
-    const toneAdj = (!isFirstRender && rCalibrated)
+    const toneAdj = (!isFirstRender && !narratorSilenced && rCalibrated)
       ? (rProfile.toneBias > 0.68 ? (TONE_BRIGHT[rawToneAdj] ?? rawToneAdj)
        : rProfile.toneBias < 0.32 ? (TONE_CALM[rawToneAdj]   ?? rawToneAdj)
        : rawToneAdj)
@@ -1812,7 +1819,7 @@ export function SeasonalFieldCard() {
     //  +1 -> act one tier more open (tightening->balanced, balanced->full)
     //  -1 -> act one tier more closed (full->balanced, balanced->minimal)
     // Resonance depthBias further shifts: +0.08 at max depth, -0.08 at min
-    const resonanceClauseBias = (!isFirstRender && rCalibrated)
+    const resonanceClauseBias = (!isFirstRender && !narratorSilenced && rCalibrated)
       ? (rProfile.depthBias - 0.5) * 0.16  // 0.5->0, 1->+0.08, 0->-0.08
       : 0;
     const effectiveClarity = reflectionClarity

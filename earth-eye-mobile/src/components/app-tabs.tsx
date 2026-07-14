@@ -95,6 +95,7 @@ export default function AppTabs() {
       {/* Trail browser — folder route, hidden from tab bar */}
       <Tabs.Screen name="trails/index" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="trails/[id]" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="companion" options={{ href: null, headerShown: false }} />
     </Tabs>
   );
 }
