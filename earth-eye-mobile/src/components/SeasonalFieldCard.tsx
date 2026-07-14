@@ -1,17 +1,16 @@
 /**
- * SeasonalFieldCard.tsx -- Arc 25
+ * SeasonalFieldCard.tsx -- Arc 27
  *
- * Three-register color system (from slowest to fastest):
+ * Three-register color system (unchanged):
  *   Window label   <- constellation archetype tint (weeks)
  *   Suggestion     <- reweight dominant tint (days)
- *   Chapter label  <- drift direction tint (weeks, but directional)
+ *   Chapter label  <- drift direction tint (weeks, directional)
  *
- * Signal rows (fast layer, each optional):
- *   Branch, Initiative, Alignment, Presence
+ * Arc 27 addition: "Field mood: X" appended to the chapter footer.
+ * One word. No new color. No new row. The slow layers now speak
+ * with one voice at the bottom of the card.
  *
- * Drift does NOT add a row. It tints the season/chapter label
- * at the bottom -- the temporal anchor of the card.
- * Constitutional: whisper labels, italic serif prose, no shouts.
+ * Visibility gate: harmony.isReadable (at least one sibling active).
  */
 import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
@@ -25,6 +24,7 @@ import { useFieldBranch } from '@/hooks/useFieldBranch';
 import { useFieldReweight } from '@/hooks/useFieldReweight';
 import { useFieldConstellation } from '@/hooks/useFieldConstellation';
 import { useFieldDrift } from '@/hooks/useFieldDrift';
+import { useFieldHarmony } from '@/hooks/useFieldHarmony';
 
 const QUALITY_ACCENT: Record<string, string> = {
   prime:    Accents.sage,
@@ -78,13 +78,12 @@ const REWEIGHT_TINT: Record<string, string> = {
   season:     'rgba(255,255,255,0.72)',
 };
 
-// Drift: chapter label tint (very subtle -- this is the slowest register)
 const DRIFT_TINT: Record<string, string> = {
-  settling:    'rgba(255,255,255,0.28)',   // muted -- field is quieting
-  brightening: 'rgba(196,151,74,0.55)',    // warm amber -- brightening
-  wandering:   'rgba(122,154,184,0.55)',   // cool blue -- ranging
-  returning:   'rgba(154,122,184,0.55)',   // lavender -- cycling back
-  seeking:     'rgba(196,151,74,0.65)',    // vivid amber -- expanding
+  settling:    'rgba(255,255,255,0.28)',
+  brightening: 'rgba(196,151,74,0.55)',
+  wandering:   'rgba(122,154,184,0.55)',
+  returning:   'rgba(154,122,184,0.55)',
+  seeking:     'rgba(196,151,74,0.65)',
 };
 
 export function SeasonalFieldCard() {
@@ -97,8 +96,8 @@ export function SeasonalFieldCard() {
   const reweight       = useFieldReweight();
   const constellation  = useFieldConstellation();
   const drift          = useFieldDrift();
+  const harmony        = useFieldHarmony();
 
-  // Three registers, three speeds
   const windowColor = constellation.isFormed
     ? CONSTELLATION_TINT[constellation.archetype]
     : (QUALITY_ACCENT[fieldWindow.quality] ?? Accents.sage);
@@ -126,12 +125,10 @@ export function SeasonalFieldCard() {
     <View style={s.card}>
       <ThemedText style={s.whisper}>Field Window</ThemedText>
 
-      {/* Register 1: constellation-tinted window label */}
       <ThemedText style={[s.windowLabel, { color: windowColor }]}>
         {fieldWindow.label}
       </ThemedText>
 
-      {/* Register 2: reweight-tinted suggestion */}
       <ThemedText style={[s.suggestion, { color: suggestionColor }]}>
         {fieldWindow.suggestion}
       </ThemedText>
@@ -142,7 +139,6 @@ export function SeasonalFieldCard() {
         </ThemedText>
       )}
 
-      {/* Fast signal rows */}
       {showBranch && (
         <View style={[s.signalRow, s.branchRow]}>
           <View style={[s.dot, { backgroundColor: branchColor }]} />
@@ -192,7 +188,7 @@ export function SeasonalFieldCard() {
         </View>
       )}
 
-      {/* Register 3: drift-tinted chapter label with chapterNote */}
+      {/* Chapter footer: drift note + harmony mood */}
       <View style={s.chapterFooter}>
         <ThemedText style={[s.seasonLabel, { color: chapterColor }]}>
           {label}
@@ -200,6 +196,11 @@ export function SeasonalFieldCard() {
         {drift.isMeasurable && (
           <ThemedText style={[s.chapterNote, { color: chapterColor }]}>
             {drift.chapterNote}
+          </ThemedText>
+        )}
+        {harmony.isReadable && (
+          <ThemedText style={s.harmonyMood}>
+            {harmony.moodLabel}
           </ThemedText>
         )}
       </View>
@@ -271,6 +272,13 @@ const s = StyleSheet.create({
   },
   chapterNote: {
     fontSize: 10, fontFamily: 'Georgia', fontStyle: 'italic',
+    letterSpacing: 0.2,
+  },
+  harmonyMood: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.22)',
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
     letterSpacing: 0.2,
   },
 });
