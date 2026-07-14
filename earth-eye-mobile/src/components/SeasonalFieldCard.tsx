@@ -460,6 +460,108 @@ export function SeasonalFieldCard() {
     return 'Resilience: fragile.';
   })();
 
+  // Arc 40: field lineage -- earliest 40-moment origin pattern
+  // Pure earliest-slice read. No evaluator, no hook.
+  const LINEAGE_MIN   = 100;
+  const LINEAGE_SLICE = 40;
+  const lineagePhrase: string | null = (() => {
+    const linActive =
+      resiliencePhrase !== null &&        // resilience gate (>= 80) already cleared
+      allMoments.length >= LINEAGE_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!linActive) return null;
+
+    // Read earliest LINEAGE_SLICE moments only
+    const early = allMoments.slice(0, LINEAGE_SLICE);
+    const eN    = early.length;  // always LINEAGE_SLICE when linActive
+
+    // -- Earliest stable tone (>= 40% threshold, same as signature) ---
+    const eTones: Record<string, number> = {};
+    for (const m of early) {
+      if (m.corridorTone) eTones[m.corridorTone] = (eTones[m.corridorTone] ?? 0) + 1;
+    }
+    const eTopTone  = Object.entries(eTones).sort((a, b) => b[1] - a[1])[0];
+    const earlyTone = eTopTone && eTopTone[1] / eN >= 0.40 ? eTopTone[0] : null;
+
+    // -- Earliest stable season (>= 40%) ------------------------------
+    const eSeasons: Record<string, number> = {};
+    for (const m of early) {
+      if (m.season) eSeasons[m.season] = (eSeasons[m.season] ?? 0) + 1;
+    }
+    const eTopSeason  = Object.entries(eSeasons).sort((a, b) => b[1] - a[1])[0];
+    const earlySeason = eTopSeason && eTopSeason[1] / eN >= 0.40 ? eTopSeason[0] : null;
+
+    // -- Earliest species presence ------------------------------------
+    const eSpeciesMoments = early.filter(m => m.invitedCount > 0).length;
+    const earlySpeciesHeavy = eSpeciesMoments / eN >= 0.50;
+
+    // -- Earliest symbolic mode ---------------------------------------
+    const ePlusMoments = early.filter(m => m.symbolic === 'plur').length;
+    const earlySym     = ePlusMoments / eN >= 0.55 ? 'plur' : 'love';
+
+    // -- Earliest cardType (behavioral origin) ------------------------
+    const eCardTypes: Record<string, number> = {};
+    for (const m of early) {
+      if (m.cardType) eCardTypes[m.cardType] = (eCardTypes[m.cardType] ?? 0) + 1;
+    }
+    const eTopCard  = Object.entries(eCardTypes).sort((a, b) => b[1] - a[1])[0];
+    const earlyCard = eTopCard?.[0] ?? null;
+
+    // -- Phrase composition -------------------------------------------
+    // Verb: what was the field doing at its origin?
+    const CARD_VERB: Record<string, string> = {
+      trail:    'trail moments',
+      coastal:  'coastal openings',
+      yard:     'yard pockets',
+      night:    'night moments',
+      field:    'field moments',
+      fallback: 'field moments',
+    };
+
+    const TONE_ADJ: Record<string, string> = {
+      bright: 'bright',
+      calm:   'calm',
+      still:  'quiet',
+      mixed:  'mixed',
+      noisy:  'active',
+    };
+
+    const SEASON_PHRASE: Record<string, string> = {
+      spring: 'early spring',
+      summer: 'warm summer',
+      fall:   'turning fall',
+      winter: 'quiet winter',
+    };
+
+    // Noun: what defined the earliest moments?
+    // Priority: tone > species-heavy > cardType > season > symbolic
+    let origin: string;
+    const toneAdj  = earlyTone ? (TONE_ADJ[earlyTone] ?? null) : null;
+    const cardVerb = earlyCard ? (CARD_VERB[earlyCard] ?? 'field moments') : 'field moments';
+
+    if (toneAdj && earlySpeciesHeavy) {
+      origin = `${toneAdj} corridor with early species presence`;
+    } else if (toneAdj) {
+      origin = `${toneAdj} ${cardVerb}`;
+    } else if (earlySpeciesHeavy) {
+      origin = `species-rich ${cardVerb}`;
+    } else if (earlySeason) {
+      origin = `${SEASON_PHRASE[earlySeason]} ${cardVerb}`;
+    } else {
+      origin = earlySym === 'love' ? 'quiet interior beginnings' : 'open field beginnings';
+    }
+
+    // Verb prefix: how did it originate?
+    const eTopToneRatio = eTopTone ? eTopTone[1] / eN : 0;
+    const verb = eTopToneRatio >= 0.65 ? 'born from'
+               : earlySeason           ? 'rooted in'
+               : earlySpeciesHeavy     ? 'seeded by'
+               : 'shaped by';
+
+    return `Lineage: ${verb} ${origin}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -641,6 +743,10 @@ export function SeasonalFieldCard() {
           {resiliencePhrase !== null && (
             <ThemedText style={s.resilienceText}>{resiliencePhrase}</ThemedText>
           )}
+          {/* Arc 40: lineage -- below resilience, above strip */}
+          {lineagePhrase !== null && (
+            <ThemedText style={s.lineageText}>{lineagePhrase}</ThemedText>
+          )}
         </>
       )}
 
@@ -810,6 +916,14 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.48)',
+    letterSpacing: 0.12,
+    marginBottom: 4,
+  },
+  lineageText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.46)',
     letterSpacing: 0.12,
     marginBottom: 10,
   },
