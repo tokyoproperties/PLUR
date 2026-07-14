@@ -1508,7 +1508,13 @@ export function SeasonalFieldCard() {
   //   high clarity (>= 0.75) -> 0.50 (more layers visible)
   //   balanced (0.55-0.75)   -> 0.55 (default)
   //   low clarity (< 0.55)   -> 0.62 (fewer layers visible)
-  // Arc 56: use smoothedClarity (thread-blended) for threshold, not raw
+
+  // Arc 56: thread-blended clarity -- smoothed before tier selection to
+  // prevent categorical threshold jumps on navigation / ring boundary crossings.
+  const smoothedClarity = (threadRef.current.isWarm && !isFirstRender)
+    ? _blendWithThread(reflectionClarity, threadRef.current.threadClarity)
+    : reflectionClarity;
+
   const rawThreshold =
     smoothedClarity >= 0.75 ? 0.50 :
     smoothedClarity >= 0.55 ? 0.55 : 0.62;
