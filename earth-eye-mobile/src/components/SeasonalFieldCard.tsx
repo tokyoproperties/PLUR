@@ -1281,7 +1281,83 @@ export function SeasonalFieldCard() {
   // Compression activates only when integrityPhrase is active (>= 220 moments).
   // Below 220 moments the stack renders as-is (no compression needed --
   // fewer layers are active anyway).
-  const COMPRESS_THRESHOLD = 0.55;
+
+  // Arc 49: field reflection -- clarity score computed BEFORE compression
+  // so compression can read it to adjust its own threshold.
+  // Activation: essencePhrase requires >= 260 moments, but reflection
+  // begins at >= 300 so it only modulates a mature card.
+  // Below 300 moments reflectionClarity = 0.70 (neutral -- no modulation).
+  const REFLECT_MIN = 300;
+  const reflectionClarity: number = (() => {
+    if (allMoments.length < REFLECT_MIN || !harmony.isReadable) return 0.70;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // -- 1. Layer density score (0.25) ---------------------------------
+    // Count how many phrases currently exist (not yet compressed).
+    const existingPhrases = [
+      signaturePhrase, resiliencePhrase, lineagePhrase, rhythmPhrase,
+      orientationPhrase, coherencePhrase, alignmentPhrase,
+      continuityPhrase, integrityPhrase,
+    ].filter(Boolean).length;
+    // Ideal density: 3-5 visible layers (too many = dense, too few = sparse).
+    // Score peaks at 4, falls off on either side.
+    const densityScore = existingPhrases === 0 ? 0
+      : existingPhrases <= 2 ? 0.40               // too sparse
+      : existingPhrases <= 5 ? 0.85               // ideal range
+      : existingPhrases <= 7 ? 0.65               // getting dense
+      : 0.45;                                      // too many layers
+
+    // -- 2. Tone stability score (0.20) --------------------------------
+    // Low flip rate = stable tone = high clarity.
+    let toneFlips = 0;
+    for (let i = 1; i < N; i++) {
+      if (ring[i].corridorTone !== ring[i-1].corridorTone) toneFlips++;
+    }
+    const toneStability = 1 - toneFlips / Math.max(1, N - 1);
+
+    // -- 3. Contradiction rate score (0.20) ----------------------------
+    // Inverted contradiction rate: fewer contradictions = clearer field.
+    const PLUR_T = new Set(['bright', 'noisy', 'mixed']);
+    const LOVE_T = new Set(['calm', 'still', 'mixed']);
+    let contradCount = 0;
+    for (const m of ring) {
+      if (!m.symbolic || !m.corridorTone) continue;
+      const inSet = m.symbolic === 'plur' ? PLUR_T.has(m.corridorTone)
+                                           : LOVE_T.has(m.corridorTone);
+      if (!inSet) contradCount++;
+    }
+    const nonContradRate = 1 - contradCount / N;
+
+    // -- 4. Harmony agreement (0.20) -----------------------------------
+    const harmClarity = harmony.agreement;          // already [0,1]
+
+    // -- 5. Symbolic stability (0.15) ----------------------------------
+    let symFlips = 0;
+    for (let i = 1; i < N; i++) {
+      if (ring[i].symbolic !== ring[i-1].symbolic) symFlips++;
+    }
+    const symStability = 1 - symFlips / Math.max(1, N - 1);
+
+    // -- Weighted clarity coefficient ----------------------------------
+    const clarity =
+      densityScore    * 0.25 +
+      toneStability   * 0.20 +
+      nonContradRate  * 0.20 +
+      harmClarity     * 0.20 +
+      symStability    * 0.15;
+
+    return Math.max(0, Math.min(1, clarity));
+  })();
+
+  // Compression threshold modulated by reflection clarity:
+  //   high clarity (>= 0.75) -> 0.50 (more layers visible)
+  //   balanced (0.55-0.75)   -> 0.55 (default)
+  //   low clarity (< 0.55)   -> 0.62 (fewer layers visible)
+  const COMPRESS_THRESHOLD =
+    reflectionClarity >= 0.75 ? 0.50 :
+    reflectionClarity >= 0.55 ? 0.55 : 0.62;
 
   type PhraseKey =
     'signature' | 'resilience' | 'lineage' | 'rhythm' |
@@ -1510,21 +1586,29 @@ export function SeasonalFieldCard() {
       directionalClause = DRIFT_CL[drift.direction] ?? '';
     }
 
-    // -- Compose: one sentence, always --------------------------------
-    // Pattern: "A {toneAdj} {archNoun} field {temporal}, {directional}."
-    // Variations based on which clauses are available.
-    const parts: string[] = [];
-    parts.push(`A ${toneAdj} ${archNoun} field`);
-    if (temporalClause)   parts.push(temporalClause);
-    if (directionalClause) parts.push(directionalClause);
+    // -- Compose: clause count modulated by reflection clarity ---------
+    // high clarity (>= 0.75): full three-axis (structural + temporal + directional)
+    // balanced (0.55-0.75):   two-axis (structural + directional)
+    // low clarity (< 0.55):   minimal (toneAdj + first directional word)
+    let sentence: string;
 
-    let sentence = parts.join(', ');
-    // Ensure exactly one terminal period
-    if (!sentence.endsWith('.')) sentence += '.';
-    // Cap length -- if somehow > 90 chars, use abbreviated form
-    if (sentence.length > 90) {
-      sentence = `A ${toneAdj} field, ${directionalClause || archNoun}.`;
+    if (reflectionClarity >= 0.75) {
+      const parts: string[] = [`A ${toneAdj} ${archNoun} field`];
+      if (temporalClause)    parts.push(temporalClause);
+      if (directionalClause) parts.push(directionalClause);
+      sentence = parts.join(', ');
+    } else if (reflectionClarity >= 0.55) {
+      sentence = directionalClause
+        ? `A ${toneAdj} ${archNoun} field, ${directionalClause}`
+        : `A ${toneAdj} ${archNoun} field`;
+    } else {
+      // Minimal: 'A calm field, settling.' -- first word of directional only
+      const shortDir = directionalClause.split(' ')[0] ?? archNoun;
+      sentence = `A ${toneAdj} field, ${shortDir}`;
     }
+
+    if (!sentence.endsWith('.')) sentence += '.';
+    if (sentence.length > 90) sentence = `A ${toneAdj} field, ${directionalClause || archNoun}.`;
 
     return sentence.charAt(0).toUpperCase() + sentence.slice(1);
   })();
