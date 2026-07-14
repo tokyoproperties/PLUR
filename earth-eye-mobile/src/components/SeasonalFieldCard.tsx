@@ -30,6 +30,7 @@ import { FieldSummaryStrip } from '@/components/FieldSummaryStrip';
 import { useFieldForesight } from '@/hooks/useFieldForesight';
 import { useNarrator } from '@/contexts/narrator-context';
 import { useNarratorRebirth } from '@/hooks/useNarratorRebirth';
+import { useFieldSky } from '@/hooks/useFieldSky';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -113,7 +114,10 @@ export function SeasonalFieldCard() {
   const narrator  = useNarrator();
   const resonance = narrator.resonance;
   const { profile: rProfile, isCalibrated: rCalibrated } = resonance;
-  const fieldOnlyMode = narrator.fieldOnlyMode;
+  const fieldOnlyMode    = narrator.fieldOnlyMode;
+
+  // Arc 55: sky intelligence
+  const sky = useFieldSky();
 
   // Arc 53: rebirth -- narrator reset without touching the field
   const rebirth = useNarratorRebirth(
@@ -1873,6 +1877,49 @@ export function SeasonalFieldCard() {
     return sentence.charAt(0).toUpperCase() + sentence.slice(1);
   })();
 
+  // Arc 55: field + sky synthesis phrase
+  // Combines horizontal field essence with vertical sky layer.
+  // Only rendered when sky is calibrated and not silenced by fieldOnlyMode.
+  const atmospherePhrase: string | null = (() => {
+    if (!sky.isActive || !sky.isCalibrated || narratorSilenced) return null;
+    if (sky.skyTone === 'unknown') return null;
+
+    // Sky descriptor: brief, lowercase, no period
+    const SKY_ADJ: Record<string, string> = {
+      bright:   'a bright sky',
+      dim:      'a dim sky',
+      shifting: 'a shifting sky',
+      still:    'a still sky',
+      twilight: 'a twilight sky',
+      dark:     'a dark sky',
+    };
+    const skyDesc = SKY_ADJ[sky.skyTone] ?? 'the sky';
+
+    // Orientation connector
+    const ORI_VERB: Record<string, string> = {
+      brightening: 'widening',
+      dimming:     'pulling back',
+      open:        'open',
+      settling:    'settling',
+      stable:      'steady',
+    };
+    const skyVerb = sky.orientation !== 'unknown'
+      ? ORI_VERB[sky.orientation] ?? 'present'
+      : 'present';
+
+    // Field ground descriptor (abbreviated from toneAdj in essence)
+    const c = constellation;
+    const groundAdj = c.isFormed
+      ? (c.archetype === 'observer' ? 'quiet'
+       : c.archetype === 'wanderer' ? 'moving'
+       : c.archetype === 'steady'   ? 'steady'
+       : c.archetype === 'returner' ? 'familiar'
+       : 'open')
+      : 'present';
+
+    return `${SKY_ADJ[sky.skyTone] ?? 'the sky'}, ${skyVerb}, above a ${groundAdj} field.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2193,6 +2240,11 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.deltaText}>{deltaPhrase}</ThemedText>
       )}
 
+      {/* Arc 55: atmosphere -- sky + field synthesis */}
+      {atmospherePhrase !== null && (
+        <ThemedText style={s.atmosphereText}>{atmospherePhrase}</ThemedText>
+      )}
+
       {/* Arc 37: Field Structure -- chapter distribution */}
       {structurePhrase !== null && (
         <ThemedText style={s.structureText}>{structurePhrase}</ThemedText>
@@ -2413,6 +2465,15 @@ const s = StyleSheet.create({
     fontStyle: 'italic',
     letterSpacing: 0.15,
     marginTop: 6,
+    marginBottom: 2,
+  },
+  atmosphereText: {
+    fontSize: 11,
+    color: 'rgba(122,184,184,0.38)',
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    letterSpacing: 0.15,
+    marginTop: 4,
     marginBottom: 2,
   },
   structureText: {

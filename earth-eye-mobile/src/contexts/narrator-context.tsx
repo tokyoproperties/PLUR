@@ -26,11 +26,14 @@ import { useResonance } from '@/hooks/useResonance';
 import type { ResonanceHandle, StyleProfile } from '@/hooks/useResonance';
 
 const FIELD_ONLY_KEY = 'earthEye.narrator.fieldOnlyMode';
+const SKY_MODE_KEY   = 'earthEye.narrator.skyMode';
 
 interface NarratorContextValue {
-  resonance:     ResonanceHandle;
-  fieldOnlyMode: boolean;
-  setFieldOnly:  (v: boolean) => void;
+  resonance:       ResonanceHandle;
+  fieldOnlyMode:   boolean;
+  setFieldOnly:    (v: boolean) => void;
+  skyModeEnabled:  boolean;
+  setSkyMode:      (v: boolean) => void;
 }
 
 const NarratorContext = createContext<NarratorContextValue | null>(null);
@@ -38,12 +41,15 @@ const NarratorContext = createContext<NarratorContextValue | null>(null);
 export function NarratorProvider({ children }: { children: ReactNode }) {
   const resonance = useResonance();
 
-  const [fieldOnlyMode, setFieldOnlyMode] = useState(false);
+  const [fieldOnlyMode,  setFieldOnlyMode]  = useState(false);
+  const [skyModeEnabled, setSkyModeEnabled] = useState(false);
 
-  // Hydrate fieldOnlyMode from AsyncStorage
+  // Hydrate both booleans from AsyncStorage
   useEffect(() => {
-    AsyncStorage.getItem(FIELD_ONLY_KEY).then(raw => {
-      if (raw === 'true') setFieldOnlyMode(true);
+    AsyncStorage.multiGet([FIELD_ONLY_KEY, SKY_MODE_KEY]).then(pairs => {
+      const map = Object.fromEntries(pairs);
+      if (map[FIELD_ONLY_KEY] === 'true') setFieldOnlyMode(true);
+      if (map[SKY_MODE_KEY]   === 'true') setSkyModeEnabled(true);
     });
   }, []);
 
@@ -52,8 +58,16 @@ export function NarratorProvider({ children }: { children: ReactNode }) {
     AsyncStorage.setItem(FIELD_ONLY_KEY, v ? 'true' : 'false').catch(() => {});
   }, []);
 
+  const setSkyMode = useCallback((v: boolean) => {
+    setSkyModeEnabled(v);
+    AsyncStorage.setItem(SKY_MODE_KEY, v ? 'true' : 'false').catch(() => {});
+  }, []);
+
   return (
-    <NarratorContext.Provider value={{ resonance, fieldOnlyMode, setFieldOnly }}>
+    <NarratorContext.Provider value={{
+      resonance, fieldOnlyMode, setFieldOnly,
+      skyModeEnabled, setSkyMode,
+    }}>
       {children}
     </NarratorContext.Provider>
   );

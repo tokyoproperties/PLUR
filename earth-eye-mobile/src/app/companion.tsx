@@ -19,6 +19,7 @@ import {
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { useNarrator } from '@/contexts/narrator-context';
+import { useFieldSky } from '@/hooks/useFieldSky';
 import { useNarratorRebirth } from '@/hooks/useNarratorRebirth';
 import { useAtlas } from '@/atlas/useAtlas';
 import { useFieldHarmony } from '@/hooks/useFieldHarmony';
@@ -102,7 +103,9 @@ function Row({ label, value, onIncrease, onDecrease }: {
 // ── Main screen ──────────────────────────────────────────────────────────────
 
 export default function CompanionSettingsScreen() {
-  const { resonance, fieldOnlyMode, setFieldOnly } = useNarrator();
+  const narrator = useNarrator();
+  const { resonance, fieldOnlyMode, setFieldOnly } = narrator;
+  const sky = useFieldSky();
   const rebirth = useSettingsRebirth();
   const atlas = useAtlas();
   const harmony = useFieldHarmony(atlas.moments);
@@ -227,6 +230,32 @@ export default function CompanionSettingsScreen() {
             thumbColor={fieldOnlyMode ? '#7AB87A' : 'rgba(255,255,255,0.55)'}
           />
         </View>
+      </View>
+
+      {/* ── 3b. Sky Intelligence toggle ──────────────────────────────── */}
+      <View style={s.card}>
+        <Whisper>SKY INTELLIGENCE</Whisper>
+        <View style={s.toggleRow}>
+          <View style={s.toggleLabel}>
+            <ThemedText style={s.toggleTitle}>Read the vertical field</ThemedText>
+            <ThemedText style={s.toggleSub}>
+              {'Adds sky tone, brightness, and atmospheric drift to the narrator. Uses ambient light sensor.'}
+            </ThemedText>
+          </View>
+          <Switch
+            value={narrator.skyModeEnabled}
+            onValueChange={narrator.setSkyMode}
+            trackColor={{ false: 'rgba(255,255,255,0.12)', true: 'rgba(122,184,184,0.50)' }}
+            thumbColor={narrator.skyModeEnabled ? 'rgba(122,184,184,0.90)' : 'rgba(255,255,255,0.55)'}
+          />
+        </View>
+        {narrator.skyModeEnabled && (
+          <ThemedText style={s.toggleSub}>
+            {sky.isCalibrated
+              ? `Sky calibrated. Tone: ${sky.skyTone}. ${sky.identity}.`
+              : `Calibrating sky... (${sky.luxNow !== null ? Math.round(sky.luxNow) + ' lux' : 'waiting for sensor'})`}
+          </ThemedText>
+        )}
       </View>
 
       {/* ── 4. Reset Companion Voice ─────────────────────────────────── */}
