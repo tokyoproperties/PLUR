@@ -562,6 +562,148 @@ export function SeasonalFieldCard() {
     return `Lineage: ${verb} ${origin}.`;
   })();
 
+  // Arc 41: field rhythm -- long-scale temporal cadence
+  // Pure ring read. No evaluator, no hook.
+  const RHYTHM_MIN = 120;
+  const rhythmPhrase: string | null = (() => {
+    const rActive =
+      lineagePhrase !== null &&           // lineage gate (>= 100) already cleared
+      allMoments.length >= RHYTHM_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!rActive) return null;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // -- Moment spacing: median gap between consecutive timestamps -----
+    const gaps: number[] = [];
+    for (let i = 1; i < N; i++) {
+      const gap = ring[i].timestamp - ring[i - 1].timestamp;
+      if (gap > 0 && gap < 30 * 24 * 3600 * 1000) gaps.push(gap); // ignore >30d gaps
+    }
+    gaps.sort((a, b) => a - b);
+    const medianGapMs = gaps.length > 0 ? gaps[Math.floor(gaps.length / 2)] : 0;
+    const medianGapDays = medianGapMs / (24 * 3600 * 1000);
+
+    // Spacing class
+    const spacing: 'dense' | 'steady' | 'slow' | 'sparse' =
+      medianGapDays < 0.5  ? 'dense'  :
+      medianGapDays < 3    ? 'steady' :
+      medianGapDays < 10   ? 'slow'   : 'sparse';
+
+    // -- Tone oscillation: how often does dominant tone alternate ------
+    // Bucket into N/10 windows; count dominant-tone changes
+    const BUCKET = Math.max(5, Math.floor(N / 10));
+    const toneBuckets: string[] = [];
+    for (let i = 0; i + BUCKET <= N; i += BUCKET) {
+      const sl = ring.slice(i, i + BUCKET);
+      const cnt: Record<string, number> = {};
+      for (const m of sl) if (m.corridorTone) cnt[m.corridorTone] = (cnt[m.corridorTone] ?? 0) + 1;
+      const top = Object.entries(cnt).sort((a, b) => b[1] - a[1])[0];
+      if (top) toneBuckets.push(top[0]);
+    }
+    let toneChanges = 0;
+    for (let i = 1; i < toneBuckets.length; i++) {
+      if (toneBuckets[i] !== toneBuckets[i - 1]) toneChanges++;
+    }
+    const toneOscRate = toneBuckets.length > 1
+      ? toneChanges / (toneBuckets.length - 1) : 0;
+
+    // -- Symbolic alternation: plur/love switch rate (same bucket) -----
+    const symBuckets: string[] = [];
+    for (let i = 0; i + BUCKET <= N; i += BUCKET) {
+      const sl = ring.slice(i, i + BUCKET);
+      const plur = sl.filter(m => m.symbolic === 'plur').length;
+      symBuckets.push(plur / sl.length >= 0.5 ? 'plur' : 'love');
+    }
+    let symChanges = 0;
+    for (let i = 1; i < symBuckets.length; i++) {
+      if (symBuckets[i] !== symBuckets[i - 1]) symChanges++;
+    }
+    const symOscRate = symBuckets.length > 1
+      ? symChanges / (symBuckets.length - 1) : 0;
+
+    // -- Season cycle: how many full season transitions occurred -------
+    let seasonTransitions = 0;
+    for (let i = 1; i < N; i++) {
+      if (ring[i].season !== ring[i - 1].season) seasonTransitions++;
+    }
+    // Normalize: a field with 120+ moments could have seen 0-10+ transitions
+    const seasonCycleRate = Math.min(1, seasonTransitions / (N / 20));
+
+    // -- Species periodicity: alternating dense/sparse windows --------
+    const speciesBuckets: boolean[] = [];
+    for (let i = 0; i + BUCKET <= N; i += BUCKET) {
+      const sl = ring.slice(i, i + BUCKET);
+      speciesBuckets.push(sl.filter(m => m.invitedCount > 0).length / sl.length >= 0.5);
+    }
+    let speciesChanges = 0;
+    for (let i = 1; i < speciesBuckets.length; i++) {
+      if (speciesBuckets[i] !== speciesBuckets[i - 1]) speciesChanges++;
+    }
+    const speciesOscRate = speciesBuckets.length > 1
+      ? speciesChanges / (speciesBuckets.length - 1) : 0;
+
+    // -- Composite oscillation score ----------------------------------
+    const oscScore =
+      toneOscRate    * 0.35 +
+      symOscRate     * 0.25 +
+      seasonCycleRate* 0.25 +
+      speciesOscRate * 0.15;
+
+    // Oscillation class
+    const osc: 'flat' | 'gentle' | 'moderate' | 'active' =
+      oscScore < 0.15 ? 'flat'     :
+      oscScore < 0.35 ? 'gentle'   :
+      oscScore < 0.60 ? 'moderate' : 'active';
+
+    // -- Primary tone pair (for named oscillation phrases) ------------
+    const sortedTones = Object.entries(
+      (() => {
+        const c: Record<string, number> = {};
+        for (const m of ring) if (m.corridorTone) c[m.corridorTone] = (c[m.corridorTone] ?? 0) + 1;
+        return c;
+      })()
+    ).sort((a, b) => b[1] - a[1]);
+    const tone1 = sortedTones[0]?.[0] ?? null;
+    const tone2 = sortedTones[1]?.[0] ?? null;
+
+    // -- Phrase composition -------------------------------------------
+    // Tone pair label for oscillation phrases
+    const TONE_PAIR: Record<string, Record<string, string>> = {
+      bright: { calm: 'bright-calm', still: 'bright-quiet', mixed: 'bright-mixed', noisy: 'bright-noisy', bright: 'bright' },
+      calm:   { bright: 'calm-bright', still: 'calm-quiet', mixed: 'calm-mixed', noisy: 'calm-noisy', calm: 'calm' },
+      still:  { bright: 'quiet-bright', calm: 'quiet-calm', mixed: 'quiet-mixed', noisy: 'quiet-active', still: 'quiet' },
+      mixed:  { bright: 'mixed-bright', calm: 'mixed-calm', still: 'mixed-quiet', noisy: 'mixed-active', mixed: 'mixed' },
+      noisy:  { bright: 'active-bright', calm: 'active-calm', still: 'active-quiet', mixed: 'active-mixed', noisy: 'active' },
+    };
+    const tonePair = tone1 && tone2
+      ? (TONE_PAIR[tone1]?.[tone2] ?? `${tone1}`) : (tone1 ?? 'mixed');
+
+    // Spacing label
+    const SPACING_LABEL: Record<string, string> = {
+      dense:  'fast',
+      steady: 'steady',
+      slow:   'slow',
+      sparse: 'sparse',
+    };
+
+    // Final phrase: cadence type from oscillation + spacing context
+    if (osc === 'flat') {
+      return `Rhythm: ${SPACING_LABEL[spacing]}-steady cadence.`;
+    } else if (osc === 'gentle') {
+      return `Rhythm: ${tonePair} drift, ${SPACING_LABEL[spacing]} tempo.`;
+    } else if (osc === 'moderate') {
+      return `Rhythm: ${tonePair} oscillation, ${SPACING_LABEL[spacing]} tempo.`;
+    } else {
+      // active oscillation -- seasonal and species cycling is prominent
+      return seasonCycleRate > 0.5
+        ? `Rhythm: mixed seasonal pulse, ${SPACING_LABEL[spacing]} tempo.`
+        : `Rhythm: ${tonePair} alternation, ${SPACING_LABEL[spacing]} tempo.`;
+    }
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -747,6 +889,10 @@ export function SeasonalFieldCard() {
           {lineagePhrase !== null && (
             <ThemedText style={s.lineageText}>{lineagePhrase}</ThemedText>
           )}
+          {/* Arc 41: rhythm -- below lineage, above strip */}
+          {rhythmPhrase !== null && (
+            <ThemedText style={s.rhythmText}>{rhythmPhrase}</ThemedText>
+          )}
         </>
       )}
 
@@ -924,6 +1070,14 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.46)',
+    letterSpacing: 0.12,
+    marginBottom: 4,
+  },
+  rhythmText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.44)',
     letterSpacing: 0.12,
     marginBottom: 10,
   },
