@@ -29,6 +29,7 @@ import { useFieldHarmony } from '@/hooks/useFieldHarmony';
 import { FieldSummaryStrip } from '@/components/FieldSummaryStrip';
 import { useFieldForesight } from '@/hooks/useFieldForesight';
 import { useResonance } from '@/hooks/useResonance';
+import { useNarratorRebirth } from '@/hooks/useNarratorRebirth';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -111,6 +112,23 @@ export function SeasonalFieldCard() {
   // Arc 52: resonance -- local style tuner, device-only
   const resonance = useResonance();
   const { profile: rProfile, isCalibrated: rCalibrated } = resonance;
+
+  // Arc 53: rebirth -- narrator reset without touching the field
+  const rebirth = useNarratorRebirth(
+    {
+      essenceRef:   echoEssenceRef,
+      oriVecRef:    echoOriVecRef,
+      toneRef:      echoToneRef,
+      clarityRef:   echoClarityRef,
+      thresholdRef: echoThresholdRef,
+      visibleSetRef: echoVisibleSetRef,
+      archetypeRef: prevArchetypeRef,
+      driftRef:     prevDriftRef,
+      forecastRef:  prevForecastRef,
+    },
+    resonance,
+  );
+  const isFirstRender = rebirth.isFirstRender;
 
   // Arc 32: delta -- compare current slow signals to previous render
   const prevArchetypeRef = useRef<string | null>(null);
@@ -1300,7 +1318,9 @@ export function SeasonalFieldCard() {
   // Activation: >= 360 moments AND harmony >= 0.6.
   // Below threshold all anticipated values are neutral (no pre-shaping).
   const ANTICIP_MIN = 360;
+  // FirstRenderMode: anticipation disabled -- narrator starts neutral
   const anticipActive =
+    !isFirstRender &&
     allMoments.length >= ANTICIP_MIN &&
     harmony.isReadable &&
     harmony.agreement >= 0.6;
@@ -1409,7 +1429,9 @@ export function SeasonalFieldCard() {
   // Arc 50: echo -- read prior state BEFORE reflection so clarity
   // can dampen its own swing (echoClarityRef holds last render value).
   const ECHO_MIN = 320;
+  // FirstRenderMode: echo inertia disabled -- refs were just wiped to neutral
   const echoActive =
+    !isFirstRender &&
     allMoments.length >= ECHO_MIN &&
     harmony.isReadable &&
     harmony.agreement >= 0.6;
@@ -1421,7 +1443,8 @@ export function SeasonalFieldCard() {
   // Below 300 moments reflectionClarity = 0.70 (neutral -- no modulation).
   const REFLECT_MIN = 300;
   const reflectionClarity: number = (() => {
-    if (allMoments.length < REFLECT_MIN || !harmony.isReadable) return 0.70;
+    // FirstRenderMode: reflection returns neutral (0.70) -- fresh narrator
+    if (isFirstRender || allMoments.length < REFLECT_MIN || !harmony.isReadable) return 0.70;
 
     const ring = allMoments;
     const N    = ring.length;
@@ -1501,7 +1524,8 @@ export function SeasonalFieldCard() {
   // depthBias > 0.5 -> user prefers more layers -> lower threshold
   // depthBias < 0.5 -> user prefers compressed   -> raise threshold
   // Max effect: +/- 0.05 (kept small so resonance nudges, not overrides)
-  const resonanceBias = rCalibrated
+  // FirstRenderMode: resonance ignored -- narrator starts untrained
+  const resonanceBias = (!isFirstRender && rCalibrated)
     ? (0.5 - rProfile.depthBias) * 0.10   // 0.5->0, 0->+0.05, 1->-0.05
     : 0;
   const resonancedThreshold = Math.max(0.44, Math.min(0.67,
@@ -1701,7 +1725,7 @@ export function SeasonalFieldCard() {
     const TONE_BRIGHT: Record<string, string> = {
       calm: 'bright', quiet: 'bright', mixed: 'active', bright: 'bright', active: 'active',
     };
-    const toneAdj = rCalibrated
+    const toneAdj = (!isFirstRender && rCalibrated)
       ? (rProfile.toneBias > 0.68 ? (TONE_BRIGHT[rawToneAdj] ?? rawToneAdj)
        : rProfile.toneBias < 0.32 ? (TONE_CALM[rawToneAdj]   ?? rawToneAdj)
        : rawToneAdj)
@@ -1788,7 +1812,7 @@ export function SeasonalFieldCard() {
     //  +1 -> act one tier more open (tightening->balanced, balanced->full)
     //  -1 -> act one tier more closed (full->balanced, balanced->minimal)
     // Resonance depthBias further shifts: +0.08 at max depth, -0.08 at min
-    const resonanceClauseBias = rCalibrated
+    const resonanceClauseBias = (!isFirstRender && rCalibrated)
       ? (rProfile.depthBias - 0.5) * 0.16  // 0.5->0, 1->+0.08, 0->-0.08
       : 0;
     const effectiveClarity = reflectionClarity
@@ -2028,6 +2052,15 @@ export function SeasonalFieldCard() {
   prevArchetypeRef.current  = constellation.archetype;
   prevDriftRef.current      = drift.direction;
   prevForecastRef.current   = foresight.forecast;
+
+  // Arc 53: consume FirstRenderMode after all narrator state is committed.
+  // On the render after trigger(), isFirstRender was true (all subsystems
+  // ran neutral). Now that refs are committed with fresh-neutral values,
+  // clear the flag so the next render re-enables echo/reflection/anticipation.
+  if (isFirstRender) {
+    (rebirth as typeof rebirth & { _consumeFirstRender: () => void })
+      ._consumeFirstRender();
+  }
 
   return (
     <View style={s.card}>
