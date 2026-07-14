@@ -1428,6 +1428,107 @@ export function SeasonalFieldCard() {
     };
   })();
 
+  // Arc 48: field essence -- single distilled sentence from visible layers
+  // Synthesis of compressed survivors only. No new evaluator, no new hook.
+  const ESSENCE_MIN = 260;
+  const essencePhrase: string | null = (() => {
+    // Count visible compressed layers (identity excluded -- always shown)
+    const visibleCount = Object.values(compressed).filter(Boolean).length;
+    const eActive =
+      integrityPhrase !== null &&         // compression gate (>= 220) already cleared
+      allMoments.length >= ESSENCE_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6 &&
+      visibleCount >= 3;
+    if (!eActive) return null;
+
+    const ring  = allMoments;
+    const N     = ring.length;
+    const cur   = ring[N - 1];
+
+    // -- A. Structural axis: what the field IS ------------------------
+    // Derived from identity + signature (always available at this depth).
+    // Read dominant tone and constellation archetype as structural nouns.
+    const toneCnt: Record<string, number> = {};
+    for (const m of ring) if (m.corridorTone) {
+      toneCnt[m.corridorTone] = (toneCnt[m.corridorTone] ?? 0) + 1;
+    }
+    const domTone = Object.entries(toneCnt).sort((a,b) => b[1]-a[1])[0]?.[0] ?? 'mixed';
+
+    const TONE_ADJ: Record<string, string> = {
+      bright: 'bright', calm: 'calm', noisy: 'active',
+      still: 'quiet', mixed: 'mixed',
+    };
+    const ARCH_NOUN: Record<string, string> = {
+      wanderer: 'wandering', observer: 'watching', steady: 'rooted',
+      returner: 'returning', seeker: 'seeking',
+    };
+    const toneAdj   = TONE_ADJ[domTone] ?? 'mixed';
+    const archNoun  = constellation.isFormed
+      ? (ARCH_NOUN[constellation.archetype] ?? 'settled') : 'settled';
+
+    // -- B. Temporal axis: what the field HAS BEEN DOING -------------
+    // Prefer rhythm if compressed.rhythm is visible; else use history proxy.
+    let temporalClause = '';
+    if (compressed.rhythm && rhythmPhrase) {
+      // Extract the cadence descriptor from rhythmPhrase
+      // e.g. 'Rhythm: bright-calm drift, steady tempo.' -> 'steady tempo'
+      const tempoMatch = rhythmPhrase.match(/([a-z-]+ tempo)\./);
+      const cadMatch   = rhythmPhrase.match(/Rhythm: ([^,]+),/);
+      if (tempoMatch)      temporalClause = `in a ${tempoMatch[1]}`;
+      else if (cadMatch)   temporalClause = `with ${cadMatch[1]}`;
+    } else {
+      // Fall back: recent season + species presence
+      const recentSlice = ring.slice(-12);
+      const rSeason     = recentSlice[recentSlice.length - 1]?.season ?? cur?.season ?? '';
+      const specFrac    = recentSlice.filter(m => (m.invitedCount ?? 0) > 0).length
+                          / Math.max(1, recentSlice.length);
+      const SEASON_CL: Record<string, string> = {
+        spring: 'through spring',  summer: 'through summer',
+        fall:   'through fall',    winter: 'through winter',
+      };
+      const specCl = specFrac >= 0.55 ? 'with species present' : '';
+      temporalClause = [SEASON_CL[rSeason] ?? '', specCl].filter(Boolean).join(', ');
+    }
+
+    // -- C. Directional axis: where the field is LEANING -------------
+    // Prefer orientation if visible; else invitation; else drift.
+    let directionalClause = '';
+    if (compressed.orientation && orientationPhrase) {
+      // 'Orientation: leaning opening.' -> 'leaning opening'
+      const match = orientationPhrase.match(/leaning ([a-z]+)\./);
+      if (match) directionalClause = `leaning ${match[1]}`;
+    } else if (invitationPhrase) {
+      // 'Invitation: ...' -- extract key verb phrase
+      const inv = invitationPhrase.replace(/^Invitation:\s*/i, '').replace(/\.$/, '');
+      directionalClause = inv.length <= 40 ? inv : '';
+    } else if (drift.isMeasurable) {
+      const DRIFT_CL: Record<string, string> = {
+        settling: 'settling', brightening: 'brightening',
+        wandering: 'wandering', returning: 'returning', seeking: 'seeking',
+      };
+      directionalClause = DRIFT_CL[drift.direction] ?? '';
+    }
+
+    // -- Compose: one sentence, always --------------------------------
+    // Pattern: "A {toneAdj} {archNoun} field {temporal}, {directional}."
+    // Variations based on which clauses are available.
+    const parts: string[] = [];
+    parts.push(`A ${toneAdj} ${archNoun} field`);
+    if (temporalClause)   parts.push(temporalClause);
+    if (directionalClause) parts.push(directionalClause);
+
+    let sentence = parts.join(', ');
+    // Ensure exactly one terminal period
+    if (!sentence.endsWith('.')) sentence += '.';
+    // Cap length -- if somehow > 90 chars, use abbreviated form
+    if (sentence.length > 90) {
+      sentence = `A ${toneAdj} field, ${directionalClause || archNoun}.`;
+    }
+
+    return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -1614,6 +1715,11 @@ export function SeasonalFieldCard() {
         </>
       )}
 
+      {/* Arc 48: essence -- distilled one-sentence summary above strip */}
+      {essencePhrase !== null && (
+        <ThemedText style={s.essenceText}>{essencePhrase}</ThemedText>
+      )}
+
       <FieldSummaryStrip />
 
       {/* Arc 36: Field Invitation -- next moment line */}
@@ -1766,6 +1872,15 @@ const s = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.06)',
     marginBottom: 6,
+  },
+  essenceText: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.52)',
+    letterSpacing: 0.10,
+    marginBottom: 12,
+    lineHeight: 20,
   },
   signatureText: {
     fontSize: 12,
