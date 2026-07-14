@@ -1033,6 +1033,95 @@ export function SeasonalFieldCard() {
     return 'Alignment: misaligned.';
   })();
 
+  // Arc 45: field continuity -- identity-persistence across all temporal scales
+  // Composition layer: flip-rate scan over full ring + hook stability proxies.
+  // No new evaluator, no new hook.
+  const CONTINUITY_MIN = 200;
+  const continuityPhrase: string | null = (() => {
+    const ctActive =
+      alignmentPhrase !== null &&         // alignment gate (>= 180) already cleared
+      allMoments.length >= CONTINUITY_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!ctActive) return null;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // Helper: fraction of adjacent pairs where value changes (flip rate)
+    // Lower flip rate = higher persistence score
+    function flipRate(values: (string | number | boolean | null | undefined)[]): number {
+      if (values.length < 2) return 0;
+      let flips = 0;
+      for (let i = 1; i < values.length; i++) {
+        if (values[i] !== values[i - 1]) flips++;
+      }
+      return flips / (values.length - 1);
+    }
+
+    // -- Per-axis persistence (1 - flipRate, so higher = more continuous) --
+
+    // 1. corridorTone persistence (0.18)
+    const tonePersist = 1 - flipRate(ring.map(m => m.corridorTone ?? null));
+
+    // 2. Season persistence (0.15)
+    const seasonPersist = 1 - flipRate(ring.map(m => m.season ?? null));
+
+    // 3. Symbolic persistence (0.12)
+    const symPersist = 1 - flipRate(ring.map(m => m.symbolic ?? null));
+
+    // 4. Species presence persistence (0.12)
+    //    Binary: present (invitedCount > 0) or absent
+    const specPersist = 1 - flipRate(ring.map(m => (m.invitedCount ?? 0) > 0));
+
+    // 5. conditionsScore persistence (0.10)
+    //    Binary: above median or below -- measures stability of quality level
+    const scores = ring.map(m => m.conditionsScore ?? 0.5);
+    const median = [...scores].sort((a, b) => a - b)[Math.floor(N / 2)];
+    const scorePersist = 1 - flipRate(scores.map(s => s >= median));
+
+    // 6. Drift direction persistence (0.10)
+    //    isMeasurable = signal is stable; use as a continuity weight
+    const driftPersist = drift.isMeasurable ? 0.82 : 0.38;
+
+    // 7. Reweight dominant persistence (0.08)
+    const rwPersist = reweight.isMature ? 0.82 : 0.38;
+
+    // 8. Constellation archetype persistence (0.08)
+    const archPersist = constellation.isFormed ? 0.85 : 0.35;
+
+    // 9. Harmony persistence (0.07)
+    //    harmony.agreement is already a long-scale stability signal
+    const harmPersist = harmony.agreement;
+
+    // -- Weighted persistence score ------------------------------------
+    const persistCoeff =
+      tonePersist    * 0.18 +
+      seasonPersist  * 0.15 +
+      symPersist     * 0.12 +
+      specPersist    * 0.12 +
+      scorePersist   * 0.10 +
+      driftPersist   * 0.10 +
+      rwPersist      * 0.08 +
+      archPersist    * 0.08 +
+      harmPersist    * 0.07;
+
+    const ct = Math.max(0, Math.min(1, persistCoeff));
+
+    const CONTINUITY_PHRASE: Array<[number, string]> = [
+      [0.84, 'Continuity: strongly continuous.'],
+      [0.70, 'Continuity: moderately continuous.'],
+      [0.55, 'Continuity: lightly continuous.'],
+      [0.40, 'Continuity: intermittent.'],
+      [0.00, 'Continuity: discontinuous.'],
+    ];
+
+    for (const [threshold, phrase] of CONTINUITY_PHRASE) {
+      if (ct >= threshold) return phrase;
+    }
+    return 'Continuity: discontinuous.';
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -1233,6 +1322,10 @@ export function SeasonalFieldCard() {
           {/* Arc 44: alignment -- below coherence, above strip */}
           {alignmentPhrase !== null && (
             <ThemedText style={s.alignmentText}>{alignmentPhrase}</ThemedText>
+          )}
+          {/* Arc 45: continuity -- below alignment, above strip */}
+          {continuityPhrase !== null && (
+            <ThemedText style={s.continuityText}>{continuityPhrase}</ThemedText>
           )}
         </>
       )}
@@ -1443,6 +1536,14 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.38)',
+    letterSpacing: 0.12,
+    marginBottom: 4,
+  },
+  continuityText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.36)',
     letterSpacing: 0.12,
     marginBottom: 10,
   },
