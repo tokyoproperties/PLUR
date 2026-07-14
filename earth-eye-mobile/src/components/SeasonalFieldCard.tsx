@@ -257,6 +257,104 @@ export function SeasonalFieldCard() {
     return `Recent pattern: ${core}.`;
   })();
 
+  // Arc 38: field signature -- distilled long-scale repeating pattern
+  // Uses full ring (not a window). Pure ring read, no evaluator, no hook.
+  const SIGNATURE_MIN = 60;
+  const signaturePhrase: string | null = (() => {
+    const sigActive =
+      identityReady &&                        // identity gate (>= 30) already implies ring depth
+      structurePhrase !== null &&             // structure gate (>= 40) already cleared
+      allMoments.length >= SIGNATURE_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!sigActive) return null;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // -- Long-scale tone distribution ----------------------------------
+    const sigTones: Record<string, number> = {};
+    for (const m of ring) {
+      if (m.corridorTone) sigTones[m.corridorTone] = (sigTones[m.corridorTone] ?? 0) + 1;
+    }
+    const topToneEntry = Object.entries(sigTones).sort((a, b) => b[1] - a[1])[0];
+    const sigTone      = topToneEntry && topToneEntry[1] / N >= 0.40 ? topToneEntry[0] : null;
+
+    // -- Long-scale species presence -----------------------------------
+    const speciesMoments = ring.filter(m => m.invitedCount > 0).length;
+    const speciesRatio   = speciesMoments / N;
+    const speciesHeavy   = speciesRatio >= 0.55;
+
+    // -- Long-scale symbolic mode --------------------------------------
+    const plurMoments  = ring.filter(m => m.symbolic === 'plur').length;
+    const symDominant  = plurMoments / N >= 0.60 ? 'plur' : 'love';
+
+    // -- Long-scale reweight dominant frequency ------------------------
+    // reweight.dominant is already the long-scale aggregate from useFieldReweight
+    const sigReweight = reweight.isMature ? reweight.dominant : null;
+
+    // -- Long-scale drift direction frequency --------------------------
+    // drift.direction is already the long-scale slow-layer value
+    const sigDrift = drift.isMeasurable ? drift.direction : null;
+
+    // -- Long-scale harmony mood ---------------------------------------
+    const sigMood = harmony.isReadable ? harmony.mood : null;
+
+    // -- Compose signature phrase from strongest signals ---------------
+    // Noun: what kind of field is this at its core?
+    const SIG_NOUN: Record<string, string> = {
+      bright: 'bright corridor',
+      calm:   'calm trail',
+      still:  'quiet pocket',
+      mixed:  'mixed corridor',
+      noisy:  'active edge',
+    };
+
+    // Verb phrase: what does it characteristically DO?
+    const REWEIGHT_VERB: Record<string, string> = {
+      alignment:  'steady movement',
+      presence:   'frequent species returns',
+      initiative: 'brightening initiative',
+      branch:     'widening territory',
+      soul:       'open-ground returns',
+      season:     'seasonal deepening',
+    };
+
+    const DRIFT_VERB: Record<string, string> = {
+      settling:    'settling drift',
+      brightening: 'brightening drift',
+      wandering:   'wandering range',
+      returning:   'returning pattern',
+      seeking:     'expanding reach',
+    };
+
+    const MOOD_VERB: Record<string, string> = {
+      settled:     'settled behavior',
+      restless:    'restless returns',
+      turning:     'turning behavior',
+      brightening: 'brightening tendency',
+      cooling:     'cooling tendency',
+    };
+
+    // Noun from dominant tone; fallback to species or symbolic signal
+    let noun = sigTone ? (SIG_NOUN[sigTone] ?? 'field') : null;
+    if (!noun) {
+      noun = speciesHeavy ? 'species-rich ground'
+           : symDominant === 'love' ? 'quiet interior'
+           : 'open field';
+    }
+
+    // Verb from reweight (strongest behavioural signal); fallback drift; fallback mood
+    let verb = sigReweight ? (REWEIGHT_VERB[sigReweight] ?? null) : null;
+    if (!verb) verb = sigDrift ? (DRIFT_VERB[sigDrift] ?? null) : null;
+    if (!verb) verb = sigMood  ? (MOOD_VERB[sigMood]   ?? null) : null;
+    if (!verb) verb = speciesHeavy ? 'frequent species presence' : null;
+
+    if (!verb) return null;
+
+    return `Signature: ${noun} with ${verb}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -430,6 +528,10 @@ export function SeasonalFieldCard() {
         <>
           <ThemedText style={s.identityName}>{fieldIdentity}</ThemedText>
           <View style={s.identitySep} />
+          {/* Arc 38: signature -- below identity, above strip */}
+          {signaturePhrase !== null && (
+            <ThemedText style={s.signatureText}>{signaturePhrase}</ThemedText>
+          )}
         </>
       )}
 
@@ -584,6 +686,14 @@ const s = StyleSheet.create({
   identitySep: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 6,
+  },
+  signatureText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.50)',
+    letterSpacing: 0.12,
     marginBottom: 10,
   },
   invitationText: {
