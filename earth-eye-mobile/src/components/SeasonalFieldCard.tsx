@@ -28,6 +28,7 @@ import { useFieldDrift } from '@/hooks/useFieldDrift';
 import { useFieldHarmony } from '@/hooks/useFieldHarmony';
 import { FieldSummaryStrip } from '@/components/FieldSummaryStrip';
 import { useFieldForesight } from '@/hooks/useFieldForesight';
+import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
   prime:    Accents.sage,
@@ -263,6 +264,12 @@ export function SeasonalFieldCard() {
         harmony={harmony}
         foresight={foresight}
       />
+
+      {/* Arc 33: Locality -- where this moment occurred in field geography */}
+      <FieldLocality noteActive={
+        constellation.isFormed && drift.isMeasurable &&
+        harmony.isReadable && foresight.isActive
+      } />
     </View>
   );
 }
@@ -370,6 +377,17 @@ const s = StyleSheet.create({
     lineHeight: 18,
     letterSpacing: 0.1,
   },
+  localityRow: {
+    marginTop: 6,
+  },
+  localityText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.24)',
+    lineHeight: 17,
+    letterSpacing: 0.1,
+  },
 });
 
 // ---- FieldNote (Arc 31) -- naturalist sentence below footer ---------
@@ -437,4 +455,85 @@ function FieldNote({ constellation, drift, harmony, foresight }: FieldNoteProps)
 function capitalizeFirst(str: string): string {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+
+// ---- FieldLocality (Arc 33) -- where this moment occurred ----------
+// Pure composition: reads atlas.latest, maps raw moment fields to
+// naturalist-style place phrases. No new evaluator, no new hook.
+//
+// Priority order (pick strongest single signal):
+//   1. nearestTrail + corridorTone  -> trail-anchored phrase
+//   2. corridorTone                 -> corridor tone phrase
+//   3. invitedSpecies               -> species pocket phrase
+//   4. symbolic                     -> mode-flavored phrase
+//   5. conditionsScore              -> conditions phrase (fallback)
+//
+// Activation: noteActive AND at least one moment field is non-null/non-empty
+
+import type { CorridorTone } from '@/corridor/corridor-engine';
+
+const TONE_PHRASE: Record<CorridorTone, string> = {
+  calm:   'Along a calm corridor.',
+  noisy:  'Near a busy edge.',
+  bright: 'On a bright stretch.',
+  still:  'In a still pocket.',
+  mixed:  'At a shifting margin.',
+};
+
+const TONE_TRAIL_PHRASE: Record<CorridorTone, string> = {
+  calm:   'Along a calm section of the trail.',
+  noisy:  'Near the busier edge of the trail.',
+  bright: 'On a bright reach of trail.',
+  still:  'In a quiet bend of the trail.',
+  mixed:  'At a turning point in the corridor.',
+};
+
+const SPECIES_PHRASE = (count: number, first: string): string => {
+  if (count === 1) return `In a ${first} pocket.`;
+  if (count === 2) return `In a shared pocket.`;
+  return `In a species cluster.`;
+};
+
+const SYMBOLIC_PHRASE: Record<string, string> = {
+  plur: 'On open ground.',
+  love: 'In a quiet interior.',
+};
+
+interface FieldLocalityProps {
+  noteActive: boolean;
+}
+
+function FieldLocality({ noteActive }: FieldLocalityProps) {
+  const atlas  = useAtlas();
+  const latest = atlas.latest;
+
+  if (!noteActive || !latest) return null;
+
+  const { corridorTone, nearestTrail, invitedSpecies, symbolic, conditionsScore } = latest;
+
+  // Pick strongest signal
+  let phrase: string | null = null;
+
+  if (nearestTrail && corridorTone) {
+    phrase = TONE_TRAIL_PHRASE[corridorTone] ?? null;
+  } else if (corridorTone) {
+    phrase = TONE_PHRASE[corridorTone] ?? null;
+  } else if (invitedSpecies && invitedSpecies.length > 0) {
+    const first = invitedSpecies[0];
+    const shortName = first.split(' ').slice(-1)[0]; // last word of species name
+    phrase = SPECIES_PHRASE(invitedSpecies.length, shortName);
+  } else if (symbolic) {
+    phrase = SYMBOLIC_PHRASE[symbolic] ?? null;
+  } else if (conditionsScore !== undefined && conditionsScore !== null) {
+    phrase = conditionsScore >= 0.7 ? 'In good conditions.' : 'Under mixed conditions.';
+  }
+
+  if (!phrase) return null;
+
+  return (
+    <View style={s.localityRow}>
+      <ThemedText style={s.localityText}>{phrase}</ThemedText>
+    </View>
+  );
 }
