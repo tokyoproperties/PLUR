@@ -1290,6 +1290,117 @@ export function SeasonalFieldCard() {
   // Below 220 moments the stack renders as-is (no compression needed --
   // fewer layers are active anyway).
 
+  // Arc 51: field anticipation -- narrative trajectory from echo deltas
+  // Runs FIRST so reflection and compression can read anticipated outputs.
+  // Activation: >= 360 moments AND harmony >= 0.6.
+  // Below threshold all anticipated values are neutral (no pre-shaping).
+  const ANTICIP_MIN = 360;
+  const anticipActive =
+    allMoments.length >= ANTICIP_MIN &&
+    harmony.isReadable &&
+    harmony.agreement >= 0.6;
+
+  // Anticipated outputs (neutral defaults -- used by reflection + compression)
+  type NarrTraj = 'steady' | 'tightening' | 'opening' | 'cooling' | 'turning';
+  const anticipation: {
+    trajectory:            NarrTraj;
+    thresholdBias:         number;   // delta applied to rawThreshold: negative=open, positive=close
+    clauseLimitBias:       number;   // -1 = fewer clauses, 0 = neutral, +1 = more clauses
+    toneBias:              'calm' | 'bright' | 'neutral';
+    driftGuardSensitivity: number;   // 0-1: higher = harder to suppress orientation flip
+  } = (() => {
+    const neutral = {
+      trajectory:            'steady'  as NarrTraj,
+      thresholdBias:         0,
+      clauseLimitBias:       0,
+      toneBias:              'neutral' as const,
+      driftGuardSensitivity: 0.5,
+    };
+    if (!anticipActive) return neutral;
+
+    // Read echo deltas -- compare current computed values to prior stored values
+    // echoClarityRef / echoThresholdRef / echoOriVecRef hold LAST render values.
+
+    // -- Delta: clarity trend ----------------------------------------
+    // Current clarity not yet computed; approximate from tone stability proxy
+    const ring = allMoments;
+    const N    = ring.length;
+    let toneFlips = 0;
+    for (let i = 1; i < N; i++) {
+      if (ring[i].corridorTone !== ring[i-1].corridorTone) toneFlips++;
+    }
+    const approxClarity = 1 - toneFlips / Math.max(1, N - 1);
+    const deltaClarity  = approxClarity - echoClarityRef.current;
+
+    // -- Delta: threshold trend --------------------------------------
+    const priorThreshold = echoThresholdRef.current; // 0.50 / 0.55 / 0.62
+    // Current threshold not yet computed; use prior clarity to anticipate
+    const anticipatedRaw =
+      approxClarity >= 0.75 ? 0.50 :
+      approxClarity >= 0.55 ? 0.55 : 0.62;
+    const deltaThreshold = anticipatedRaw - priorThreshold;
+
+    // -- Delta: orientation trend ------------------------------------
+    const priorOri  = echoOriVecRef.current;
+    // Approximate current orientation from dominant reweight + drift signals
+    const REWEIGHT_ORI: Record<string, string> = {
+      alignment: 'settling', presence: 'opening', initiative: 'brightening',
+      branch: 'widening', soul: 'returning', season: 'turning',
+    };
+    const DRIFT_ORI_A: Record<string, string> = {
+      settling: 'settling', brightening: 'brightening',
+      wandering: 'widening', returning: 'returning', seeking: 'opening',
+    };
+    const approxOri =
+      (reweight.isMature ? REWEIGHT_ORI[reweight.dominant] : null) ??
+      (drift.isMeasurable ? DRIFT_ORI_A[drift.direction]  : null) ??
+      priorOri ?? 'settling';
+    const oriChanged = priorOri !== null && priorOri !== approxOri;
+
+    // -- Delta: visible layer count trend ----------------------------
+    const priorVisible = echoVisibleSetRef.current
+      ? echoVisibleSetRef.current.split(',').filter(Boolean).length : 0;
+    // Approximate current visible count from existing phrase count
+    const existingCount = [
+      signaturePhrase, resiliencePhrase, lineagePhrase, rhythmPhrase,
+      orientationPhrase, coherencePhrase, alignmentPhrase,
+      continuityPhrase, integrityPhrase,
+    ].filter(Boolean).length;
+    const deltaVisible = existingCount - priorVisible;
+
+    // -- Derive trajectory from deltas -------------------------------
+    // Rules (ordered by specificity):
+    //   1. orientation flip + clarity dropping      -> turning
+    //   2. clarity rising significantly (> 0.10)   -> opening
+    //   3. clarity dropping significantly (< -0.10) -> tightening
+    //   4. visible layers shrinking + threshold up  -> tightening
+    //   5. visible layers growing + threshold down  -> opening
+    //   6. orientation stable + clarity stable      -> steady
+    //   7. harmony >= 0.75 + stable                -> cooling (deepen)
+    let traj: NarrTraj = 'steady';
+    if (oriChanged && deltaClarity < -0.05)             traj = 'turning';
+    else if (deltaClarity > 0.10)                       traj = 'opening';
+    else if (deltaClarity < -0.10)                      traj = 'tightening';
+    else if (deltaVisible < -1 && deltaThreshold > 0)   traj = 'tightening';
+    else if (deltaVisible >  1 && deltaThreshold < 0)   traj = 'opening';
+    else if (!oriChanged && Math.abs(deltaClarity) < 0.05 && harmony.agreement >= 0.75)
+                                                        traj = 'cooling';
+
+    // -- Map trajectory to output values -----------------------------
+    const TRAJ_MAP: Record<NarrTraj, {
+      thresholdBias: number; clauseLimitBias: number;
+      toneBias: 'calm'|'bright'|'neutral'; driftGuardSensitivity: number;
+    }> = {
+      steady:     { thresholdBias:  0.00, clauseLimitBias:  0, toneBias: 'neutral', driftGuardSensitivity: 0.50 },
+      tightening: { thresholdBias:  0.04, clauseLimitBias: -1, toneBias: 'calm',    driftGuardSensitivity: 0.70 },
+      opening:    { thresholdBias: -0.04, clauseLimitBias: +1, toneBias: 'bright',  driftGuardSensitivity: 0.30 },
+      cooling:    { thresholdBias:  0.02, clauseLimitBias:  0, toneBias: 'calm',    driftGuardSensitivity: 0.60 },
+      turning:    { thresholdBias:  0.00, clauseLimitBias:  0, toneBias: 'neutral', driftGuardSensitivity: 0.25 },
+    };
+
+    return { trajectory: traj, ...TRAJ_MAP[traj] };
+  })();
+
   // Arc 50: echo -- read prior state BEFORE reflection so clarity
   // can dampen its own swing (echoClarityRef holds last render value).
   const ECHO_MIN = 320;
@@ -1377,10 +1488,14 @@ export function SeasonalFieldCard() {
   const rawThreshold =
     reflectionClarity >= 0.75 ? 0.50 :
     reflectionClarity >= 0.55 ? 0.55 : 0.62;
+  // Apply anticipation threshold bias (clamped to valid range 0.46-0.65)
+  const biasedThreshold = Math.max(0.46, Math.min(0.65,
+    rawThreshold + anticipation.thresholdBias
+  ));
   // Echo inertia: blend new threshold 80% / prior 20% to prevent oscillation
   const COMPRESS_THRESHOLD = echoActive
-    ? rawThreshold * 0.80 + echoThresholdRef.current * 0.20
-    : rawThreshold;
+    ? biasedThreshold * 0.80 + echoThresholdRef.current * 0.20
+    : biasedThreshold;
 
   type PhraseKey =
     'signature' | 'resilience' | 'lineage' | 'rhythm' |
@@ -1613,8 +1728,14 @@ export function SeasonalFieldCard() {
         })();
         // Suppress orientation flip if echo is active, prior exists,
         // the vector changed, but the dominant tone didn't shift.
+        // driftGuardSensitivity: 0 = easy to flip, 1 = hard to flip
+        // At sensitivity 0.25 (turning traj) guard is relaxed -- let flips through.
+        // At sensitivity 0.70 (tightening) guard is strict -- suppress unless real.
+        const suppressThreshold = anticipation.driftGuardSensitivity;
+        // toneFlipProxy is boolean; treat no flip as low evidence (0.3), flip as high (1.0)
+        const flipEvidence = toneFlipProxy ? 1.0 : 0.3;
         const suppress = echoActive && priorVec !== null
-                      && priorVec !== newVec && !toneFlipProxy;
+                      && priorVec !== newVec && flipEvidence < suppressThreshold;
         directionalClause = suppress ? `leaning ${priorVec}` : `leaning ${newVec}`;
       }
     } else if (invitationPhrase) {
@@ -1635,12 +1756,16 @@ export function SeasonalFieldCard() {
     // low clarity (< 0.55):   minimal (toneAdj + first directional word)
     let sentence: string;
 
-    if (reflectionClarity >= 0.75) {
+    // Anticipation clauseLimitBias shifts effective clarity tier:
+    //  +1 -> act one tier more open (tightening->balanced, balanced->full)
+    //  -1 -> act one tier more closed (full->balanced, balanced->minimal)
+    const effectiveClarity = reflectionClarity + anticipation.clauseLimitBias * 0.12;
+    if (effectiveClarity >= 0.75) {
       const parts: string[] = [`A ${toneAdj} ${archNoun} field`];
       if (temporalClause)    parts.push(temporalClause);
       if (directionalClause) parts.push(directionalClause);
       sentence = parts.join(', ');
-    } else if (reflectionClarity >= 0.55) {
+    } else if (effectiveClarity >= 0.55) {
       sentence = directionalClause
         ? `A ${toneAdj} ${archNoun} field, ${directionalClause}`
         : `A ${toneAdj} ${archNoun} field`;
