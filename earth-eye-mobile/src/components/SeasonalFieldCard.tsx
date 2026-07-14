@@ -25,6 +25,7 @@ import { useFieldReweight } from '@/hooks/useFieldReweight';
 import { useFieldConstellation } from '@/hooks/useFieldConstellation';
 import { useFieldDrift } from '@/hooks/useFieldDrift';
 import { useFieldHarmony } from '@/hooks/useFieldHarmony';
+import { FieldSummaryStrip } from '@/components/FieldSummaryStrip';
 import { useFieldForesight } from '@/hooks/useFieldForesight';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -125,6 +126,8 @@ export function SeasonalFieldCard() {
 
   return (
     <View style={s.card}>
+      <FieldSummaryStrip />
+
       <ThemedText style={s.whisper}>Field Window</ThemedText>
 
       <ThemedText style={[s.windowLabel, { color: windowColor }]}>
