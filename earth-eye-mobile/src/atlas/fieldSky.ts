@@ -38,7 +38,7 @@ export type SkyOrientationType =
   | 'brightening' | 'dimming' | 'open' | 'settling' | 'stable' | 'unknown';
 
 export type SkyRhythmType   = 'fast' | 'slow' | 'stable' | 'unknown';
-export type SkyForecastType = 'brightening' | 'dimming' | 'stable' | 'unknown';
+export type SkyForecastType = 'brightening' | 'dimming' | 'opening' | 'softening' | 'clearing' | 'settling' | 'stable' | 'unknown';
 
 export interface SkyState {
   skyTone:        SkyTone;
@@ -46,6 +46,7 @@ export interface SkyState {
   signature:      string | null;   // naturalist phrase describing the pattern
   rhythm:         SkyRhythmType;
   continuity:     number;          // 0-1: 1 = perfectly stable, 0 = chaotic
+  drift:          number;          // Arc 58: -1 to +1, negative=dimming positive=brightening
   orientation:    SkyOrientationType;
   foresight:      SkyForecastType;
   luxNow:         number | null;
@@ -57,7 +58,7 @@ export interface SkyState {
 // Minimum lux samples before sky layers are meaningful
 export const MIN_SKY_SAMPLES = 12;
 
-// ── Internal helpers ──────────────────────────────────────────────────────────
+// ------ Internal helpers ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function mean(arr: number[]): number {
   if (!arr.length) return 0;
@@ -74,7 +75,7 @@ function stddev(arr: number[]): number {
   return Math.sqrt(variance(arr));
 }
 
-// ── skyTone ────────────────────────────────────────────────────────────────────
+// ------ skyTone ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export function computeSkyTone(
   luxNow: number | null,
@@ -96,7 +97,7 @@ export function computeSkyTone(
   return 'dim';
 }
 
-// ── Sky Identity ───────────────────────────────────────────────────────────────
+// ------ Sky Identity ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export function computeSkyIdentity(
   luxNow: number | null,
@@ -113,7 +114,7 @@ export function computeSkyIdentity(
   return 'overcast';
 }
 
-// ── Sky Signature ──────────────────────────────────────────────────────────────
+// ------ Sky Signature ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Describes the repeating character of the sky observed in the ring.
 
 export function computeSkySignature(
@@ -143,7 +144,7 @@ export function computeSkySignature(
   return 'A settled sky, calm variation.';
 }
 
-// ── Sky Rhythm ─────────────────────────────────────────────────────────────────
+// ------ Sky Rhythm ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export function computeSkyRhythm(luxRing: number[]): SkyRhythmType {
   if (luxRing.length < MIN_SKY_SAMPLES) return 'unknown';
@@ -162,7 +163,7 @@ export function computeSkyRhythm(luxRing: number[]): SkyRhythmType {
   return 'stable';
 }
 
-// ── Sky Continuity ─────────────────────────────────────────────────────────────
+// ------ Sky Continuity ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 0 = chaotic, 1 = perfectly stable
 
 export function computeSkyContinuity(luxRing: number[]): number {
@@ -174,7 +175,7 @@ export function computeSkyContinuity(luxRing: number[]): number {
   return Math.max(0, Math.min(1, 1 - cv));
 }
 
-// ── Sky Orientation ────────────────────────────────────────────────────────────
+// ------ Sky Orientation ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export function computeSkyOrientation(luxRing: number[]): SkyOrientationType {
   if (luxRing.length < MIN_SKY_SAMPLES) return 'unknown';
@@ -196,22 +197,61 @@ export function computeSkyOrientation(luxRing: number[]): SkyOrientationType {
   return 'stable';
 }
 
-// ── Sky Foresight ──────────────────────────────────────────────────────────────
+// ------ Sky Foresight ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Short-term atmospheric drift -- derived purely from trend + rhythm
+
+// -- Sky Drift (Arc 58) -----------------------------------------------------------------------
+// Numeric slope of the lux ring: -1 (rapidly dimming) to +1 (rapidly brightening).
+// Uses a simple linear regression over the full ring to get the signed slope,
+// normalised by mean lux so the value is scale-independent.
+
+export function computeSkyDrift(luxRing: number[]): number {
+  if (luxRing.length < MIN_SKY_SAMPLES) return 0;
+  const n = luxRing.length;
+  const m = luxRing.reduce((s, v) => s + v, 0) / n;
+  if (m <= 0) return 0;
+
+  // Numerator: sum of (i - mean_i) * (lux_i - mean_lux)
+  const meanI = (n - 1) / 2;
+  let num = 0;
+  let den = 0;
+  for (let i = 0; i < n; i++) {
+    num += (i - meanI) * (luxRing[i]! - m);
+    den += (i - meanI) ** 2;
+  }
+  const slope = den > 0 ? num / den : 0;
+  // Normalise: slope / mean -> relative change per sample step
+  const normSlope = slope / m;
+  // Map to -1..+1: clamp at +/-0.10 relative change per step (generous)
+  return Math.max(-1, Math.min(1, normSlope / 0.10));
+}
 
 export function computeSkyForesight(
   orientation: SkyOrientationType,
-  rhythm: SkyRhythmType,
-  continuity: number,
+  rhythm:      SkyRhythmType,
+  continuity:  number,
+  drift:       number,   // Arc 58: numeric slope -1..+1
 ): SkyForecastType {
   if (orientation === 'unknown') return 'unknown';
   if (rhythm === 'fast' && continuity < 0.40) return 'stable'; // too volatile to forecast
-  if (orientation === 'brightening' || orientation === 'open')    return 'brightening';
-  if (orientation === 'dimming'     || orientation === 'settling') return 'dimming';
+
+  // Strong numeric drift overrides categorical orientation
+  if (drift > 0.55)  return 'brightening';
+  if (drift < -0.55) return 'dimming';
+
+  // Moderate drift with directional orientation -> nuanced forecast
+  if (orientation === 'brightening' && drift > 0.15) return 'opening';
+  if (orientation === 'brightening')                  return 'brightening';
+  if (orientation === 'open'       && drift > 0.10) return 'clearing';
+  if (orientation === 'open')                         return 'opening';
+  if (orientation === 'settling'   && drift < -0.15) return 'softening';
+  if (orientation === 'settling')                     return 'settling';
+  if (orientation === 'dimming'    && drift < -0.15) return 'dimming';
+  if (orientation === 'dimming')                      return 'softening';
   return 'stable';
 }
 
-// ── Full sky state composer ────────────────────────────────────────────────────
+// ------ Full sky state composer ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export function computeSkyState(
   luxNow: number | null,
@@ -226,7 +266,7 @@ export function computeSkyState(
   if (!isActive) {
     return {
       skyTone: 'unknown', identity: 'unknown', signature: null,
-      rhythm: 'unknown', continuity: 1, orientation: 'unknown',
+      rhythm: 'unknown', continuity: 1, drift: 0, orientation: 'unknown',
       foresight: 'unknown', luxNow, luxVariance: 0,
       isCalibrated: false, isActive: false,
     };
@@ -237,11 +277,12 @@ export function computeSkyState(
   const signature  = computeSkySignature(luxRing, skyTone);
   const rhythm     = computeSkyRhythm(luxRing);
   const continuity = computeSkyContinuity(luxRing);
+  const drift      = computeSkyDrift(luxRing);          // Arc 58
   const orientation = computeSkyOrientation(luxRing);
-  const foresight  = computeSkyForesight(orientation, rhythm, continuity);
+  const foresight  = computeSkyForesight(orientation, rhythm, continuity, drift);
 
   return {
-    skyTone, identity, signature, rhythm, continuity,
+    skyTone, identity, signature, rhythm, continuity, drift,
     orientation, foresight, luxNow, luxVariance,
     isCalibrated, isActive,
   };

@@ -1917,7 +1917,22 @@ export function SeasonalFieldCard() {
        : 'open')
       : 'present';
 
-    return `${SKY_ADJ[sky.skyTone] ?? 'the sky'}, ${skyVerb}, above a ${groundAdj} field.`;
+    // Arc 58: use sky.foresight for richer compound sentence when drift is clear
+    const FORESIGHT_TAIL: Record<string, string> = {
+      brightening: ' and brightening',
+      opening:     ' and opening',
+      clearing:    ' and clearing',
+      softening:   ' and softening',
+      settling:    ' and settling',
+      dimming:     ' and pulling back',
+      stable:      '',
+      unknown:     '',
+    };
+    const foresightTail = sky.drift !== 0
+      ? (FORESIGHT_TAIL[sky.foresight] ?? '')
+      : '';
+
+    return `${SKY_ADJ[sky.skyTone] ?? 'the sky'}, ${skyVerb}${foresightTail}, above a ${groundAdj} field.`;
   })();
 
   // Arc 57: aural field phrase
@@ -2146,11 +2161,13 @@ export function SeasonalFieldCard() {
   const skyToneContinuity = sky.isActive ? sky.continuity : 0.50;
   // Arc 57: ear continuity also enters the thread as an aural stability signal
   const earContinuityProxy = ear.isCalibrated ? ear.continuity : 0.50;
+  const skyDriftProxy  = sky.isActive && sky.isCalibrated ? sky.drift : 0;
   threadRef.current = _advanceThread(
     threadRef.current,
     smoothedClarity,          // smoothed reflectionClarity
     COMPRESS_THRESHOLD,       // final threshold (echo + thread blended)
     (skyToneContinuity + earContinuityProxy) * 0.50,  // blended vertical+aural
+    skyDriftProxy,            // Arc 58: sky slope for cross-screen drift memory
   );
 
   // Arc 53: consume FirstRenderMode after all narrator state is committed.

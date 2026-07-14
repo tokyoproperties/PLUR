@@ -33,6 +33,7 @@ export interface NarratorThreadState {
   threadClarity:   number;   // smoothed reflectionClarity, default 0.70
   threadThreshold: number;   // smoothed COMPRESS_THRESHOLD, default 0.55
   threadSkyTone:   number;   // smoothed sky.continuity proxy, default 0.50
+  threadSkyDrift:  number;   // Arc 58: smoothed sky.drift (-1..+1), default 0
   isWarm:          boolean;  // true once thread has been updated at least once
 }
 
@@ -40,6 +41,7 @@ export const THREAD_NEUTRAL: NarratorThreadState = {
   threadClarity:   0.70,
   threadThreshold: 0.55,
   threadSkyTone:   0.50,
+  threadSkyDrift:  0,
   isWarm:          false,
 };
 
@@ -54,12 +56,14 @@ export function advanceThread(
   nextClarity:   number,
   nextThreshold: number,
   nextSkyTone:   number,   // sky.continuity (0-1), or 0.50 if sky inactive
+  nextSkyDrift:  number,   // Arc 58: sky.drift (-1..+1), or 0 if sky inactive
 ): NarratorThreadState {
   const smooth = (p: number, n: number) => p + (n - p) * SMOOTH;
   return {
     threadClarity:   smooth(prev.threadClarity,   nextClarity),
     threadThreshold: smooth(prev.threadThreshold, nextThreshold),
     threadSkyTone:   smooth(prev.threadSkyTone,   nextSkyTone),
+    threadSkyDrift:  smooth(prev.threadSkyDrift,  nextSkyDrift),
     isWarm:          true,
   };
 }
