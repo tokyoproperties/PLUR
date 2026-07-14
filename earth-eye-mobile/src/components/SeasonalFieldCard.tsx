@@ -112,6 +112,14 @@ export function SeasonalFieldCard() {
   const prevDriftRef     = useRef<string | null>(null);
   const prevForecastRef  = useRef<string | null>(null);
 
+  // Arc 50: echo -- card's own self-history for narrative continuity
+  const echoEssenceRef     = useRef<string | null>(null);
+  const echoOriVecRef      = useRef<string | null>(null);
+  const echoToneRef        = useRef<string | null>(null);
+  const echoClarityRef     = useRef<number>(0.70);
+  const echoThresholdRef   = useRef<number>(0.55);
+  const echoVisibleSetRef  = useRef<string>('');
+
   const archChanged  = prevArchetypeRef.current !== null && prevArchetypeRef.current !== constellation.archetype;
   const driftChanged = prevDriftRef.current     !== null && prevDriftRef.current     !== drift.direction;
   const foreChanged  = prevForecastRef.current  !== null && prevForecastRef.current  !== foresight.forecast;
@@ -1282,6 +1290,14 @@ export function SeasonalFieldCard() {
   // Below 220 moments the stack renders as-is (no compression needed --
   // fewer layers are active anyway).
 
+  // Arc 50: echo -- read prior state BEFORE reflection so clarity
+  // can dampen its own swing (echoClarityRef holds last render value).
+  const ECHO_MIN = 320;
+  const echoActive =
+    allMoments.length >= ECHO_MIN &&
+    harmony.isReadable &&
+    harmony.agreement >= 0.6;
+
   // Arc 49: field reflection -- clarity score computed BEFORE compression
   // so compression can read it to adjust its own threshold.
   // Activation: essencePhrase requires >= 260 moments, but reflection
@@ -1348,16 +1364,23 @@ export function SeasonalFieldCard() {
       harmClarity     * 0.20 +
       symStability    * 0.15;
 
-    return Math.max(0, Math.min(1, clarity));
+    const raw = Math.max(0, Math.min(1, clarity));
+    // Echo inertia: blend 70% new + 30% prior to prevent swing
+    const prior = echoClarityRef.current;
+    return echoActive ? raw * 0.70 + prior * 0.30 : raw;
   })();
 
   // Compression threshold modulated by reflection clarity:
   //   high clarity (>= 0.75) -> 0.50 (more layers visible)
   //   balanced (0.55-0.75)   -> 0.55 (default)
   //   low clarity (< 0.55)   -> 0.62 (fewer layers visible)
-  const COMPRESS_THRESHOLD =
+  const rawThreshold =
     reflectionClarity >= 0.75 ? 0.50 :
     reflectionClarity >= 0.55 ? 0.55 : 0.62;
+  // Echo inertia: blend new threshold 80% / prior 20% to prevent oscillation
+  const COMPRESS_THRESHOLD = echoActive
+    ? rawThreshold * 0.80 + echoThresholdRef.current * 0.20
+    : rawThreshold;
 
   type PhraseKey =
     'signature' | 'resilience' | 'lineage' | 'rhythm' |
@@ -1573,7 +1596,27 @@ export function SeasonalFieldCard() {
     if (compressed.orientation && orientationPhrase) {
       // 'Orientation: leaning opening.' -> 'leaning opening'
       const match = orientationPhrase.match(/leaning ([a-z]+)\./);
-      if (match) directionalClause = `leaning ${match[1]}`;
+      if (match) {
+        const newVec = match[1];
+        // Echo drift guard: if orientation changed but underlying ring
+        // hasn't shifted significantly, hold the prior vector.
+        const priorVec = echoOriVecRef.current;
+        const toneFlipProxy = (() => {
+          // Quick: compare dominant tone of first half vs second half
+          const half = Math.floor(ring.length / 2);
+          const cnt = (slice: typeof ring) => {
+            const c: Record<string,number> = {};
+            for (const m of slice) if (m.corridorTone) c[m.corridorTone]=(c[m.corridorTone]??0)+1;
+            return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? '';
+          };
+          return cnt(ring.slice(0,half)) !== cnt(ring.slice(half));
+        })();
+        // Suppress orientation flip if echo is active, prior exists,
+        // the vector changed, but the dominant tone didn't shift.
+        const suppress = echoActive && priorVec !== null
+                      && priorVec !== newVec && !toneFlipProxy;
+        directionalClause = suppress ? `leaning ${priorVec}` : `leaning ${newVec}`;
+      }
     } else if (invitationPhrase) {
       // 'Invitation: ...' -- extract key verb phrase
       const inv = invitationPhrase.replace(/^Invitation:\s*/i, '').replace(/\.$/, '');
@@ -1609,6 +1652,33 @@ export function SeasonalFieldCard() {
 
     if (!sentence.endsWith('.')) sentence += '.';
     if (sentence.length > 90) sentence = `A ${toneAdj} field, ${directionalClause || archNoun}.`;
+
+    // Echo continuity: if new sentence differs markedly from last, soften the verb
+    const priorEssence = echoEssenceRef.current;
+    if (echoActive && priorEssence !== null) {
+      // Detect direction reversal by checking if both sentences contain
+      // opposite orientation vectors (opening vs settling, brightening vs cooling)
+      const opposites: [string, string][] = [
+        ['opening','settling'], ['brightening','cooling'],
+        ['widening','returning'], ['turning','deepening'],
+      ];
+      const hasReversal = opposites.some(([a, b]) =>
+        (priorEssence.includes(a) && sentence.includes(b)) ||
+        (priorEssence.includes(b) && sentence.includes(a))
+      );
+      if (hasReversal) {
+        // Replace directional verb with a continuity bridge
+        sentence = sentence
+          .replace('leaning opening',     'continuing to open')
+          .replace('leaning settling',    'continuing to settle')
+          .replace('leaning brightening', 'continuing to brighten')
+          .replace('leaning cooling',     'continuing to cool')
+          .replace('leaning widening',    'continuing to widen')
+          .replace('leaning returning',   'continuing to return')
+          .replace('leaning turning',     'continuing to turn')
+          .replace('leaning deepening',   'continuing to deepen');
+      }
+    }
 
     return sentence.charAt(0).toUpperCase() + sentence.slice(1);
   })();
@@ -1778,6 +1848,27 @@ export function SeasonalFieldCard() {
   const showAlignment     = alignment.isCalibrated;
   const showPresence      = presence.isCalibrated && presence.state !== 'absent';
   const showReweightShift = reweight.isMature;
+
+  // Arc 50: commit echo state after all phrases are computed
+  // (refs update silently -- no re-render triggered)
+  echoEssenceRef.current    = essencePhrase;
+  echoOriVecRef.current     = (() => {
+    if (!orientationPhrase) return echoOriVecRef.current;
+    const m = orientationPhrase.match(/leaning ([a-z]+)\./);
+    return m ? m[1] : echoOriVecRef.current;
+  })();
+  echoToneRef.current       = (() => {
+    const c: Record<string,number> = {};
+    for (const m of allMoments) if (m.corridorTone) c[m.corridorTone]=(c[m.corridorTone]??0)+1;
+    return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? echoToneRef.current;
+  })();
+  echoClarityRef.current    = reflectionClarity;
+  echoThresholdRef.current  = COMPRESS_THRESHOLD;
+  echoVisibleSetRef.current = Object.entries(compressed)
+    .filter(([,v]) => v).map(([k]) => k).sort().join(',');
+  prevArchetypeRef.current  = constellation.archetype;
+  prevDriftRef.current      = drift.direction;
+  prevForecastRef.current   = foresight.forecast;
 
   return (
     <View style={s.card}>
