@@ -28,6 +28,7 @@ import { useFieldDrift } from '@/hooks/useFieldDrift';
 import { useFieldHarmony } from '@/hooks/useFieldHarmony';
 import { FieldSummaryStrip } from '@/components/FieldSummaryStrip';
 import { useFieldForesight } from '@/hooks/useFieldForesight';
+import { useResonance } from '@/hooks/useResonance';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -106,6 +107,10 @@ export function SeasonalFieldCard() {
   const totalMoments   = atlas.totalMoments;
   const latestMoment   = atlas.latest;
   const allMoments     = atlas.moments;
+
+  // Arc 52: resonance -- local style tuner, device-only
+  const resonance = useResonance();
+  const { profile: rProfile, isCalibrated: rCalibrated } = resonance;
 
   // Arc 32: delta -- compare current slow signals to previous render
   const prevArchetypeRef = useRef<string | null>(null);
@@ -1492,10 +1497,20 @@ export function SeasonalFieldCard() {
   const biasedThreshold = Math.max(0.46, Math.min(0.65,
     rawThreshold + anticipation.thresholdBias
   ));
+  // Resonance depth bias: calibrated profile shifts threshold
+  // depthBias > 0.5 -> user prefers more layers -> lower threshold
+  // depthBias < 0.5 -> user prefers compressed   -> raise threshold
+  // Max effect: +/- 0.05 (kept small so resonance nudges, not overrides)
+  const resonanceBias = rCalibrated
+    ? (0.5 - rProfile.depthBias) * 0.10   // 0.5->0, 0->+0.05, 1->-0.05
+    : 0;
+  const resonancedThreshold = Math.max(0.44, Math.min(0.67,
+    biasedThreshold + resonanceBias
+  ));
   // Echo inertia: blend new threshold 80% / prior 20% to prevent oscillation
   const COMPRESS_THRESHOLD = echoActive
-    ? biasedThreshold * 0.80 + echoThresholdRef.current * 0.20
-    : biasedThreshold;
+    ? resonancedThreshold * 0.80 + echoThresholdRef.current * 0.20
+    : resonancedThreshold;
 
   type PhraseKey =
     'signature' | 'resilience' | 'lineage' | 'rhythm' |
@@ -1677,7 +1692,20 @@ export function SeasonalFieldCard() {
       wanderer: 'wandering', observer: 'watching', steady: 'rooted',
       returner: 'returning', seeker: 'seeking',
     };
-    const toneAdj   = TONE_ADJ[domTone] ?? 'mixed';
+    const rawToneAdj = TONE_ADJ[domTone] ?? 'mixed';
+    // Resonance toneBias: calibrated preference shifts adjective toward
+    // calm (< 0.5) or bright (> 0.5). Only swaps between near-synonyms.
+    const TONE_CALM: Record<string, string> = {
+      bright: 'calm', active: 'steady', mixed: 'quiet', calm: 'calm', quiet: 'quiet',
+    };
+    const TONE_BRIGHT: Record<string, string> = {
+      calm: 'bright', quiet: 'bright', mixed: 'active', bright: 'bright', active: 'active',
+    };
+    const toneAdj = rCalibrated
+      ? (rProfile.toneBias > 0.68 ? (TONE_BRIGHT[rawToneAdj] ?? rawToneAdj)
+       : rProfile.toneBias < 0.32 ? (TONE_CALM[rawToneAdj]   ?? rawToneAdj)
+       : rawToneAdj)
+      : rawToneAdj;
     const archNoun  = constellation.isFormed
       ? (ARCH_NOUN[constellation.archetype] ?? 'settled') : 'settled';
 
@@ -1759,7 +1787,13 @@ export function SeasonalFieldCard() {
     // Anticipation clauseLimitBias shifts effective clarity tier:
     //  +1 -> act one tier more open (tightening->balanced, balanced->full)
     //  -1 -> act one tier more closed (full->balanced, balanced->minimal)
-    const effectiveClarity = reflectionClarity + anticipation.clauseLimitBias * 0.12;
+    // Resonance depthBias further shifts: +0.08 at max depth, -0.08 at min
+    const resonanceClauseBias = rCalibrated
+      ? (rProfile.depthBias - 0.5) * 0.16  // 0.5->0, 1->+0.08, 0->-0.08
+      : 0;
+    const effectiveClarity = reflectionClarity
+      + anticipation.clauseLimitBias * 0.12
+      + resonanceClauseBias;
     if (effectiveClarity >= 0.75) {
       const parts: string[] = [`A ${toneAdj} ${archNoun} field`];
       if (temporalClause)    parts.push(temporalClause);
