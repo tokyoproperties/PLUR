@@ -1,48 +1,39 @@
 /**
- * atlas/fieldReweight.ts -- Arc 23 (REWEIGHT)
+ * atlas/fieldReweight.ts -- Arc 26 (PURITY rewrite)
  *
- * Field Reweight Engine.
+ * Field Reweight Engine -- ring-native.
  *
- * The field's first act of self-organization. Reads long-term memory
- * patterns and soul state to determine which intelligence signals
- * carry the most weight for THIS field, over time.
+ * Arc 26 doctrine: slow layers read the moment ring directly.
+ * No FieldMemory, no FieldSoul re-evaluation. Soul traits are
+ * accepted as a read-only hint (currentSoulTraits), never re-derived.
  *
- * This is NOT moment-to-moment adaptation -- that is what alignment,
- * presence, initiative, and branch already do. Reweight is the
- * slow layer -- it shifts over days and weeks as chapters accumulate.
+ * What it reads from the ring:
+ *   - m.corridorTone         -> corridor consistency signal
+ *   - m.season               -> phase distribution (depth vs breadth)
+ *   - m.invitedSpecies       -> species frequency (habitat affinity)
+ *   - m.intensity            -> activity level (initiative proxy)
+ *   - m.symbolic             -> mode distribution (soul signal)
  *
- * What it reads (all real, long-term data):
- *   - Chapter distribution: which phases have the most moments
- *   - Chapter tone dominance: calm/bright/still/moist/shifting across phases
- *   - Corridor history: which corridor tones persist across chapters
- *   - Species frequency: frequent vs rare -- habitat affinity signal
- *   - Soul stability: rootMovement + rootTone + isRevealed
- *   - Total chapter count vs totalMoments ratio
+ * What it accepts as hints (currentSoulTraits):
+ *   - rootMovement           -> initiative/branch modifier
+ *   - rootTone               -> soul signal modifier
+ *   - isRevealed             -> soul confidence gate
  *
- * What it outputs:
- *   emphasis: weights for each signal layer (0.0-1.0 normalized)
- *   dominant: which signal layer the field is currently centering
- *   toneShift: a short phrase for Field Window tone coloring
+ * Six signal layers weighted:
+ *   alignment  -- corridor consistency across seasons
+ *   presence   -- moment concentration in dominant season
+ *   initiative -- activity level + rootMovement
+ *   branch     -- tone diversity across seasons
+ *   soul       -- mode consistency + soul revelation
+ *   season     -- season phase breadth
  *
- * Six signal layers:
- *   alignment  -- field is responding to time-of-day + season cycles
- *   presence   -- field is centering the user's attention state
- *   initiative -- field is action-oriented, directive
- *   branch     -- field is exploring multiple paths
- *   soul       -- field is deepening into long-term identity
- *   season     -- field is following the ecological calendar
- *
- * Priority in stack: above branch, below danger.
- * Confidence gate: only meaningful after 10+ moments.
- *
+ * Confidence gate: 10+ moments.
  * Pure logic -- no React, no hooks.
  */
 
-import type { FieldMemory } from '@/atlas/fieldMemory';
-import type { FieldSoul } from '@/atlas/fieldSoul';
-import type { BranchPath } from '@/atlas/fieldBranch';
+import type { FieldMoment } from '@/atlas/fieldMoment';
+import type { RootMovement, RootTone } from '@/atlas/fieldSoul';
 import type { SymbolicMode } from '@/contexts/mode-context';
-import type { CalendarSeason } from '@/hooks/useSeason';
 
 // ---- Types -----------------------------------------------------------
 
@@ -63,24 +54,24 @@ export interface ReweightEmphasis {
   season:     number;
 }
 
+export interface SoulHint {
+  rootMovement: RootMovement;
+  rootTone:     RootTone;
+  isRevealed:   boolean;
+  isEstablished: boolean;
+}
+
 export interface FieldReweight {
-  /** Normalized 0.0-1.0 weights per signal */
-  emphasis:   ReweightEmphasis;
-  /** Which signal is currently dominant */
-  dominant:   ReweightSignal;
-  /** Short tone-shift phrase for Field Window */
-  toneShift:  string;
-  /** Whether reweight has enough data to be meaningful */
-  isMature:   boolean;
-  /** Implied mode from dominant signal */
+  emphasis:    ReweightEmphasis;
+  dominant:    ReweightSignal;
+  toneShift:   string;
+  isMature:    boolean;
   impliedMode: SymbolicMode;
 }
 
-// ---- Thresholds ------------------------------------------------------
+// ---- Constants -------------------------------------------------------
 
-const MIN_MOMENTS_FOR_REWEIGHT = 10;
-
-// ---- Tone shift text -------------------------------------------------
+const MIN_MOMENTS = 10;
 
 const TONE_SHIFTS: Record<ReweightSignal, string> = {
   alignment:  'Field leaning toward cycle and rhythm.',
@@ -91,8 +82,6 @@ const TONE_SHIFTS: Record<ReweightSignal, string> = {
   season:     'Field following the ecological calendar.',
 };
 
-// ---- Mode coupling ---------------------------------------------------
-
 const SIGNAL_MODE: Record<ReweightSignal, SymbolicMode> = {
   alignment:  'plur',
   presence:   'love',
@@ -102,96 +91,97 @@ const SIGNAL_MODE: Record<ReweightSignal, SymbolicMode> = {
   season:     'plur',
 };
 
-// ---- Scoring functions -----------------------------------------------
+// ---- Ring extraction helpers -----------------------------------------
 
-/**
- * Alignment signal strength.
- * High when: many chapters, consistent corridor tones across phases.
- * The field that responds predictably to time-of-day and season
- * is one where alignment is the reliable guide.
- */
-function scoreAlignment(memory: FieldMemory): number {
-  if (memory.chapters.length < 2) return 0.3;
-  // Corridor tone consistency across chapters
-  const tones = memory.corridorHistory.map((c) => c.dominantTone);
-  const dominant = mostCommon(tones);
-  const consistency = tones.filter((t) => t === dominant).length / tones.length;
-  // More chapters + more consistency = stronger alignment signal
-  const chapterBonus = Math.min(0.3, memory.chapters.length * 0.06);
-  return clamp(0.3 + consistency * 0.4 + chapterBonus, 0, 1);
+function groupBySeason(moments: FieldMoment[]): Map<string, FieldMoment[]> {
+  const groups = new Map<string, FieldMoment[]>();
+  for (const m of moments) {
+    const s = m.season ?? 'unknown';
+    if (!groups.has(s)) groups.set(s, []);
+    groups.get(s)!.push(m);
+  }
+  return groups;
 }
 
-/**
- * Presence signal strength.
- * High when: many moments concentrated in few chapters (depth over breadth).
- * A field with dense moments in a single chapter has a strong presence pattern.
- */
-function scorePresence(memory: FieldMemory): number {
-  if (memory.chapters.length === 0) return 0.2;
-  const momentCounts = memory.chapters.map((c) => c.momentCount);
-  const max = Math.max(...momentCounts);
-  const avg = momentCounts.reduce((a, b) => a + b, 0) / momentCounts.length;
-  // High ratio of max to avg = concentrated presence
+function mostCommon<T>(arr: T[]): T | undefined {
+  if (!arr.length) return undefined;
+  const counts = new Map<T, number>();
+  for (const v of arr) counts.set(v, (counts.get(v) ?? 0) + 1);
+  return [...counts.entries()].reduce((a, b) => b[1] > a[1] ? b : a)[0];
+}
+
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.min(hi, Math.max(lo, v));
+}
+
+// ---- Scoring (ring-native) -------------------------------------------
+
+function scoreAlignment(moments: FieldMoment[]): number {
+  // Corridor tone consistency across seasons
+  const groups = groupBySeason(moments);
+  if (groups.size < 2) return 0.3;
+  const seasonTones = [...groups.values()].map((ms) =>
+    mostCommon(ms.map((m) => m.corridorTone))
+  ).filter(Boolean);
+  const overallDominant = mostCommon(seasonTones);
+  const consistency = overallDominant
+    ? seasonTones.filter((t) => t === overallDominant).length / seasonTones.length
+    : 0;
+  const seasonBonus = Math.min(0.3, groups.size * 0.06);
+  return clamp(0.3 + consistency * 0.4 + seasonBonus, 0, 1);
+}
+
+function scorePresence(moments: FieldMoment[]): number {
+  // Moment concentration in dominant season
+  const groups = groupBySeason(moments);
+  if (groups.size === 0) return 0.2;
+  const counts = [...groups.values()].map((ms) => ms.length);
+  const max = Math.max(...counts);
+  const avg = counts.reduce((a, b) => a + b, 0) / counts.length;
   const concentration = avg > 0 ? Math.min(max / avg, 3) / 3 : 0;
   return clamp(0.2 + concentration * 0.5, 0, 1);
 }
 
-/**
- * Initiative signal strength.
- * High when: soul rootMovement is 'wandering' or 'breathing',
- * and totalMoments is high (lots of field action).
- * The action-oriented field generates strong initiative.
- */
-function scoreInitiative(memory: FieldMemory, soul: FieldSoul): number {
-  if (!soul.isEstablished) return 0.3;
+function scoreInitiative(moments: FieldMoment[], soul: SoulHint): number {
+  // Activity level from intensity field + soul rootMovement hint
+  const avgIntensity = moments.reduce((a, m) => a + (m.intensity ?? 0), 0) / moments.length;
+  const intensityBonus = Math.min(0.25, avgIntensity * 0.1);
   const movementBonus =
-    soul.traits.rootMovement === 'wandering' ? 0.25
-    : soul.traits.rootMovement === 'breathing' ? 0.15
+    soul.rootMovement === 'wandering' ? 0.25
+    : soul.rootMovement === 'breathing' ? 0.15
     : 0;
-  const momentBonus = Math.min(0.25, memory.totalMoments * 0.005);
-  return clamp(0.3 + movementBonus + momentBonus, 0, 1);
+  return clamp(0.3 + intensityBonus + movementBonus, 0, 1);
 }
 
-/**
- * Branch signal strength.
- * High when: multiple chapters with different dominant tones.
- * A field that changes character across chapters is one that branches.
- */
-function scoreBranch(memory: FieldMemory): number {
-  if (memory.chapters.length < 2) return 0.2;
-  const tones = memory.chapters
-    .filter((c) => c.isFormed)
-    .map((c) => c.dominantTone);
-  const uniqueTones = new Set(tones).size;
-  // More unique tones = more branching character
+function scoreBranch(moments: FieldMoment[]): number {
+  // Tone diversity across seasons
+  const groups = groupBySeason(moments);
+  if (groups.size < 2) return 0.2;
+  const seasonTones = [...groups.values()].map((ms) =>
+    mostCommon(ms.map((m) => m.corridorTone))
+  ).filter(Boolean) as string[];
+  const uniqueTones = new Set(seasonTones).size;
   const diversity = Math.min(uniqueTones / 4, 1);
   return clamp(0.2 + diversity * 0.5, 0, 1);
 }
 
-/**
- * Soul signal strength.
- * High when: soul is revealed (deep memory, 20+ moments),
- * and rootTone is 'still' or 'calm' (identity-stable field).
- */
-function scoreSoul(soul: FieldSoul, totalMoments: number): number {
+function scoreSoul(moments: FieldMoment[], soul: SoulHint): number {
+  // Mode consistency (LOVE moments = soul signal) + soul revelation hint
   if (!soul.isEstablished) return 0.1;
+  const loveMoments = moments.filter((m) => m.symbolic === 'love').length;
+  const modeConsistency = loveMoments / moments.length;
   const revealBonus = soul.isRevealed ? 0.3 : 0;
   const toneBonus =
-    soul.traits.rootTone === 'still' ? 0.15
-    : soul.traits.rootTone === 'calm' ? 0.10
+    soul.rootTone === 'still' ? 0.15
+    : soul.rootTone === 'calm' ? 0.10
     : 0;
-  const depthBonus = Math.min(0.2, totalMoments * 0.004);
-  return clamp(0.2 + revealBonus + toneBonus + depthBonus, 0, 1);
+  return clamp(0.1 + modeConsistency * 0.2 + revealBonus + toneBonus, 0, 1);
 }
 
-/**
- * Season signal strength.
- * High when: formed chapters span multiple phases (the field has
- * been observed across seasons -- seasonal guidance is validated).
- */
-function scoreSeason(memory: FieldMemory): number {
-  const formedPhases = memory.chapters.filter((c) => c.isFormed).length;
-  const phaseBonus = Math.min(0.5, formedPhases * 0.12);
+function scoreSeason(moments: FieldMoment[]): number {
+  // Season breadth -- how many distinct seasons observed
+  const seasons = new Set(moments.map((m) => m.season).filter(Boolean)).size;
+  const phaseBonus = Math.min(0.5, seasons * 0.12);
   return clamp(0.2 + phaseBonus, 0, 1);
 }
 
@@ -200,18 +190,15 @@ function scoreSeason(memory: FieldMemory): number {
 function normalize(raw: ReweightEmphasis): ReweightEmphasis {
   const total = Object.values(raw).reduce((a, b) => a + b, 0);
   if (total === 0) return raw;
-  const factor = 1 / total;
+  const f = 1 / total;
   return {
-    alignment:  raw.alignment  * factor,
-    presence:   raw.presence   * factor,
-    initiative: raw.initiative * factor,
-    branch:     raw.branch     * factor,
-    soul:       raw.soul       * factor,
-    season:     raw.season     * factor,
+    alignment: raw.alignment * f, presence:   raw.presence * f,
+    initiative: raw.initiative * f, branch:  raw.branch * f,
+    soul:      raw.soul * f,      season:    raw.season * f,
   };
 }
 
-function dominant(e: ReweightEmphasis): ReweightSignal {
+function dominantSignal(e: ReweightEmphasis): ReweightSignal {
   return (Object.entries(e) as [ReweightSignal, number][])
     .reduce((a, b) => b[1] > a[1] ? b : a)[0];
 }
@@ -219,54 +206,28 @@ function dominant(e: ReweightEmphasis): ReweightSignal {
 // ---- Main evaluator --------------------------------------------------
 
 export function evaluateFieldReweight(
-  memory: FieldMemory,
-  soul:   FieldSoul,
+  moments:   FieldMoment[],
+  soulHint:  SoulHint,
 ): FieldReweight {
-  if (memory.totalMoments < MIN_MOMENTS_FOR_REWEIGHT) {
-    // Not enough data -- return a flat, neutral reweight
+  if (moments.length < MIN_MOMENTS) {
     const flat: ReweightEmphasis = {
       alignment: 0.17, presence: 0.17, initiative: 0.17,
       branch: 0.17, soul: 0.17, season: 0.15,
     };
-    return {
-      emphasis:    flat,
-      dominant:    'season',
-      toneShift:   TONE_SHIFTS.season,
-      isMature:    false,
-      impliedMode: 'plur',
-    };
+    return { emphasis: flat, dominant: 'season', toneShift: TONE_SHIFTS.season, isMature: false, impliedMode: 'plur' };
   }
 
   const raw: ReweightEmphasis = {
-    alignment:  scoreAlignment(memory),
-    presence:   scorePresence(memory),
-    initiative: scoreInitiative(memory, soul),
-    branch:     scoreBranch(memory),
-    soul:       scoreSoul(soul, memory.totalMoments),
-    season:     scoreSeason(memory),
+    alignment:  scoreAlignment(moments),
+    presence:   scorePresence(moments),
+    initiative: scoreInitiative(moments, soulHint),
+    branch:     scoreBranch(moments),
+    soul:       scoreSoul(moments, soulHint),
+    season:     scoreSeason(moments),
   };
 
   const emphasis = normalize(raw);
-  const dom      = dominant(emphasis);
+  const dom      = dominantSignal(emphasis);
 
-  return {
-    emphasis,
-    dominant:    dom,
-    toneShift:   TONE_SHIFTS[dom],
-    isMature:    true,
-    impliedMode: SIGNAL_MODE[dom],
-  };
-}
-
-// ---- Utils -----------------------------------------------------------
-
-function clamp(v: number, lo: number, hi: number): number {
-  return Math.min(hi, Math.max(lo, v));
-}
-
-function mostCommon<T>(arr: T[]): T | undefined {
-  if (arr.length === 0) return undefined;
-  const counts = new Map<T, number>();
-  for (const v of arr) counts.set(v, (counts.get(v) ?? 0) + 1);
-  return [...counts.entries()].reduce((a, b) => b[1] > a[1] ? b : a)[0];
+  return { emphasis, dominant: dom, toneShift: TONE_SHIFTS[dom], isMature: true, impliedMode: SIGNAL_MODE[dom] };
 }
