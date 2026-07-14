@@ -355,6 +355,111 @@ export function SeasonalFieldCard() {
     return `Signature: ${noun} with ${verb}.`;
   })();
 
+  // Arc 39: field resilience -- structural stability coefficient
+  // Pure ring read. No evaluator, no hook. Reads full ring only.
+  const RESILIENCE_MIN = 80;
+  const resiliencePhrase: string | null = (() => {
+    const resActive =
+      signaturePhrase !== null &&         // sig gate (>= 60) already cleared
+      allMoments.length >= RESILIENCE_MIN &&
+      harmony.isReadable &&
+      harmony.agreement >= 0.6;
+    if (!resActive) return null;
+
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // Helper: variance of a numeric array (population variance)
+    function variance(arr: number[]): number {
+      if (arr.length < 2) return 0;
+      const mean = arr.reduce((s, v) => s + v, 0) / arr.length;
+      return arr.reduce((s, v) => s + (v - mean) ** 2, 0) / arr.length;
+    }
+
+    // Helper: how often does the dominant value change across
+    // non-overlapping buckets of size `bucketSize`?
+    function volatility(values: string[], bucketSize: number): number {
+      const buckets: string[] = [];
+      for (let i = 0; i + bucketSize <= values.length; i += bucketSize) {
+        const slice = values.slice(i, i + bucketSize);
+        const cnt: Record<string, number> = {};
+        for (const v of slice) cnt[v] = (cnt[v] ?? 0) + 1;
+        buckets.push(Object.entries(cnt).sort((a, b) => b[1] - a[1])[0][0]);
+      }
+      // Fraction of adjacent bucket-pairs where dominant value changes
+      if (buckets.length < 2) return 0;
+      let changes = 0;
+      for (let i = 1; i < buckets.length; i++) {
+        if (buckets[i] !== buckets[i - 1]) changes++;
+      }
+      return changes / (buckets.length - 1);
+    }
+
+    // -- Tone variance (0 = perfectly stable, higher = more variable) --
+    const tones = ring.map(m => m.corridorTone ?? 'mixed');
+    const toneVol = volatility(tones, Math.max(5, Math.floor(N / 12)));
+
+    // -- Season entropy variance across sliding windows ----------------
+    const WIN = Math.max(10, Math.floor(N / 8));
+    const seasonEntropies: number[] = [];
+    for (let i = WIN; i <= N; i += Math.floor(WIN / 2)) {
+      const wSlice = ring.slice(i - WIN, i);
+      const cnt: Record<string, number> = {};
+      for (const m of wSlice) if (m.season) cnt[m.season] = (cnt[m.season] ?? 0) + 1;
+      const LOG4 = Math.log(4);
+      let H = 0;
+      for (const v of Object.values(cnt)) {
+        const p = v / WIN; if (p > 0) H -= p * Math.log(p);
+      }
+      seasonEntropies.push(H / LOG4);
+    }
+    const seasonEntropyVar = variance(seasonEntropies);
+
+    // -- Species presence variance (invitedCount) ----------------------
+    const speciesCounts = ring.map(m => m.invitedCount ?? 0);
+    const speciesVar = variance(speciesCounts) /
+      Math.max(1, Math.max(...speciesCounts) ** 2);  // normalize to [0,1]
+
+    // -- Reweight dominant volatility (bucket size 8) ------------------
+    const reweightVol = reweight.isMature
+      ? volatility(ring.map(m => m.symbolic ?? 'plur'), Math.max(5, Math.floor(N / 10)))
+      : 0.5;
+
+    // -- Drift direction volatility (bucket size 10) -------------------
+    const driftVol = drift.isMeasurable
+      ? volatility(ring.map(m => m.corridorTone ?? 'mixed'), Math.max(5, Math.floor(N / 8)))
+      : 0.5;
+
+    // -- Harmony variance (use conditionsScore as numeric proxy) -------
+    const condScores = ring.map(m => m.conditionsScore ?? 0.5);
+    const harmVar = variance(condScores);
+
+    // -- Weighted resilience coefficient (higher = more resilient) -----
+    // Low volatility/variance = high resilience
+    const rawScore =
+      (1 - toneVol)          * 0.25 +
+      (1 - seasonEntropyVar) * 0.20 +
+      (1 - speciesVar)       * 0.15 +
+      (1 - reweightVol)      * 0.15 +
+      (1 - driftVol)         * 0.15 +
+      (1 - Math.min(harmVar * 4, 1)) * 0.10;
+    // Clamp to [0, 1]
+    const coeff = Math.max(0, Math.min(1, rawScore));
+
+    const RESILIENCE_PHRASE: Array<[number, string]> = [
+      [0.85, 'Resilience: strongly stable.'],
+      [0.65, 'Resilience: moderately stable.'],
+      [0.45, 'Resilience: lightly stable.'],
+      [0.25, 'Resilience: variable.'],
+      [0.00, 'Resilience: fragile.'],
+    ];
+
+    for (const [threshold, phrase] of RESILIENCE_PHRASE) {
+      if (coeff >= threshold) return phrase;
+    }
+    return 'Resilience: fragile.';
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -532,6 +637,10 @@ export function SeasonalFieldCard() {
           {signaturePhrase !== null && (
             <ThemedText style={s.signatureText}>{signaturePhrase}</ThemedText>
           )}
+          {/* Arc 39: resilience -- below signature, above strip */}
+          {resiliencePhrase !== null && (
+            <ThemedText style={s.resilienceText}>{resiliencePhrase}</ThemedText>
+          )}
         </>
       )}
 
@@ -693,6 +802,14 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.50)',
+    letterSpacing: 0.12,
+    marginBottom: 4,
+  },
+  resilienceText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.48)',
     letterSpacing: 0.12,
     marginBottom: 10,
   },
