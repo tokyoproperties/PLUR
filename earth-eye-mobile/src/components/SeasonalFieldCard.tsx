@@ -1272,6 +1272,162 @@ export function SeasonalFieldCard() {
     return 'Integrity: fractured.';
   })();
 
+  // Arc 47: field compression -- adaptive relevance selector
+  // Scores each top-stack phrase 0-1 and suppresses those below 0.55.
+  // Runs after all phrases are computed; reads only phrase existence +
+  // already-available hook values. No new evaluator, no new hook.
+  //
+  // Identity is never suppressed -- it anchors the card.
+  // Compression activates only when integrityPhrase is active (>= 220 moments).
+  // Below 220 moments the stack renders as-is (no compression needed --
+  // fewer layers are active anyway).
+  const COMPRESS_THRESHOLD = 0.55;
+
+  type PhraseKey =
+    'signature' | 'resilience' | 'lineage' | 'rhythm' |
+    'orientation' | 'coherence' | 'alignment' | 'continuity' | 'integrity';
+
+  const compressed: Record<PhraseKey, boolean> = (() => {
+    // When integrity is not yet active, show everything that exists
+    if (integrityPhrase === null) {
+      return {
+        signature:   signaturePhrase   !== null,
+        resilience:  resiliencePhrase  !== null,
+        lineage:     lineagePhrase     !== null,
+        rhythm:      rhythmPhrase      !== null,
+        orientation: orientationPhrase !== null,
+        coherence:   coherencePhrase   !== null,
+        alignment:   alignmentPhrase   !== null,
+        continuity:  continuityPhrase  !== null,
+        integrity:   false,
+      };
+    }
+
+    // -- Compute relevance score for each phrase ----------------------
+    // Each score is a weighted combination of three axes:
+    //   A. Temporal relevance  -- does this layer matter RIGHT NOW?
+    //   B. Structural contrast -- does this layer differ from the moment?
+    //   C. Harmony amplifier   -- high agreement promotes depth
+
+    const harmBoost = Math.max(0, (harmony.agreement - 0.6) / 0.4); // 0-1 above threshold
+    const ring = allMoments;
+    const N    = ring.length;
+
+    // Recent-window (last 20 moments) for temporal relevance
+    const recent   = ring.slice(-20);
+    const rN       = recent.length;
+
+    // Recent flip rate helper
+    function recentFlip(vals: (string|boolean|number|null|undefined)[]): number {
+      if (vals.length < 2) return 0;
+      let f = 0;
+      for (let i = 1; i < vals.length; i++) if (vals[i] !== vals[i-1]) f++;
+      return f / (vals.length - 1);
+    }
+
+    const recentToneFlip    = recentFlip(recent.map(m => m.corridorTone ?? null));
+    const recentSymFlip     = recentFlip(recent.map(m => m.symbolic     ?? null));
+    const recentSeasonFlip  = recentFlip(recent.map(m => m.season       ?? null));
+    const recentSpeciesFlip = recentFlip(recent.map(m => (m.invitedCount ?? 0) > 0));
+
+    // Current moment (most recent)
+    const cur = ring[N - 1];
+
+    // -- SIGNATURE: show when current moment matches long-scale pattern --
+    // Proxy: current corridorTone matches the lineage-origin tone
+    const linToneWord = lineagePhrase
+      ? (['bright','calm','quiet','mixed','active'].find(t => lineagePhrase.includes(t)) ?? null)
+      : null;
+    const LIN_NORM: Record<string,string> = {bright:'bright',calm:'calm',quiet:'still',mixed:'mixed',active:'noisy'};
+    const linToneNorm2 = linToneWord ? (LIN_NORM[linToneWord] ?? null) : null;
+    const sigTemporalRel  = linToneNorm2 && cur?.corridorTone === linToneNorm2 ? 0.80 : 0.40;
+    const sigStructRel    = constellation.isFormed ? 0.75 : 0.45;
+    const sigScore = sigTemporalRel * 0.50 + sigStructRel * 0.35 + harmBoost * 0.15;
+
+    // -- RESILIENCE: show when moment contradicts stability --
+    // Contradiction: conditionsScore is low when resilience said stable
+    const curScore        = cur?.conditionsScore ?? 0.5;
+    const resTemporalRel  = curScore < 0.40 ? 0.85 : 0.38; // low quality = resilience relevant
+    const resStructRel    = recentToneFlip > 0.40 ? 0.80 : 0.35;
+    const resScore = resTemporalRel * 0.50 + resStructRel * 0.35 + harmBoost * 0.15;
+
+    // -- LINEAGE: show when field is returning to early patterns --
+    const earlyTone       = lineagePhrase && linToneNorm2 ? linToneNorm2 : null;
+    const linTemporalRel  = earlyTone && cur?.corridorTone === earlyTone ? 0.82 : 0.35;
+    const linStructRel    = recentSeasonFlip < 0.10 ? 0.72 : 0.40; // stable season = origin moment
+    const linScore = linTemporalRel * 0.55 + linStructRel * 0.30 + harmBoost * 0.15;
+
+    // -- RHYTHM: show when moment spacing recently changed --
+    // Proxy: recent flip rate on tone is noticeably different from full-ring average
+    const fullToneFlip = (() => {
+      let f = 0;
+      for (let i = 1; i < N; i++) if (ring[i].corridorTone !== ring[i-1].corridorTone) f++;
+      return N > 1 ? f / (N-1) : 0;
+    })();
+    const rhythmTemporalRel = Math.abs(recentToneFlip - fullToneFlip) > 0.15 ? 0.82 : 0.38;
+    const rhythmStructRel   = recentSpeciesFlip > 0.30 ? 0.70 : 0.38;
+    const rhythmScore = rhythmTemporalRel * 0.55 + rhythmStructRel * 0.30 + harmBoost * 0.15;
+
+    // -- ORIENTATION: show when drift recently changed --
+    const oriTemporalRel  = drift.isMeasurable ? 0.78 : 0.35;
+    const oriStructRel    = recentSymFlip > 0.30 ? 0.72 : 0.38;
+    const oriScore = oriTemporalRel * 0.55 + oriStructRel * 0.30 + harmBoost * 0.15;
+
+    // -- COHERENCE: show when current moment contradicts cross-layer agreement --
+    // Proxy: current symbolic vs tone contradiction
+    const PLUR_T = new Set(['bright','noisy','mixed']);
+    const LOVE_T = new Set(['calm','still','mixed']);
+    const curContrad = cur?.symbolic && cur?.corridorTone
+      ? !(cur.symbolic === 'plur' ? PLUR_T.has(cur.corridorTone) : LOVE_T.has(cur.corridorTone))
+      : false;
+    const cohTemporalRel = curContrad ? 0.88 : 0.40;
+    const cohStructRel   = harmony.agreement >= 0.75 ? 0.75 : 0.42;
+    const cohScore = cohTemporalRel * 0.50 + cohStructRel * 0.35 + harmBoost * 0.15;
+
+    // -- ALIGNMENT: show when structure<->direction mismatch is present --
+    const oriVecComp = orientationPhrase
+      ? orientationPhrase.replace('Orientation: leaning ','').replace('.','').trim()
+      : null;
+    const DRIFT_ORI_C: Record<string,string> = {
+      settling:'settling', brightening:'brightening',
+      wandering:'widening', returning:'returning', seeking:'opening',
+    };
+    const driftNatOri2 = drift.isMeasurable ? DRIFT_ORI_C[drift.direction] : null;
+    const alnMismatch  = oriVecComp && driftNatOri2 && oriVecComp !== driftNatOri2;
+    const alnTemporalRel = alnMismatch ? 0.88 : 0.35;
+    const alnStructRel   = reweight.isMature ? 0.72 : 0.38;
+    const alnScore = alnTemporalRel * 0.50 + alnStructRel * 0.35 + harmBoost * 0.15;
+
+    // -- CONTINUITY: show when flip rate recently dropped (field settling) --
+    const contTemporalRel = recentToneFlip < 0.10 ? 0.82 : 0.38;
+    const contStructRel   = recentSeasonFlip < 0.10 ? 0.75 : 0.38;
+    const contScore = contTemporalRel * 0.55 + contStructRel * 0.30 + harmBoost * 0.15;
+
+    // -- INTEGRITY: show when cross-layer contradiction recently spiked --
+    let recentContradCount = 0;
+    for (const m of recent) {
+      if (!m.symbolic || !m.corridorTone) continue;
+      const inSet = m.symbolic === 'plur' ? PLUR_T.has(m.corridorTone) : LOVE_T.has(m.corridorTone);
+      if (!inSet) recentContradCount++;
+    }
+    const recentContradRate = rN > 0 ? recentContradCount / rN : 0;
+    const intTemporalRel = recentContradRate > 0.30 ? 0.86 : 0.38;
+    const intStructRel   = constellation.isFormed && !drift.isMeasurable ? 0.72 : 0.40;
+    const intScore = intTemporalRel * 0.55 + intStructRel * 0.30 + harmBoost * 0.15;
+
+    return {
+      signature:   signaturePhrase   !== null && sigScore   >= COMPRESS_THRESHOLD,
+      resilience:  resiliencePhrase  !== null && resScore   >= COMPRESS_THRESHOLD,
+      lineage:     lineagePhrase     !== null && linScore   >= COMPRESS_THRESHOLD,
+      rhythm:      rhythmPhrase      !== null && rhythmScore >= COMPRESS_THRESHOLD,
+      orientation: orientationPhrase !== null && oriScore   >= COMPRESS_THRESHOLD,
+      coherence:   coherencePhrase   !== null && cohScore   >= COMPRESS_THRESHOLD,
+      alignment:   alignmentPhrase   !== null && alnScore   >= COMPRESS_THRESHOLD,
+      continuity:  continuityPhrase  !== null && contScore  >= COMPRESS_THRESHOLD,
+      integrity:   integrityPhrase   !== null && intScore   >= COMPRESS_THRESHOLD,
+    };
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -1445,42 +1601,16 @@ export function SeasonalFieldCard() {
         <>
           <ThemedText style={s.identityName}>{fieldIdentity}</ThemedText>
           <View style={s.identitySep} />
-          {/* Arc 38: signature -- below identity, above strip */}
-          {signaturePhrase !== null && (
-            <ThemedText style={s.signatureText}>{signaturePhrase}</ThemedText>
-          )}
-          {/* Arc 39: resilience -- below signature, above strip */}
-          {resiliencePhrase !== null && (
-            <ThemedText style={s.resilienceText}>{resiliencePhrase}</ThemedText>
-          )}
-          {/* Arc 40: lineage -- below resilience, above strip */}
-          {lineagePhrase !== null && (
-            <ThemedText style={s.lineageText}>{lineagePhrase}</ThemedText>
-          )}
-          {/* Arc 41: rhythm -- below lineage, above strip */}
-          {rhythmPhrase !== null && (
-            <ThemedText style={s.rhythmText}>{rhythmPhrase}</ThemedText>
-          )}
-          {/* Arc 42: orientation -- below rhythm, above strip */}
-          {orientationPhrase !== null && (
-            <ThemedText style={s.orientationText}>{orientationPhrase}</ThemedText>
-          )}
-          {/* Arc 43: coherence -- below orientation, above strip */}
-          {coherencePhrase !== null && (
-            <ThemedText style={s.coherenceText}>{coherencePhrase}</ThemedText>
-          )}
-          {/* Arc 44: alignment -- below coherence, above strip */}
-          {alignmentPhrase !== null && (
-            <ThemedText style={s.alignmentText}>{alignmentPhrase}</ThemedText>
-          )}
-          {/* Arc 45: continuity -- below alignment, above strip */}
-          {continuityPhrase !== null && (
-            <ThemedText style={s.continuityText}>{continuityPhrase}</ThemedText>
-          )}
-          {/* Arc 46: integrity -- below continuity, above strip */}
-          {integrityPhrase !== null && (
-            <ThemedText style={s.integrityText}>{integrityPhrase}</ThemedText>
-          )}
+          {/* Arc 38-46: top-stack phrases, filtered by Arc 47 compression */}
+          {compressed.signature   && <ThemedText style={s.signatureText}>{signaturePhrase}</ThemedText>}
+          {compressed.resilience  && <ThemedText style={s.resilienceText}>{resiliencePhrase}</ThemedText>}
+          {compressed.lineage     && <ThemedText style={s.lineageText}>{lineagePhrase}</ThemedText>}
+          {compressed.rhythm      && <ThemedText style={s.rhythmText}>{rhythmPhrase}</ThemedText>}
+          {compressed.orientation && <ThemedText style={s.orientationText}>{orientationPhrase}</ThemedText>}
+          {compressed.coherence   && <ThemedText style={s.coherenceText}>{coherencePhrase}</ThemedText>}
+          {compressed.alignment   && <ThemedText style={s.alignmentText}>{alignmentPhrase}</ThemedText>}
+          {compressed.continuity  && <ThemedText style={s.continuityText}>{continuityPhrase}</ThemedText>}
+          {compressed.integrity   && <ThemedText style={s.integrityText}>{integrityPhrase}</ThemedText>}
         </>
       )}
 
