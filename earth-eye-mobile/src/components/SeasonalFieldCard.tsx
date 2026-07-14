@@ -297,7 +297,22 @@ export function SeasonalFieldCard() {
       calm:   {},  // calm history -- no override, trust foresight
     };
 
-    const adj     = HISTORY_SHADE[toneMajority ?? '']?.[foresight.forecast]
+    // Recompute tone majority locally -- toneMajority is scoped to the
+    // history IIFE and is not accessible here. Invitation is a pure
+    // composition layer; it reads the ring directly rather than coupling
+    // to the internal shape of the history block (Arc 26 purity rule).
+    const invSlice = allMoments.slice(-HISTORY_WINDOW);
+    const invN     = invSlice.length;
+    const invTones: Record<string, number> = {};
+    for (const m of invSlice) {
+      if (m.corridorTone) invTones[m.corridorTone] = (invTones[m.corridorTone] ?? 0) + 1;
+    }
+    const invTopTone    = Object.entries(invTones).sort((a, b) => b[1] - a[1])[0];
+    const invToneMajority = invTopTone && invTopTone[1] / invN >= 0.5
+      ? invTopTone[0]
+      : null;
+
+    const adj     = HISTORY_SHADE[invToneMajority ?? '']?.[foresight.forecast]
                  ?? FORECAST_ADJ[foresight.forecast]
                  ?? 'quiet';
     const moment  = SIGNAL_MOMENT[reweight.dominant] ?? 'field moment';
