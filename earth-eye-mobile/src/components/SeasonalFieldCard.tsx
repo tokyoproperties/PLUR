@@ -214,6 +214,14 @@ export function SeasonalFieldCard() {
           </ThemedText>
         )}
       </View>
+
+      {/* Arc 31: Field Note -- naturalist sentence below the footer */}
+      <FieldNote
+        constellation={constellation}
+        drift={drift}
+        harmony={harmony}
+        foresight={foresight}
+      />
     </View>
   );
 }
@@ -298,4 +306,85 @@ const s = StyleSheet.create({
     fontStyle: 'italic',
     letterSpacing: 0.25,
   },
+  noteRow: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.05)',
+  },
+  noteText: {
+    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.28)',
+    lineHeight: 18,
+    letterSpacing: 0.1,
+  },
 });
+
+// ---- FieldNote (Arc 31) -- naturalist sentence below footer ---------
+// Pure composition: reads no ring, calls no evaluator.
+// Strips terminal periods from behavior phrases before mid-clause use.
+
+import type { FieldConstellation } from '@/atlas/fieldConstellation';
+import type { FieldDrift } from '@/atlas/fieldDrift';
+import type { FieldHarmony } from '@/atlas/fieldHarmony';
+import type { FieldForesight } from '@/atlas/fieldForesight';
+
+// Re-use the phrase tables from FieldSummaryStrip by duplicating the
+// key lookups here (avoids cross-file export of private tables).
+// These are small and stable -- they won't drift independently.
+const _CHAR_NOTE: Record<string, Record<string, string>> = {
+  wanderer: { settled:'Steady wanderer', restless:'Restless wanderer', turning:'Shifting wanderer', brightening:'Bright wanderer', cooling:'Quiet wanderer' },
+  observer: { settled:'Quiet observer',  restless:'Restless observer',  turning:'Turning observer',  brightening:'Open observer',  cooling:'Still observer' },
+  steady:   { settled:'Steady field',    restless:'Unsettled field',    turning:'Field in motion',   brightening:'Brightening field', cooling:'Cooling field' },
+  returner: { settled:'Quiet returner',  restless:'Restless returner',  turning:'Returner shifting', brightening:'Returner opening', cooling:'Deep returner' },
+  seeker:   { settled:'Calm seeker',     restless:'Restless seeker',    turning:'Turning seeker',    brightening:'Bright seeker',  cooling:'Cooling seeker' },
+};
+const _BEH_NOTE: Record<string, string> = {
+  settling:'pattern settling', brightening:'energy rising',
+  wandering:'range widening',  returning:'familiar ground returning',
+  seeking:'territory expanding',
+};
+const _TRAJ_NOTE: Record<string, string> = {
+  opening:'likely opening', deepening:'likely deepening',
+  turning:'likely turning', brightening:'likely brightening',
+  cooling:'likely cooling',
+};
+
+interface FieldNoteProps {
+  constellation: FieldConstellation;
+  drift:         FieldDrift;
+  harmony:       FieldHarmony;
+  foresight:     FieldForesight;
+}
+
+function FieldNote({ constellation, drift, harmony, foresight }: FieldNoteProps) {
+  const ready =
+    constellation.isFormed &&
+    drift.isMeasurable &&
+    harmony.isReadable &&
+    foresight.isActive;
+
+  if (!ready) return null;
+
+  const character  = _CHAR_NOTE[constellation.archetype]?.[harmony.mood] ?? '';
+  const behavior   = _BEH_NOTE[drift.direction] ?? '';
+  const trajectory = _TRAJ_NOTE[foresight.forecast] ?? '';
+
+  if (!character || !behavior || !trajectory) return null;
+
+  // "Bright wanderer. Range widening, and the field is likely opening."
+  const sentence = `${character}. ${capitalizeFirst(behavior)}, and the field is ${trajectory}.`;
+
+  return (
+    <View style={s.noteRow}>
+      <ThemedText style={s.noteText}>{sentence}</ThemedText>
+    </View>
+  );
+}
+
+function capitalizeFirst(str: string): string {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
