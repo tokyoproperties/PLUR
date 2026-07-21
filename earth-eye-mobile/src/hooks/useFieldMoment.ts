@@ -13,7 +13,7 @@
 
 import { useMemo } from 'react';
 import { useNarrator } from '@/contexts/narrator-context';
-import { computeMomentState, type MomentState } from '@/atlas/fieldMoment';
+import { computeMomentState, type MomentState } from '@/atlas/fieldThreadMoment';
 
 export function useFieldMoment(): MomentState {
   const narrator = useNarrator();
