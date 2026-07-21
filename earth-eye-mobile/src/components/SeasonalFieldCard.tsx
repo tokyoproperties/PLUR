@@ -2189,6 +2189,8 @@ export function SeasonalFieldCard() {
   const footPhrase: string | null = (() => {
     if (!foot.isActive || !foot.isCalibrated || narratorSilenced) return null;
     if (foot.identity === 'unknown') return null;
+    // Arc 66: continuity collapse -- low-quality readings don't display
+    if (foot.continuity < 0.15) return null;
 
     // Only surface when drift is non-trivial OR identity is transitioning
     // (not just "still" — stillness is the default state, not worth narrating)
@@ -2228,6 +2230,8 @@ export function SeasonalFieldCard() {
   const pulsePhrase: string | null = (() => {
     if (!pulse.isActive || !pulse.isCalibrated || narratorSilenced) return null;
     if (pulse.identity === 'unknown') return null;
+    // Arc 66: continuity collapse -- low-quality readings don't display
+    if (pulse.continuity < 0.15) return null;
 
     // Only surface when load is non-trivial AND changing
     // Calm with no drift = the default state, not worth narrating
@@ -2266,6 +2270,8 @@ export function SeasonalFieldCard() {
   const momentPhrase: string | null = (() => {
     if (!moment.isActive || !moment.isCalibrated || narratorSilenced) return null;
     if (moment.identity === 'unknown' || moment.identity === 'quiet' || moment.identity === 'stable') return null;
+    // Arc 66: continuity collapse -- low thread stability doesn't display
+    if (threadRef.current.threadPulseContinuity < 0.15) return null;
     // Only narrate transitional identities -- not the default states.
     // 'quiet' and 'stable' are the environmental baseline, not worth narrating.
 
@@ -2642,50 +2648,72 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.deltaText}>{deltaPhrase}</ThemedText>
       )}
 
-      {/* Arc 59: EarthMouth -- unified tri-field sentence (replaces atmosphere+ear) */}
+      {/* Arc 66: V1.0 Vertical Grammar -- eight-register stack */}
+      {/* Each register: tinted View row, 4px radius, 6px/4px padding, 8px gap */}
+      {/* Suppression ladder: mouth > celestial > nose > skin > foot > pulse > moment */}
+
+      {/* Register 1: Mouth (tri-field synthesis, replaces atmosphere+ear) */}
       {mouthPhrase !== null ? (
-        <ThemedText style={s.mouthText}>{mouthPhrase}</ThemedText>
+        <View style={s.mouthRow}>
+          <ThemedText style={s.mouthTextV1}>{mouthPhrase}</ThemedText>
+        </View>
       ) : (
         <>
-          {/* Arc 55: atmosphere -- sky + field synthesis (shown when mouth inactive) */}
+          {/* Atmosphere (sky+field synthesis, shown when mouth inactive) */}
           {atmospherePhrase !== null && (
-            <ThemedText style={s.atmosphereText}>{atmospherePhrase}</ThemedText>
+            <View style={s.skyRow}>
+              <ThemedText style={s.skyTextV1}>{atmospherePhrase}</ThemedText>
+            </View>
           )}
-          {/* Arc 57: ear phrase -- aural (shown when mouth inactive) */}
+          {/* Ear (aural, shown when mouth inactive) */}
           {earPhrase !== null && (
-            <ThemedText style={s.earText}>{earPhrase}</ThemedText>
+            <View style={s.earRow}>
+              <ThemedText style={s.earTextV1}>{earPhrase}</ThemedText>
+            </View>
           )}
         </>
       )}
 
-      {/* Arc 60: celestial phrase -- transitional temporal line */}
+      {/* Register 2: Celestial */}
       {celestialPhrase !== null && mouthPhrase === null && (
-        <ThemedText style={s.celestialText}>{celestialPhrase}</ThemedText>
+        <View style={s.celestialRow}>
+          <ThemedText style={s.celestialTextV1}>{celestialPhrase}</ThemedText>
+        </View>
       )}
 
-      {/* Arc 61: nose phrase -- barometric pressure line */}
+      {/* Register 3: Nose */}
       {nosePhrase !== null && mouthPhrase === null && celestialPhrase === null && (
-        <ThemedText style={s.noseText}>{nosePhrase}</ThemedText>
+        <View style={s.noseRow}>
+          <ThemedText style={s.noseTextV1}>{nosePhrase}</ThemedText>
+        </View>
       )}
 
-      {/* Arc 62: skin phrase -- tactile/comfort line */}
+      {/* Register 4: Skin */}
       {skinPhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && (
-        <ThemedText style={s.skinText}>{skinPhrase}</ThemedText>
+        <View style={s.skinRow}>
+          <ThemedText style={s.skinTextV1}>{skinPhrase}</ThemedText>
+        </View>
       )}
 
-      {/* Arc 63: foot phrase -- mobility line */}
+      {/* Register 5: Foot */}
       {footPhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && skinPhrase === null && (
-        <ThemedText style={s.footText}>{footPhrase}</ThemedText>
+        <View style={s.footRow}>
+          <ThemedText style={s.footTextV1}>{footPhrase}</ThemedText>
+        </View>
       )}
 
-      {/* Arc 64: pulse phrase -- synthetic load line */}
+      {/* Register 6: Pulse */}
       {pulsePhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && skinPhrase === null && footPhrase === null && (
-        <ThemedText style={s.pulseText}>{pulsePhrase}</ThemedText>
+        <View style={s.pulseRow}>
+          <ThemedText style={s.pulseTextV1}>{pulsePhrase}</ThemedText>
+        </View>
       )}
 
-      {/* Arc 65: moment phrase -- temporal identity line */}
+      {/* Register 7: Moment */}
       {momentPhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && skinPhrase === null && footPhrase === null && pulsePhrase === null && (
-        <ThemedText style={s.momentText}>{momentPhrase}</ThemedText>
+        <View style={s.momentRow}>
+          <ThemedText style={s.momentTextV1}>{momentPhrase}</ThemedText>
+        </View>
       )}
 
       {/* Arc 37: Field Structure -- chapter distribution */}
@@ -2910,86 +2938,154 @@ const s = StyleSheet.create({
     marginTop: 6,
     marginBottom: 2,
   },
-  atmosphereText: {
-    fontSize: 11,
-    color: 'rgba(122,184,184,0.38)',
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
-    letterSpacing: 0.15,
+  // Arc 66: V1.0 Register Row Styles
+  // Each row: tinted background (low opacity), 4px radius, 6px/4px padding
+  // Gap between rows: 8px (via marginTop on all but first)
+  // Text: Inter 14px, 16px line height, medium weight (500)
+
+  // Register 0: Mouth (tri-field, highest priority)
+  mouthRow: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
     marginTop: 4,
-    marginBottom: 2,
+    marginBottom: 8,
   },
-  mouthText: {
-    fontSize: 12,
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
+  mouthTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
     color: 'rgba(255,255,255,0.42)',
-    letterSpacing: 0.15,
-    marginTop: 4,
-    marginBottom: 2,
+    letterSpacing: 0.1,
   },
-  earText: {
-    fontSize: 11,
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
+
+  // Register 1: Sky (atmosphere, teal)
+  skyRow: {
+    backgroundColor: 'rgba(0,150,170,0.06)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  skyTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
+    color: 'rgba(0,150,170,0.38)',
+    letterSpacing: 0.1,
+  },
+
+  // Register 1b: Ear (aural, white) -- shown when mouth inactive
+  earRow: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  earTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
     color: 'rgba(255,255,255,0.34)',
-    letterSpacing: 0.15,
-    marginTop: 3,
-    marginBottom: 2,
+    letterSpacing: 0.1,
   },
-  celestialText: {
-    fontSize: 11,
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
+
+  // Register 2: Celestial (amber)
+  celestialRow: {
+    backgroundColor: 'rgba(180,160,120,0.06)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  celestialTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
     color: 'rgba(180,160,120,0.38)',
-    letterSpacing: 0.15,
-    marginTop: 3,
-    marginBottom: 2,
+    letterSpacing: 0.1,
   },
-  noseText: {
-    fontSize: 11,
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
+
+  // Register 3: Nose (gray)
+  noseRow: {
+    backgroundColor: 'rgba(140,140,140,0.05)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  noseTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
     color: 'rgba(140,140,140,0.32)',
-    letterSpacing: 0.15,
-    marginTop: 3,
-    marginBottom: 2,
+    letterSpacing: 0.1,
   },
-  skinText: {
-    fontSize: 11,
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
+
+  // Register 4: Skin (tan)
+  skinRow: {
+    backgroundColor: 'rgba(200,180,160,0.05)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  skinTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
     color: 'rgba(200,180,160,0.28)',
-    letterSpacing: 0.15,
-    marginTop: 3,
-    marginBottom: 2,
+    letterSpacing: 0.1,
   },
-  footText: {
-    fontSize: 11,
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
+
+  // Register 5: Foot (lavender)
+  footRow: {
+    backgroundColor: 'rgba(160,160,200,0.04)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  footTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
     color: 'rgba(160,160,200,0.26)',
-    letterSpacing: 0.15,
-    marginTop: 3,
-    marginBottom: 2,
+    letterSpacing: 0.1,
   },
-  pulseText: {
-    fontSize: 11,
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
+
+  // Register 6: Pulse (rose-violet)
+  pulseRow: {
+    backgroundColor: 'rgba(200,120,160,0.04)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  pulseTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
     color: 'rgba(200,120,160,0.24)',
-    letterSpacing: 0.15,
-    marginTop: 3,
-    marginBottom: 2,
+    letterSpacing: 0.1,
   },
-  momentText: {
-    fontSize: 11,
-    fontFamily: 'Georgia',
-    fontStyle: 'italic',
+
+  // Register 7: Moment (silver)
+  momentRow: {
+    backgroundColor: 'rgba(180,180,180,0.03)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  momentTextV1: {
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: '500',
     color: 'rgba(180,180,180,0.20)',
-    letterSpacing: 0.15,
-    marginTop: 3,
-    marginBottom: 2,
+    letterSpacing: 0.1,
   },
   structureText: {
     fontSize: 11,
