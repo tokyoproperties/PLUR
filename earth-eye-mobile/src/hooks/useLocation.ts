@@ -26,6 +26,10 @@ export interface UserLocation {
   latitude: number;
   longitude: number;
   accuracy: number | null;
+  /** Arc 63: GPS speed in m/s. Null when stationary or unavailable. */
+  speed: number | null;
+  /** Arc 63: GPS heading in degrees (0-360). Null when unavailable. */
+  heading: number | null;
   /** Timestamp (ms) this fix was received — used to detect staleness. */
   timestamp: number;
 }
@@ -74,6 +78,8 @@ export function useLocationInternal(): UseLocationResult {
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
           accuracy: pos.coords.accuracy ?? null,
+          speed: pos.coords.speed ?? null,
+          heading: pos.coords.heading ?? null,
           timestamp: Date.now(),
         };
         locationRef.current = fix;
@@ -81,12 +87,14 @@ export function useLocationInternal(): UseLocationResult {
 
         sub = await Location.watchPositionAsync(
           { accuracy: Location.Accuracy.Balanced, timeInterval: 10000, distanceInterval: 10 },
-          (pos: { coords: { latitude: number; longitude: number; accuracy?: number | null } }) => {
+          (pos: { coords: { latitude: number; longitude: number; accuracy?: number | null; speed?: number | null; heading?: number | null } }) => {
             if (cancelled) return;
             const nextFix: UserLocation = {
               latitude: pos.coords.latitude,
               longitude: pos.coords.longitude,
               accuracy: pos.coords.accuracy ?? null,
+              speed: pos.coords.speed ?? null,
+              heading: pos.coords.heading ?? null,
               timestamp: Date.now(),
             };
             locationRef.current = nextFix;

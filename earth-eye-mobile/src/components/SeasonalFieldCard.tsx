@@ -34,6 +34,7 @@ import { useFieldEar } from '@/hooks/useFieldEar';
 import { useFieldCelestial } from '@/hooks/useFieldCelestial';
 import { useFieldNose } from '@/hooks/useFieldNose';
 import { useFieldSkin } from '@/hooks/useFieldSkin';
+import { useFieldFoot } from '@/hooks/useFieldFoot';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -144,6 +145,9 @@ export function SeasonalFieldCard() {
 
   // Arc 62: skin -- derived tactile/comfort field (composition layer)
   const skin = useFieldSkin();
+
+  // Arc 63: foot -- derived mobility field (composition layer)
+  const foot = useFieldFoot();
 
   // Arc 32: delta -- compare current slow signals to previous render
 
@@ -2170,6 +2174,45 @@ export function SeasonalFieldCard() {
     return tail ? `${desc}${tail}.` : `${desc}.`;
   })();
 
+  // Arc 63: foot phrase -- mobility naturalist line
+  // A quiet movement clause that surfaces when the mobility state is
+  // meaningful and no higher-priority register is speaking.
+  // Quadruple suppression: mouth + celestial + nose + skin must all be null.
+  const footPhrase: string | null = (() => {
+    if (!foot.isActive || !foot.isCalibrated || narratorSilenced) return null;
+    if (foot.identity === 'unknown') return null;
+
+    // Only surface when drift is non-trivial OR identity is transitioning
+    // (not just "still" — stillness is the default state, not worth narrating)
+    if (foot.identity === 'still' && Math.abs(foot.drift) < 0.10) return null;
+
+    const IDENTITY_MOVE: Record<string, string> = {
+      still:    'the field holding still',
+      standing: 'a quiet presence, unmoving',
+      walking:  'steps settling into a rhythm',
+      running:  'steps quickening across the ground',
+      drifting: 'a slow drift across the field',
+    };
+    const desc = IDENTITY_MOVE[foot.identity];
+    if (!desc) return null;
+
+    // Foresight tail: only when drift is meaningful
+    if (Math.abs(foot.drift) < 0.08 && foot.foresight !== 'shifting') {
+      return `${desc}.`;
+    }
+
+    const FORE_TAIL: Record<string, string> = {
+      accelerating:  ', the pace rising',
+      slowing:       ', the pace easing',
+      settling:      ', settling',
+      shifting:      ', the path turning',
+      holding:       '',
+      unknown:       '',
+    };
+    const tail = FORE_TAIL[foot.foresight] ?? '';
+    return tail ? `${desc}${tail}.` : `${desc}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2534,6 +2577,11 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.skinText}>{skinPhrase}</ThemedText>
       )}
 
+      {/* Arc 63: foot phrase -- mobility line */}
+      {footPhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && skinPhrase === null && (
+        <ThemedText style={s.footText}>{footPhrase}</ThemedText>
+      )}
+
       {/* Arc 37: Field Structure -- chapter distribution */}
       {structurePhrase !== null && (
         <ThemedText style={s.structureText}>{structurePhrase}</ThemedText>
@@ -2806,6 +2854,15 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(200,180,160,0.28)',
+    letterSpacing: 0.15,
+    marginTop: 3,
+    marginBottom: 2,
+  },
+  footText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(160,160,200,0.26)',
     letterSpacing: 0.15,
     marginTop: 3,
     marginBottom: 2,

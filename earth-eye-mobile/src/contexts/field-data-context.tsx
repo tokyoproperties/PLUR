@@ -66,7 +66,7 @@ export function FieldDataProvider({ children }: { children: ReactNode }) {
   // 4. Memoize context values
   const sensorsValue = useMemo(
     () => sensors,
-    [sensors.light, sensors.motion, sensors.sound, sensors.barometer, sensors.snapshot],
+    [sensors.light, sensors.motion, sensors.sound, sensors.barometer, sensors.steps, sensors.snapshot],
   );
 
   const corridorsValue = useMemo(

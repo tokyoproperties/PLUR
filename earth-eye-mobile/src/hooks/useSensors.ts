@@ -23,6 +23,7 @@ import { useMotion, type MotionConfidence } from '@/sensors/useMotion';
 import type { MotionBand } from '@/utils/thresholds';
 import { useSound } from '@/sensors/useSound';
 import { useBarometer } from '@/sensors/useBarometer';
+import { useSteps } from '@/sensors/useSteps';
 
 export interface SensorSnapshot {
   lux: number | null;
@@ -43,6 +44,16 @@ export interface SensorSnapshot {
   pressure: number | null;
   /** Arc 61: whether the device has a barometer. */
   pressureAvailable: boolean;
+  /** Arc 63: cumulative step count, null if pedometer unavailable/permission denied. */
+  stepCount: number | null;
+  /** Arc 63: steps in the last 10s window. */
+  stepsInWindow: number;
+  /** Arc 63: derived walking state. */
+  isWalking: boolean;
+  /** Arc 63: estimated steps per minute. */
+  cadence: number;
+  /** Arc 63: whether the device has a pedometer with permission granted. */
+  stepsAvailable: boolean;
 }
 
 export interface UseSensorsResult {
@@ -50,6 +61,7 @@ export interface UseSensorsResult {
   motion: ReturnType<typeof useMotion>;
   sound: ReturnType<typeof useSound>;
   barometer: ReturnType<typeof useBarometer>;
+  steps: ReturnType<typeof useSteps>;
   snapshot: SensorSnapshot;
 }
 
@@ -59,6 +71,7 @@ export function useSensorsInternal(): UseSensorsResult {
   const motion = useMotion();
   const sound = useSound();
   const barometer = useBarometer();
+  const steps = useSteps();
 
   const snapshot = useMemo<SensorSnapshot>(
     () => ({
@@ -67,13 +80,18 @@ export function useSensorsInternal(): UseSensorsResult {
       motionBand: motion.band,
       pressure: barometer.pressure,
       pressureAvailable: barometer.isAvailable,
+      stepCount: steps.stepCount,
+      stepsInWindow: steps.stepsInWindow,
+      isWalking: steps.isWalking,
+      cadence: steps.cadence,
+      stepsAvailable: steps.isAvailable,
       motionConfidence: motion.confidence,
       soundRelativeDb: sound.relativeDb,
     }),
     [light.lux, motion.magnitude, motion.band, motion.confidence, sound.relativeDb]
   );
 
-  return { light, motion, sound, barometer, snapshot };
+  return { light, motion, sound, barometer, steps, snapshot };
 }
 
 // Consumer — reads from context
