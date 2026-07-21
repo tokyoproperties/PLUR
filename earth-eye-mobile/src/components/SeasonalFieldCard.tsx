@@ -33,6 +33,7 @@ import { useFieldSky } from '@/hooks/useFieldSky';
 import { useFieldEar } from '@/hooks/useFieldEar';
 import { useFieldCelestial } from '@/hooks/useFieldCelestial';
 import { useFieldNose } from '@/hooks/useFieldNose';
+import { useFieldSkin } from '@/hooks/useFieldSkin';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -140,6 +141,9 @@ export function SeasonalFieldCard() {
 
   // Arc 61: nose -- barometric pressure field
   const nose = useFieldNose();
+
+  // Arc 62: skin -- derived tactile/comfort field (composition layer)
+  const skin = useFieldSkin();
 
   // Arc 32: delta -- compare current slow signals to previous render
 
@@ -2126,6 +2130,46 @@ export function SeasonalFieldCard() {
     return `${desc}${oriTail}${foreTail}.`;
   })();
 
+  // Arc 62: skin phrase -- tactile/comfort naturalist line
+  // A quiet comfort clause that surfaces when the derived thermal state
+  // is meaningful and no higher-priority register is speaking.
+  // Triple suppression: mouth + celestial + nose must all be null.
+  const skinPhrase: string | null = (() => {
+    if (!skin.isActive || !skin.isCalibrated || narratorSilenced) return null;
+    if (skin.identity === 'unknown') return null;
+
+    // Only surface when orientation is non-stable (actual comfort shift)
+    if (skin.orientation === 'stable' || skin.orientation === 'unknown') return null;
+
+    const IDENTITY_TACTILE: Record<string, string> = {
+      cold:    'a cold edge to the air',
+      cool:    'cool air against the skin',
+      neutral: 'the air neutral against the skin',
+      warm:    'warmth settling on the skin',
+      hot:     'heat pressing on the skin',
+    };
+    const desc = IDENTITY_TACTILE[skin.identity];
+    if (!desc) return null;
+
+    const ORI_TAIL: Record<string, string> = {
+      warming:  ', warming',
+      cooling:  ', cooling',
+    };
+    const oriTail = ORI_TAIL[skin.orientation] ?? '';
+
+    const FORE_TAIL: Record<string, string> = {
+      warming:   ' gradually',
+      cooling:   ' gradually',
+      settling:  ' toward comfort',
+      holding:   '',
+      unknown:   '',
+    };
+    const foreTail = FORE_TAIL[skin.foresight] ?? '';
+
+    const tail = oriTail + foreTail;
+    return tail ? `${desc}${tail}.` : `${desc}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2485,6 +2529,11 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.noseText}>{nosePhrase}</ThemedText>
       )}
 
+      {/* Arc 62: skin phrase -- tactile/comfort line */}
+      {skinPhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && (
+        <ThemedText style={s.skinText}>{skinPhrase}</ThemedText>
+      )}
+
       {/* Arc 37: Field Structure -- chapter distribution */}
       {structurePhrase !== null && (
         <ThemedText style={s.structureText}>{structurePhrase}</ThemedText>
@@ -2748,6 +2797,15 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(140,140,140,0.32)',
+    letterSpacing: 0.15,
+    marginTop: 3,
+    marginBottom: 2,
+  },
+  skinText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(200,180,160,0.28)',
     letterSpacing: 0.15,
     marginTop: 3,
     marginBottom: 2,
