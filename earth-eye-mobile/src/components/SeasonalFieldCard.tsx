@@ -35,6 +35,7 @@ import { useFieldCelestial } from '@/hooks/useFieldCelestial';
 import { useFieldNose } from '@/hooks/useFieldNose';
 import { useFieldSkin } from '@/hooks/useFieldSkin';
 import { useFieldFoot } from '@/hooks/useFieldFoot';
+import { useFieldPulse } from '@/hooks/useFieldPulse';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -148,6 +149,9 @@ export function SeasonalFieldCard() {
 
   // Arc 63: foot -- derived mobility field (composition layer)
   const foot = useFieldFoot();
+
+  // Arc 64: pulse -- synthetic physiological load field (composition layer)
+  const pulse = useFieldPulse();
 
   // Arc 32: delta -- compare current slow signals to previous render
 
@@ -2213,6 +2217,44 @@ export function SeasonalFieldCard() {
     return tail ? `${desc}${tail}.` : `${desc}.`;
   })();
 
+  // Arc 64: pulse phrase -- synthetic load naturalist line
+  // A quiet load clause that surfaces when the aggregate field load is
+  // meaningful and no other register is speaking.
+  // Quintuple suppression: mouth + celestial + nose + skin + foot all null.
+  const pulsePhrase: string | null = (() => {
+    if (!pulse.isActive || !pulse.isCalibrated || narratorSilenced) return null;
+    if (pulse.identity === 'unknown') return null;
+
+    // Only surface when load is non-trivial AND changing
+    // Calm with no drift = the default state, not worth narrating
+    if (pulse.identity === 'calm' && Math.abs(pulse.drift) < 0.10) return null;
+
+    const IDENTITY_PULSE: Record<string, string> = {
+      calm:     'a quiet pulse beneath the field',
+      rising:   'a rising pulse in the field',
+      elevated: 'an elevated pulse across the corridor',
+      spiking:  'a sharp pulse through the field',
+    };
+    const desc = IDENTITY_PULSE[pulse.identity];
+    if (!desc) return null;
+
+    // Only add foresight tail when drift is meaningful
+    if (Math.abs(pulse.drift) < 0.08) {
+      return `${desc}.`;
+    }
+
+    const FORE_TAIL: Record<string, string> = {
+      rising:    ', still rising',
+      spiking:   ', still climbing',
+      settling:  ', settling',
+      softening: ', softening',
+      holding:   '',
+      unknown:   '',
+    };
+    const tail = FORE_TAIL[pulse.foresight] ?? '';
+    return tail ? `${desc}${tail}.` : `${desc}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2582,6 +2624,11 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.footText}>{footPhrase}</ThemedText>
       )}
 
+      {/* Arc 64: pulse phrase -- synthetic load line */}
+      {pulsePhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && skinPhrase === null && footPhrase === null && (
+        <ThemedText style={s.pulseText}>{pulsePhrase}</ThemedText>
+      )}
+
       {/* Arc 37: Field Structure -- chapter distribution */}
       {structurePhrase !== null && (
         <ThemedText style={s.structureText}>{structurePhrase}</ThemedText>
@@ -2863,6 +2910,15 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(160,160,200,0.26)',
+    letterSpacing: 0.15,
+    marginTop: 3,
+    marginBottom: 2,
+  },
+  pulseText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(200,120,160,0.24)',
     letterSpacing: 0.15,
     marginTop: 3,
     marginBottom: 2,
