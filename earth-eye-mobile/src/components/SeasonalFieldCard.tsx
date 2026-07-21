@@ -36,6 +36,7 @@ import { useFieldNose } from '@/hooks/useFieldNose';
 import { useFieldSkin } from '@/hooks/useFieldSkin';
 import { useFieldFoot } from '@/hooks/useFieldFoot';
 import { useFieldPulse } from '@/hooks/useFieldPulse';
+import { useFieldMoment } from '@/hooks/useFieldMoment';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -152,6 +153,9 @@ export function SeasonalFieldCard() {
 
   // Arc 64: pulse -- synthetic physiological load field (composition layer)
   const pulse = useFieldPulse();
+
+  // Arc 65: moment -- temporal identity from cross-field thread memory
+  const moment = useFieldMoment();
 
   // Arc 32: delta -- compare current slow signals to previous render
 
@@ -2255,6 +2259,30 @@ export function SeasonalFieldCard() {
     return tail ? `${desc}${tail}.` : `${desc}.`;
   })();
 
+  // Arc 65: moment phrase -- temporal identity naturalist line
+  // The deepest register. Names the environment's temporal state from
+  // the smoothed cross-field thread memory.
+  // Sextuple suppression: all six higher registers must be null.
+  const momentPhrase: string | null = (() => {
+    if (!moment.isActive || !moment.isCalibrated || narratorSilenced) return null;
+    if (moment.identity === 'unknown' || moment.identity === 'quiet' || moment.identity === 'stable') return null;
+    // Only narrate transitional identities -- not the default states.
+    // 'quiet' and 'stable' are the environmental baseline, not worth narrating.
+
+    const IDENTITY_MOMENT: Record<string, string> = {
+      brightening: 'the horizon brightening',
+      dimming:     'the light dimming',
+      settling:    'the day settling',
+      softening:   'the field softening',
+      rising:      'the field rising',
+      turning:     'the path turning',
+    };
+    const desc = IDENTITY_MOMENT[moment.identity];
+    if (!desc) return null;
+
+    return `${desc}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2447,12 +2475,38 @@ export function SeasonalFieldCard() {
   // Arc 57: ear continuity also enters the thread as an aural stability signal
   const earContinuityProxy = ear.isCalibrated ? ear.continuity : 0.50;
   const skyDriftProxy  = sky.isActive && sky.isCalibrated ? sky.drift : 0;
+  // Arc 65: pass cross-field drift + continuity to thread for moment identity
+  const noseDriftProxy    = nose.isActive && nose.isCalibrated ? nose.drift : 0;
+  const skinDriftProxy     = skin.isActive ? (skin.thermalLoad - 0.52) * 2 : 0;  // thermal displacement as drift
+  const footDriftProxy    = foot.isActive && foot.isCalibrated ? foot.drift : 0;
+  const pulseDriftProxy   = pulse.isActive && pulse.isCalibrated ? pulse.drift : 0;
+  const skyContProxy      = sky.isActive ? sky.continuity : 0.50;
+  const noseContProxy     = nose.isActive ? nose.continuity : 0.50;
+  const skinContProxy     = skin.isActive ? skin.continuity : 0.50;
+  const footContProxy     = foot.isActive ? foot.continuity : 0.50;
+  const pulseContProxy    = pulse.isActive ? pulse.continuity : 0.50;
+
   threadRef.current = _advanceThread(
     threadRef.current,
     smoothedClarity,          // smoothed reflectionClarity
     COMPRESS_THRESHOLD,       // final threshold (echo + thread blended)
     (skyToneContinuity + earContinuityProxy) * 0.50,  // blended vertical+aural
     skyDriftProxy,            // Arc 58: sky slope for cross-screen drift memory
+    // Arc 65: cross-field drift memory
+    {
+      nose:  noseDriftProxy,
+      skin:  skinDriftProxy,
+      foot:  footDriftProxy,
+      pulse: pulseDriftProxy,
+    },
+    // Arc 65: cross-field continuity memory
+    {
+      sky:   skyContProxy,
+      nose:  noseContProxy,
+      skin:  skinContProxy,
+      foot:  footContProxy,
+      pulse: pulseContProxy,
+    },
   );
 
   // Arc 53: consume FirstRenderMode after all narrator state is committed.
@@ -2627,6 +2681,11 @@ export function SeasonalFieldCard() {
       {/* Arc 64: pulse phrase -- synthetic load line */}
       {pulsePhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && skinPhrase === null && footPhrase === null && (
         <ThemedText style={s.pulseText}>{pulsePhrase}</ThemedText>
+      )}
+
+      {/* Arc 65: moment phrase -- temporal identity line */}
+      {momentPhrase !== null && mouthPhrase === null && celestialPhrase === null && nosePhrase === null && skinPhrase === null && footPhrase === null && pulsePhrase === null && (
+        <ThemedText style={s.momentText}>{momentPhrase}</ThemedText>
       )}
 
       {/* Arc 37: Field Structure -- chapter distribution */}
@@ -2919,6 +2978,15 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(200,120,160,0.24)',
+    letterSpacing: 0.15,
+    marginTop: 3,
+    marginBottom: 2,
+  },
+  momentText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(180,180,180,0.20)',
     letterSpacing: 0.15,
     marginTop: 3,
     marginBottom: 2,
