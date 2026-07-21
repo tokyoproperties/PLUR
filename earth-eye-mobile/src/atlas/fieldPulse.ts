@@ -87,6 +87,12 @@ function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v));
 }
 
+// Arc 68: sensor value safety -- clamps load to 0-1, guards NaN
+function safeClamp01(v: number): number {
+  if (isNaN(v)) return 0;
+  return Math.max(0, Math.min(1, v));
+}
+
 function mean(arr: number[]): number {
   if (!arr.length) return 0;
   return arr.reduce((s, v) => s + v, 0) / arr.length;
@@ -201,7 +207,7 @@ export function computePulseState(
 
   if (!isActive) return neutral;
 
-  const load       = computePulseLoad(inputs);
+  const load       = safeClamp01(computePulseLoad(inputs));  // Arc 68: clamp 0-1, guard NaN
   const identity   = computePulseIdentity(load);
   const continuity = computePulseContinuity(pulseRing);
   const drift      = computePulseDrift(pulseRing);

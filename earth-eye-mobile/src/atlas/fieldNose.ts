@@ -56,7 +56,13 @@ export interface NoseState {
 
 export const MIN_NOSE_SAMPLES = 8;
 
-// -- Helpers ------------------------------------------------------------------
+// -- Helpers
+
+// Arc 68: sensor value safety -- clamps pressure, guards NaN
+function safePressure(v: number | null | undefined): number {
+  if (v === null || v === undefined || isNaN(v)) return 0;
+  return Math.max(0, v);
+} ------------------------------------------------------------------
 
 function mean(arr: number[]): number {
   if (!arr.length) return 0;

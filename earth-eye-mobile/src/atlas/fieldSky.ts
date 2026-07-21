@@ -58,7 +58,13 @@ export interface SkyState {
 // Minimum lux samples before sky layers are meaningful
 export const MIN_SKY_SAMPLES = 12;
 
-// ------ Internal helpers ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ------ Internal helpers
+
+// Arc 68: sensor value safety -- clamps to non-negative, guards NaN
+function safeLux(v: number | null | undefined): number {
+  if (v === null || v === undefined || isNaN(v)) return 0;
+  return Math.max(0, v);
+} ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function mean(arr: number[]): number {
   if (!arr.length) return 0;

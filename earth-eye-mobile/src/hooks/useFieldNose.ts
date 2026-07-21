@@ -50,7 +50,7 @@ export function useFieldNose(): NoseState {
     if (now - lastSampleRef.current >= PRESSURE_SAMPLE_INTERVAL_MS || lastSampleRef.current === 0) {
       lastSampleRef.current = now;
       const ring = pressureRingRef.current;
-      ring.push(pressureNow);
+      ring.push(Math.max(0, isNaN(pressureNow) ? 0 : pressureNow));  // Arc 68: clamp non-negative, guard NaN
       if (ring.length > PRESSURE_RING_SIZE) ring.shift();
     }
 

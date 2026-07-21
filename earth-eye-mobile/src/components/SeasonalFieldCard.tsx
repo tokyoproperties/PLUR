@@ -2191,10 +2191,11 @@ export function SeasonalFieldCard() {
     if (!foot.isActive || !foot.isCalibrated || narratorSilenced) return null;
     if (foot.identity === 'unknown') return null;
     // Arc 66: continuity collapse -- low-quality readings don't display
-    if (foot.continuity < 0.15) return null;
+    // Arc 68: NaN-safe collapse -- !(val >= threshold) catches NaN, null, and low values
+    if (!(foot.continuity >= 0.15)) return null;
 
     // Only surface when drift is non-trivial OR identity is transitioning
-    // (not just "still" — stillness is the default state, not worth narrating)
+    // (not just "still" -- stillness is the default state, not worth narrating)
     if (foot.identity === 'still' && Math.abs(foot.drift) < 0.10) return null;
 
     const IDENTITY_MOVE: Record<string, string> = {
@@ -2232,7 +2233,7 @@ export function SeasonalFieldCard() {
     if (!pulse.isActive || !pulse.isCalibrated || narratorSilenced) return null;
     if (pulse.identity === 'unknown') return null;
     // Arc 66: continuity collapse -- low-quality readings don't display
-    if (pulse.continuity < 0.15) return null;
+    if (!(pulse.continuity >= 0.15)) return null;
 
     // Only surface when load is non-trivial AND changing
     // Calm with no drift = the default state, not worth narrating
@@ -2272,7 +2273,7 @@ export function SeasonalFieldCard() {
     if (!moment.isActive || !moment.isCalibrated || narratorSilenced) return null;
     if (moment.identity === 'unknown' || moment.identity === 'quiet' || moment.identity === 'stable') return null;
     // Arc 66: continuity collapse -- low thread stability doesn't display
-    if (threadRef.current.threadPulseContinuity < 0.15) return null;
+    if (!(threadRef.current.threadPulseContinuity >= 0.15)) return null;
     // Only narrate transitional identities -- not the default states.
     // 'quiet' and 'stable' are the environmental baseline, not worth narrating.
 
@@ -2297,6 +2298,10 @@ export function SeasonalFieldCard() {
     if (narratorSilenced || isFirstRender) return null;
     // Mouth overrides the narrator line entirely
     if (mouthPhrase !== null) return null;
+    // Arc 68: sensor dropout guard -- need at least sky or pulse active
+    if (!sky?.isActive && !pulse?.isActive && !foot?.isActive) return null;
+    // Arc 68: harmony guard -- don't narrate with unreadable harmony
+    if (!harmony?.isReadable) return null;
 
     const line = composeNarratorLine({
       sky:       sky,
@@ -2305,7 +2310,7 @@ export function SeasonalFieldCard() {
       skin:      skin,
       foot:      foot,
       pulse:     pulse,
-      moment:    moment.identity,
+      moment:    moment?.identity ?? 'unknown',
       harmony:   harmony.agreement,
       moments:   allMoments.length,
     });

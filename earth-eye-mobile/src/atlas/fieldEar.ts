@@ -108,8 +108,8 @@ export function computeEarTone(ring: FieldMoment[]): EarTone {
   // Use the recent half of the ring for tone (current character, not deep history)
   const recent = ring.slice(-Math.ceil(ring.length / 2));
   const dominantTone = mostCommon(recent.map((m) => m.corridorTone));
-  const avgIntensity = recent.reduce((a, m) => a + m.intensity, 0) / recent.length;
-  const avgSpecies   = recent.reduce((a, m) => a + m.invitedCount, 0) / recent.length;
+  const avgIntensity = recent.length > 0 ? recent.reduce((a, m) => a + m.intensity, 0) / recent.length : 0;  // Arc 68: NaN guard
+  const avgSpecies   = recent.length > 0 ? recent.reduce((a, m) => a + m.invitedCount, 0) / recent.length : 0;  // Arc 68: NaN guard
 
   if (dominantTone === 'still') return 'still';
   if (dominantTone === 'mixed') return 'mixed';
@@ -150,14 +150,14 @@ export function computeEarSignature(ring: FieldMoment[]): string | null {
 
   const tones  = ring.map((m) => m.corridorTone);
   const dom    = mostCommon(tones);
-  const domPct = tones.filter((t) => t === dom).length / tones.length;
+  const domPct = tones.length > 0 ? tones.filter((t) => t === dom).length / tones.length : 0;  // Arc 68: NaN guard
 
   // Transition count -- how often tone changes between consecutive moments
   let transitions = 0;
   for (let i = 1; i < tones.length; i++) if (tones[i] !== tones[i - 1]) transitions++;
   const transRate = transitions / Math.max(1, tones.length - 1);
 
-  const avgSpecies = ring.reduce((a, m) => a + m.invitedCount, 0) / ring.length;
+  const avgSpecies = ring.length > 0 ? ring.reduce((a, m) => a + m.invitedCount, 0) / ring.length : 0;  // Arc 68: NaN guard
 
   // Steady pattern: dominant tone > 70% and low transitions
   if (domPct >= 0.70 && transRate < 0.25) {
@@ -193,7 +193,7 @@ export function computeEarContinuity(ring: FieldMoment[]): number {
 
   const tones = ring.map((m) => m.corridorTone);
   const dom = mostCommon(tones);
-  const toneStability = tones.filter((t) => t === dom).length / tones.length;
+  const toneStability = tones.length > 0 ? tones.filter((t) => t === dom).length / tones.length : 0;  // Arc 68: NaN guard
 
   const intensities = ring.map((m) => m.intensity);
   const intensityVar = variance(intensities);

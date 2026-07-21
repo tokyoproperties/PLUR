@@ -58,7 +58,7 @@ export function useFieldSky(): SkyState {
     if (now - lastSampleRef.current >= LUX_SAMPLE_INTERVAL_MS || lastSampleRef.current === 0) {
       lastSampleRef.current = now;
       const ring = luxRingRef.current;
-      ring.push(luxNow);
+      ring.push(Math.max(0, isNaN(luxNow) ? 0 : luxNow));  // Arc 68: clamp non-negative, guard NaN
       if (ring.length > LUX_RING_SIZE) ring.shift();
     }
 

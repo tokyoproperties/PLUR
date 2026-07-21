@@ -70,12 +70,9 @@ export function computeDriftMagnitude(
   foot:  FootState,
   pulse: PulseState,
 ): number {
-  return Math.max(
-    Math.abs(sky.drift || 0),
-    Math.abs(nose.drift || 0),
-    Math.abs(foot.drift || 0),
-    Math.abs(pulse.drift || 0),
-  );
+  // Arc 68: NaN-safe -- || 0 catches null/undefined, isNaN check catches NaN
+  const safe = (v: number) => { const n = v || 0; return isNaN(n) ? 0 : Math.abs(n); };
+  return Math.max(safe(sky.drift), safe(nose.drift), safe(foot.drift), safe(pulse.drift));
 }
 
 // -- Foresight magnitude ------------------------------------------------------
@@ -87,6 +84,7 @@ export function computeForesightMagnitude(
 ): number {
   const cActive = celestial.foresight !== 'stable' && celestial.foresight !== 'unknown';
   const pActive = pulse.foresight !== 'holding' && pulse.foresight !== 'unknown';
+  // Arc 68: safe boolean checks (foresight strings are never NaN, but guard for null)
   if (cActive && pActive) return 0.10;
   if (cActive || pActive) return 0.06;
   return 0;
@@ -244,13 +242,23 @@ export function composeNarratorLine(inputs: NarratorInputs): NarratorLine {
   if (!essence) return empty;
 
   // Compose with cadence: [essence], [drift], [foresight].
+  // Arc 68: tautology guard -- skip drift if it appears in essence
   const parts: string[] = [essence];
-  if (drift)     parts.push(drift);
-  if (foresight) parts.push(foresight);
+  if (drift && !essence.toLowerCase().includes(drift.toLowerCase())) {
+    parts.push(drift);
+  }
+  // Arc 68: empty clause guard -- skip foresight if null or empty string
+  if (foresight && foresight.trim().length > 0) {
+    parts.push(foresight);
+  }
 
-  const phrase = parts.length === 1
-    ? `${essence}.`
-    : `${parts.join(', ')}.`;
+  // Arc 68: if only essence remains after guards, it's single-clause
+  if (parts.length === 1) {
+    return { phrase: `${essence}.`, mode: 'single-clause',
+             hasEssence: true, hasDrift: false, hasForesight: false };
+  }
+
+  const phrase = `${parts.join(', ')}.`;
 
   return {
     phrase,
