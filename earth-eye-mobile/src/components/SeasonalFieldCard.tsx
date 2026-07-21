@@ -32,6 +32,7 @@ import { useNarrator } from '@/contexts/narrator-context';
 import { useFieldSky } from '@/hooks/useFieldSky';
 import { useFieldEar } from '@/hooks/useFieldEar';
 import { useFieldCelestial } from '@/hooks/useFieldCelestial';
+import { useFieldNose } from '@/hooks/useFieldNose';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -136,6 +137,9 @@ export function SeasonalFieldCard() {
 
   // Arc 60: celestial -- time-of-day vertical intelligence
   const celestial = useFieldCelestial();
+
+  // Arc 61: nose -- barometric pressure field
+  const nose = useFieldNose();
 
   // Arc 32: delta -- compare current slow signals to previous render
 
@@ -2085,6 +2089,43 @@ export function SeasonalFieldCard() {
     return desc;
   })();
 
+  // Arc 61: nose phrase -- barometric pressure naturalist line
+  // A quiet air-quality clause that surfaces when pressure is active
+  // and calibrated, and the narrator isn't already speaking via mouthPhrase.
+  // Suppressed when mouthPhrase or celestialPhrase is active to avoid stacking.
+  const nosePhrase: string | null = (() => {
+    if (!nose.isActive || !nose.isCalibrated || narratorSilenced) return null;
+    if (nose.identity === 'unknown') return null;
+
+    // Only surface when orientation is non-stable (actual pressure trend)
+    if (nose.orientation === 'stable' || nose.orientation === 'unknown') return null;
+
+    const IDENTITY_DESC: Record<string, string> = {
+      low:    'low pressure air',
+      normal: 'the air holding steady',
+      high:   'high pressure air',
+    };
+    const desc = IDENTITY_DESC[nose.identity];
+    if (!desc) return null;
+
+    const ORI_TAIL: Record<string, string> = {
+      rising:  ' and rising',
+      falling: ' and falling',
+    };
+    const oriTail = ORI_TAIL[nose.orientation] ?? '';
+
+    const FORE_TAIL: Record<string, string> = {
+      clearing:    ', clearing ahead',
+      settling:     ', settling',
+      unsettling:   ', unsettling',
+      holding:      '',
+      unknown:      '',
+    };
+    const foreTail = FORE_TAIL[nose.foresight] ?? '';
+
+    return `${desc}${oriTail}${foreTail}.`;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2439,6 +2480,11 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.celestialText}>{celestialPhrase}</ThemedText>
       )}
 
+      {/* Arc 61: nose phrase -- barometric pressure line */}
+      {nosePhrase !== null && mouthPhrase === null && celestialPhrase === null && (
+        <ThemedText style={s.noseText}>{nosePhrase}</ThemedText>
+      )}
+
       {/* Arc 37: Field Structure -- chapter distribution */}
       {structurePhrase !== null && (
         <ThemedText style={s.structureText}>{structurePhrase}</ThemedText>
@@ -2693,6 +2739,15 @@ const s = StyleSheet.create({
     fontFamily: 'Georgia',
     fontStyle: 'italic',
     color: 'rgba(180,160,120,0.38)',
+    letterSpacing: 0.15,
+    marginTop: 3,
+    marginBottom: 2,
+  },
+  noseText: {
+    fontSize: 11,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(140,140,140,0.32)',
     letterSpacing: 0.15,
     marginTop: 3,
     marginBottom: 2,

@@ -22,6 +22,7 @@ import { useAmbientLight } from '@/sensors/useAmbientLight';
 import { useMotion, type MotionConfidence } from '@/sensors/useMotion';
 import type { MotionBand } from '@/utils/thresholds';
 import { useSound } from '@/sensors/useSound';
+import { useBarometer } from '@/sensors/useBarometer';
 
 export interface SensorSnapshot {
   lux: number | null;
@@ -38,12 +39,17 @@ export interface SensorSnapshot {
   /** How reliable the current motion band is right now (see useMotion.ts). */
   motionConfidence: MotionConfidence;
   soundRelativeDb: number | null;
+  /** Arc 61: barometric pressure in hPa, null if barometer unavailable. */
+  pressure: number | null;
+  /** Arc 61: whether the device has a barometer. */
+  pressureAvailable: boolean;
 }
 
 export interface UseSensorsResult {
   light: ReturnType<typeof useAmbientLight>;
   motion: ReturnType<typeof useMotion>;
   sound: ReturnType<typeof useSound>;
+  barometer: ReturnType<typeof useBarometer>;
   snapshot: SensorSnapshot;
 }
 
@@ -52,19 +58,22 @@ export function useSensorsInternal(): UseSensorsResult {
   const light = useAmbientLight();
   const motion = useMotion();
   const sound = useSound();
+  const barometer = useBarometer();
 
   const snapshot = useMemo<SensorSnapshot>(
     () => ({
       lux: light.lux,
       motionMagnitude: motion.magnitude,
       motionBand: motion.band,
+      pressure: barometer.pressure,
+      pressureAvailable: barometer.isAvailable,
       motionConfidence: motion.confidence,
       soundRelativeDb: sound.relativeDb,
     }),
     [light.lux, motion.magnitude, motion.band, motion.confidence, sound.relativeDb]
   );
 
-  return { light, motion, sound, snapshot };
+  return { light, motion, sound, barometer, snapshot };
 }
 
 // Consumer — reads from context
