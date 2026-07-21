@@ -37,6 +37,7 @@ import { useFieldSkin } from '@/hooks/useFieldSkin';
 import { useFieldFoot } from '@/hooks/useFieldFoot';
 import { useFieldPulse } from '@/hooks/useFieldPulse';
 import { useFieldMoment } from '@/hooks/useFieldMoment';
+import { composeNarratorLine } from '@/atlas/fieldNarrator';
 import { useAtlas } from '@/atlas/useAtlas';
 
 const QUALITY_ACCENT: Record<string, string> = {
@@ -2289,6 +2290,29 @@ export function SeasonalFieldCard() {
     return `${desc}.`;
   })();
 
+  // Arc 67: V1.0 Narrator -- unified synthesis line
+  // Composes all eight registers into a single naturalist sentence.
+  // Sits above the register stack. Suppressed when mouthPhrase is active.
+  const narratorLine = (() => {
+    if (narratorSilenced || isFirstRender) return null;
+    // Mouth overrides the narrator line entirely
+    if (mouthPhrase !== null) return null;
+
+    const line = composeNarratorLine({
+      sky:       sky,
+      celestial: celestial,
+      nose:      nose,
+      skin:      skin,
+      foot:      foot,
+      pulse:     pulse,
+      moment:    moment.identity,
+      harmony:   harmony.agreement,
+      moments:   allMoments.length,
+    });
+
+    return line.phrase;
+  })();
+
   // Arc 36: field invitation -- one quiet "next moment" line
   const invitationPhrase: string | null = (() => {
     const invitationActive =
@@ -2648,6 +2672,13 @@ export function SeasonalFieldCard() {
         <ThemedText style={s.deltaText}>{deltaPhrase}</ThemedText>
       )}
 
+      {/* Arc 67: V1.0 Narrator -- unified synthesis line (top of card) */}
+      {narratorLine !== null && (
+        <View style={s.narratorRow}>
+          <ThemedText style={s.narratorTextV1}>{narratorLine}</ThemedText>
+        </View>
+      )}
+
       {/* Arc 66: V1.0 Vertical Grammar -- eight-register stack */}
       {/* Each register: tinted View row, 4px radius, 6px/4px padding, 8px gap */}
       {/* Suppression ladder: mouth > celestial > nose > skin > foot > pulse > moment */}
@@ -2938,6 +2969,24 @@ const s = StyleSheet.create({
     marginTop: 6,
     marginBottom: 2,
   },
+  // Arc 67: V1.0 Narrator -- unified synthesis line
+  // Sits above all registers. Inter 15px medium, white at 0.42 opacity.
+  narratorRow: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  narratorTextV1: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.42)',
+    letterSpacing: 0.08,
+  },
+
   // Arc 66: V1.0 Register Row Styles
   // Each row: tinted background (low opacity), 4px radius, 6px/4px padding
   // Gap between rows: 8px (via marginTop on all but first)
