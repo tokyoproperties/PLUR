@@ -10,6 +10,24 @@ import {
   PAGE_PX, NAV_H, getSeason, SEASON_LABEL, isSpeciesActiveNow,
 } from "@/theme";
 
+function joinField(val, sep = ", ") {
+  if (Array.isArray(val)) {
+    return val
+      .filter(Boolean)
+      .map((v) => String(v).trim())
+      .join(sep);
+  }
+  return val;
+}
+
+function isLongForm(val) {
+  return Array.isArray(val) && val.some((v) => String(v).length > 90);
+}
+
+function titleCase(str) {
+  return String(str).replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function Section({ label, children }) {
   return (
     <div style={{ marginBottom: "28px" }}>
@@ -177,7 +195,9 @@ export default function SpeciesDetail() {
         {s.seasonPresence && (
           <Section label="When to find">
             <p style={{ ...bodyStyle, marginTop: 0, marginBottom: 0 }}>
-              {s.seasonPresence}
+              {Array.isArray(s.seasonPresence)
+                ? s.seasonPresence.map(titleCase).join(", ")
+                : titleCase(s.seasonPresence)}
               {s.frequency ? " · " + s.frequency : ""}
             </p>
           </Section>
@@ -185,13 +205,25 @@ export default function SpeciesDetail() {
 
         {s.ecologicalRole && (
           <Section label="Ecological role">
-            <p style={{ ...narrativeStyle, marginTop: 0, marginBottom: 0 }}>{s.ecologicalRole}</p>
+            {isLongForm(s.ecologicalRole) ? (
+              s.ecologicalRole.filter(Boolean).map((role, i) => (
+                <p key={i} style={{ ...narrativeStyle, marginTop: 0, marginBottom: "12px" }}>
+                  {role}
+                </p>
+              ))
+            ) : (
+              <p style={{ ...narrativeStyle, marginTop: 0, marginBottom: 0 }}>
+                {joinField(s.ecologicalRole, " · ")}
+              </p>
+            )}
           </Section>
         )}
 
         {s.lookalikes && (
           <Section label="Lookalikes">
-            <p style={{ ...narrativeStyle, marginTop: 0, marginBottom: 0 }}>{s.lookalikes}</p>
+            <p style={{ ...narrativeStyle, marginTop: 0, marginBottom: 0 }}>
+              {joinField(s.lookalikes, "; ")}
+            </p>
           </Section>
         )}
 
