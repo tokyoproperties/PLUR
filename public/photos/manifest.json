@@ -1,0 +1,1109 @@
+{
+  "archived": [
+    {
+      "species_id": "69ee7488cfd96dfcfa88038c",
+      "species_name": "Cushion Moss",
+      "scientific_name": "Grimmia pulvinata",
+      "filename": "69ee7488cfd96dfcfa88038c_cushion_moss.jpg",
+      "sha256": "fd3de24d831ab355",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ee7488cfd96dfcfa88038b",
+      "species_name": "Soil Crust Lichen",
+      "scientific_name": "Diploschistes scruposus",
+      "filename": "69ee7488cfd96dfcfa88038b_soil_crust_lichen.jpg",
+      "sha256": "224eee4465814816",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ee7488cfd96dfcfa88038e",
+      "species_name": "Tumble Mustard",
+      "scientific_name": "Sisymbrium altissimum",
+      "filename": "69ee7488cfd96dfcfa88038e_tumble_mustard.jpg",
+      "sha256": "edd59f8b917bffbf",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ee7488cfd96dfcfa88038d",
+      "species_name": "White Forget-Me-Not",
+      "scientific_name": "Cryptantha sp.",
+      "filename": "69ee7488cfd96dfcfa88038d_white_forget_me_not.jpg",
+      "sha256": "9fd9a6a0779c4673",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ed3fa2b3a5b5b00475678f",
+      "species_name": "Green Bottle Fly",
+      "scientific_name": "Lucilia sericata",
+      "filename": "69ed3fa2b3a5b5b00475678f_green_bottle_fly.jpg",
+      "sha256": "fcb4d3a79e719147",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ed3fa2b3a5b5b004756790",
+      "species_name": "Garden Snail",
+      "scientific_name": "Cornu aspersum",
+      "filename": "69ed3fa2b3a5b5b004756790_garden_snail.jpg",
+      "sha256": "01c750bc481890b5",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ed3fa2b3a5b5b004756791",
+      "species_name": "Millipede",
+      "scientific_name": "Narceus gordanus",
+      "filename": "69ed3fa2b3a5b5b004756791_millipede.jpg",
+      "sha256": "0f299c0d17de4d2d",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ed3fa2b3a5b5b004756792",
+      "species_name": "Decollate Snail",
+      "scientific_name": "Rumina decollata",
+      "filename": "69ed3fa2b3a5b5b004756792_decollate_snail.jpg",
+      "sha256": "6e2d9888cc59048b",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ed3fa2b3a5b5b004756793",
+      "species_name": "Cutworm",
+      "scientific_name": "Agrotis ipsilon",
+      "filename": "69ed3fa2b3a5b5b004756793_cutworm.jpg",
+      "sha256": "418f2f65ddb4a8a8",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ed03cd82af21217b8bf9c4",
+      "species_name": "Brown Pelican",
+      "scientific_name": "Pelecanus occidentalis",
+      "filename": "69ed03cd82af21217b8bf9c4_brown_pelican.jpg",
+      "sha256": "80101bbf0f012e77",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ecf727fc9b3080d84d5a0b",
+      "species_name": "Western Yellow-legged Centipede",
+      "scientific_name": "Scolopocryptops gracilis",
+      "filename": "69ecf727fc9b3080d84d5a0b_western_yellow_legged_centipede.jpg",
+      "sha256": "e1efcc31d8d2daf5",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ecf727fc9b3080d84d5a0a",
+      "species_name": "Desert Chicory",
+      "scientific_name": "Rafinesquia neomexicana",
+      "filename": "69ecf727fc9b3080d84d5a0a_desert_chicory.jpg",
+      "sha256": "3f8b28795d4baa78",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec6f7ca13b1bf282b87302",
+      "species_name": "Eastern Fox Squirrel",
+      "scientific_name": "Sciurus niger",
+      "filename": "69ec6f7ca13b1bf282b87302_eastern_fox_squirrel.jpg",
+      "sha256": "cd3ad6e60a6e199b",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec6f7aa13b1bf282b87301",
+      "species_name": "Pallid-winged Grasshopper",
+      "scientific_name": "Trimerotropis pallidipennis",
+      "filename": "69ec6f7aa13b1bf282b87301_pallid_winged_grasshopper.jpg",
+      "sha256": "45628ee5e039073a",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec6f7aa13b1bf282b87300",
+      "species_name": "Cattail",
+      "scientific_name": "Typha latifolia",
+      "filename": "69ec6f7aa13b1bf282b87300_cattail.jpg",
+      "sha256": "b376315432621fd5",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec630a5f5e0fd68d817275",
+      "species_name": "Mexican Fan Palm",
+      "scientific_name": "Washingtonia robusta",
+      "filename": "69ec630a5f5e0fd68d817275_mexican_fan_palm.jpg",
+      "sha256": "7d56b760d57b2278",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec630a5f5e0fd68d817274",
+      "species_name": "Jacaranda",
+      "scientific_name": "Jacaranda mimosifolia",
+      "filename": "69ec630a5f5e0fd68d817274_jacaranda.jpg",
+      "sha256": "a781c3df9fdfcb92",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec616968cc65020875839d",
+      "species_name": "Great Egret",
+      "scientific_name": "Ardea alba",
+      "filename": "69ec616968cc65020875839d_great_egret.jpg",
+      "sha256": "b72758db237b1f44",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec616868cc65020875839c",
+      "species_name": "Wire Lettuce",
+      "scientific_name": "Stephanomeria pauciflora",
+      "filename": "69ec616868cc65020875839c_wire_lettuce.jpg",
+      "sha256": "e9589394655cfc9e",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec5f2890f5e75a73ca374b",
+      "species_name": "Starfish Iris",
+      "scientific_name": "Ferraria crispa",
+      "filename": "69ec5f2890f5e75a73ca374b_starfish_iris.jpg",
+      "sha256": "e8e256fb075f7e87",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec5eb689511e8c931adaff",
+      "species_name": "Black Mustard",
+      "scientific_name": "Brassica nigra",
+      "filename": "69ec5eb689511e8c931adaff_black_mustard.jpg",
+      "sha256": "1aeebb0c60b306d6",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec5eb689511e8c931adafe",
+      "species_name": "Dodder",
+      "scientific_name": "Cuscuta californica",
+      "filename": "69ec5eb689511e8c931adafe_dodder.jpg",
+      "sha256": "9c1c6e6bbd34e293",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec5eb689511e8c931adafd",
+      "species_name": "Yellow Mariposa Lily",
+      "scientific_name": "Calochortus clavatus",
+      "filename": "69ec5eb689511e8c931adafd_yellow_mariposa_lily.jpg",
+      "sha256": "fe07d71728e10672",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec5101ff3ab87274f4fb01",
+      "species_name": "Lantana",
+      "scientific_name": "Lantana camara",
+      "filename": "69ec5101ff3ab87274f4fb01_lantana.jpg",
+      "sha256": "3443090fec28a263",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec5101ff3ab87274f4fb00",
+      "species_name": "Bougainvillea",
+      "scientific_name": "Bougainvillea spectabilis",
+      "filename": "69ec5101ff3ab87274f4fb00_bougainvillea.jpg",
+      "sha256": "47527db4b5c0276d",
+      "status": "archived"
+    },
+    {
+      "species_id": "69ec4f0ff4e2b8699fbe63e1",
+      "species_name": "Pampas Grass",
+      "scientific_name": "Cortaderia selloana",
+      "filename": "69ec4f0ff4e2b8699fbe63e1_pampas_grass.jpg",
+      "sha256": "bcb41ba639bdfd69",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e53b5a912a75b579a0f6f2",
+      "species_name": "Cellar Spider",
+      "scientific_name": "Pholcus phalangioides",
+      "filename": "69e53b5a912a75b579a0f6f2_cellar_spider.jpg",
+      "sha256": "a52cb2f94f7edba9",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e53b2d912a75b579a0f6e9",
+      "species_name": "Jumping Spider",
+      "scientific_name": "Phidippus audax",
+      "filename": "69e53b2d912a75b579a0f6e9_jumping_spider.jpg",
+      "sha256": "15be90c0f0671708",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e5294c4a777140bff75481",
+      "species_name": "Tumbleweed",
+      "scientific_name": "Salsola tragus",
+      "filename": "69e5294c4a777140bff75481_tumbleweed.jpg",
+      "sha256": "547160dc7c4ca91e",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e5204ff3653b389b5d90a0",
+      "species_name": "Greater Roadrunner",
+      "scientific_name": "Geococcyx californianus",
+      "filename": "69e5204ff3653b389b5d90a0_greater_roadrunner.jpg",
+      "sha256": "9fd462433e4e4d5c",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45f4a9a30fe7a4104b8f4",
+      "species_name": "Serpentinite Outcrop",
+      "scientific_name": "Geological feature",
+      "filename": "69e45f4a9a30fe7a4104b8f4_serpentinite_outcrop.jpg",
+      "sha256": "2a6e538e246179b9",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45f4a9a30fe7a4104b8f3",
+      "species_name": "American Bison",
+      "scientific_name": "Bison bison",
+      "filename": "69e45f4a9a30fe7a4104b8f3_american_bison.jpg",
+      "sha256": "3ca9f3481f3b35d8",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45ecd3fb0ac0dcd79eff0",
+      "species_name": "Calla Lily",
+      "scientific_name": "Zantedeschia aethiopica",
+      "filename": "69e45ecd3fb0ac0dcd79eff0_calla_lily.jpg",
+      "sha256": "5351e3502318c054",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45e9daaed71bfefe1e47f",
+      "species_name": "Western Banded Centipede",
+      "scientific_name": "Scolopendra polymorpha",
+      "filename": "69e45e9daaed71bfefe1e47f_western_banded_centipede.jpg",
+      "sha256": "ecfdf1eba5390297",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45d8758e8659c6c600ca4",
+      "species_name": "Garden Slug",
+      "scientific_name": "Arion rufus",
+      "filename": "69e45d8758e8659c6c600ca4_garden_slug.jpg",
+      "sha256": "1f13e63ac4e2a5c5",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45d32ddb90d7ce31956e0",
+      "species_name": "Western Kingbird",
+      "scientific_name": "Tyrannus verticalis",
+      "filename": "69e45d32ddb90d7ce31956e0_western_kingbird.jpg",
+      "sha256": "9fd462433e4e4d5c",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45cc1e15ea2291602029a",
+      "species_name": "Southern California Tarantula",
+      "scientific_name": "Aphonopelma steindachneri",
+      "filename": "69e45cc1e15ea2291602029a_southern_california_tarantula.jpg",
+      "sha256": "d091ee67bea39c3c",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45cc1e15ea2291602029b",
+      "species_name": "California Scorpion",
+      "scientific_name": "Paruroctonus silvestrii",
+      "filename": "69e45cc1e15ea2291602029b_california_scorpion.jpg",
+      "sha256": "8bac9c46bd965383",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45cc1e15ea2291602029c",
+      "species_name": "Bedrock Mortars",
+      "scientific_name": "Anthropogenic feature",
+      "filename": "69e45cc1e15ea2291602029c_bedrock_mortars.jpg",
+      "sha256": "4e83fb5ce159bc10",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45c51cfd20b64ef3fed58",
+      "species_name": "Feral Cat",
+      "scientific_name": "Felis catus",
+      "filename": "69e45c51cfd20b64ef3fed58_feral_cat.jpg",
+      "sha256": "aa185bbb667e1817",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45c51cfd20b64ef3fed57",
+      "species_name": "Rock Pigeon",
+      "scientific_name": "Columba livia",
+      "filename": "69e45c51cfd20b64ef3fed57_rock_pigeon.jpg",
+      "sha256": "85249cf633dff1b9",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45bfbe69f8c78595ba1aa",
+      "species_name": "Western Bluebird",
+      "scientific_name": "Sialia mexicana",
+      "filename": "69e45bfbe69f8c78595ba1aa_western_bluebird.jpg",
+      "sha256": "dda8cba33b35f882",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45bd71c32e569b7471fb7",
+      "species_name": "Mallard",
+      "scientific_name": "Anas platyrhynchos",
+      "filename": "69e45bd71c32e569b7471fb7_mallard.jpg",
+      "sha256": "d30aac925fbeea29",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e45bd71c32e569b7471fb6",
+      "species_name": "Western Fence Lizard",
+      "scientific_name": "Sceloporus occidentalis",
+      "filename": "69e45bd71c32e569b7471fb6_western_fence_lizard.jpg",
+      "sha256": "de0d62902710fdc4",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e439c1425debaea9fbce5f",
+      "species_name": "Red Velvet Ant",
+      "scientific_name": "Dasymutilla occidentalis",
+      "filename": "69e439c1425debaea9fbce5f_red_velvet_ant.jpg",
+      "sha256": "4caa367548addca6",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e439c1425debaea9fbce60",
+      "species_name": "Wandering Glider",
+      "scientific_name": "Pantala flavescens",
+      "filename": "69e439c1425debaea9fbce60_wandering_glider.jpg",
+      "sha256": "4d101c4fcc948c54",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e439c1425debaea9fbce61",
+      "species_name": "Blue Whale",
+      "scientific_name": "Balaenoptera musculus",
+      "filename": "69e439c1425debaea9fbce61_blue_whale.jpg",
+      "sha256": "7a104e5d4b44fdb3",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e439c1425debaea9fbce5e",
+      "species_name": "Indian Peafowl",
+      "scientific_name": "Pavo cristatus",
+      "filename": "69e439c1425debaea9fbce5e_indian_peafowl.jpg",
+      "sha256": "477999fc5cf61d9d",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e439c1425debaea9fbce62",
+      "species_name": "Humpback Whale",
+      "scientific_name": "Megaptera novaeangliae",
+      "filename": "69e439c1425debaea9fbce62_humpback_whale.jpg",
+      "sha256": "3f88583d0ef31c76",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e10aa4624385009561ab92",
+      "species_name": "Sandcastle Worm",
+      "scientific_name": "Phragmatopoma californica",
+      "filename": "69e10aa4624385009561ab92_sandcastle_worm.jpg",
+      "sha256": "3fac2a95672ccad8",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e10aa4624385009561ab89",
+      "species_name": "Pacific Mole Crab",
+      "scientific_name": "Emerita analoga",
+      "filename": "69e10aa4624385009561ab89_pacific_mole_crab.jpg",
+      "sha256": "2120202757a5efa3",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e10aa4624385009561ab87",
+      "species_name": "Lingulodinium Polyedra",
+      "scientific_name": "Lingulodinium polyedra",
+      "filename": "69e10aa4624385009561ab87_lingulodinium_polyedra.jpg",
+      "sha256": "99525af6692aee72",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09c7d919a9ae4babedbfb",
+      "species_name": "Turkey Tail Fungus",
+      "scientific_name": "Trametes versicolor",
+      "filename": "69e09c7d919a9ae4babedbfb_turkey_tail_fungus.jpg",
+      "sha256": "844fc0839cca84b6",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09c7d919a9ae4babedbff",
+      "species_name": "Black Jelly Roll",
+      "scientific_name": "Exidia glandulosa",
+      "filename": "69e09c7d919a9ae4babedbff_black_jelly_roll.jpg",
+      "sha256": "50c2b4ffdf58de3e",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09c2e919a9ae4babedbed",
+      "species_name": "Trail Register",
+      "scientific_name": "Anthropogenic artifact",
+      "filename": "69e09c2e919a9ae4babedbed_trail_register.jpg",
+      "sha256": "ed718ef4d1cccd8d",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09b3c37d3f11d3a76d0ca",
+      "species_name": "Coast Live Oak",
+      "scientific_name": "Quercus agrifolia",
+      "filename": "69e09b3c37d3f11d3a76d0ca_coast_live_oak.jpg",
+      "sha256": "8868e2a2bb266ecd",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09a6ecaa6bb7479f47a11",
+      "species_name": "Isopod",
+      "scientific_name": "Armadillidium vulgare",
+      "filename": "69e09a6ecaa6bb7479f47a11_isopod.jpg",
+      "sha256": "49729e385e1b8e2c",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09a6ecaa6bb7479f47a18",
+      "species_name": "Northern Elephant Seal",
+      "scientific_name": "Mirounga angustirostris",
+      "filename": "69e09a6ecaa6bb7479f47a18_northern_elephant_seal.jpg",
+      "sha256": "1206b99610a0eb48",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09a6ecaa6bb7479f47a05",
+      "species_name": "Prickly Sculpin",
+      "scientific_name": "Cottus asperrimus",
+      "filename": "69e09a6ecaa6bb7479f47a05_prickly_sculpin.jpg",
+      "sha256": "7a5b27217f021314",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09a6ecaa6bb7479f47a08",
+      "species_name": "Indian Paintbrush",
+      "scientific_name": null,
+      "filename": "69e09a6ecaa6bb7479f47a08_indian_paintbrush.jpg",
+      "sha256": "e6d0bb2f5f8db877",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e09911e27cd51434fda7f8",
+      "species_name": "Water Boatman",
+      "scientific_name": null,
+      "filename": "69e09911e27cd51434fda7f8_water_boatman.jpg",
+      "sha256": "fe8513c4116a2848",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e0982ee27cd51434fda79e",
+      "species_name": "Turkey Vulture",
+      "scientific_name": "Cathartes aura",
+      "filename": "69e0982ee27cd51434fda79e_turkey_vulture.jpg",
+      "sha256": "5c2b00998b982583",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e095ce251765ed8ff2a298",
+      "species_name": "Lost Keys",
+      "scientific_name": null,
+      "filename": "69e095ce251765ed8ff2a298_lost_keys.jpg",
+      "sha256": "ebab0edbfb366740",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e095ce251765ed8ff2a299",
+      "species_name": "Disturbed Rock",
+      "scientific_name": null,
+      "filename": "69e095ce251765ed8ff2a299_disturbed_rock.jpg",
+      "sha256": "4e83fb5ce159bc10",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e095ce251765ed8ff2a297",
+      "species_name": "Mylar Balloon",
+      "scientific_name": null,
+      "filename": "69e095ce251765ed8ff2a297_mylar_balloon.jpg",
+      "sha256": "0b009f43c45455cf",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e082092231345f917a5a5b",
+      "species_name": "Anthropogenic Debris",
+      "scientific_name": null,
+      "filename": "69e082092231345f917a5a5b_anthropogenic_debris.jpg",
+      "sha256": "eade1c8ddd0798fe",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e082092231345f917a5a5a",
+      "species_name": "Homo Sapiens \u2014 Scat",
+      "scientific_name": null,
+      "filename": "69e082092231345f917a5a5a_homo_sapiens_scat.jpg",
+      "sha256": "aabf8e6cd3d0a383",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e082092231345f917a5a59",
+      "species_name": "Homo Sapiens \u2014 Tracks",
+      "scientific_name": null,
+      "filename": "69e082092231345f917a5a59_homo_sapiens_tracks.jpg",
+      "sha256": "7013f102df5f5be1",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e082092231345f917a5a5c",
+      "species_name": "Anthropophony \u2014 Human Noise",
+      "scientific_name": null,
+      "filename": "69e082092231345f917a5a5c_anthropophony_human_noise.jpg",
+      "sha256": "4ae03350201cb67a",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e07e46a6e44a33922a1791",
+      "species_name": "Elegant Tern",
+      "scientific_name": "Thalasseus elegans",
+      "filename": "69e07e46a6e44a33922a1791_elegant_tern.jpg",
+      "sha256": "15dd309f61fef41c",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e079cc5fc2597a7e2d1dac",
+      "species_name": "Common Dolphin",
+      "scientific_name": "Delphinus delphis",
+      "filename": "69e079cc5fc2597a7e2d1dac_common_dolphin.jpg",
+      "sha256": "b3e2625f57838ed2",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e079cc5fc2597a7e2d1daf",
+      "species_name": "Risso's Dolphin",
+      "scientific_name": "Grampus griseus",
+      "filename": "69e079cc5fc2597a7e2d1daf_risso_s_dolphin.jpg",
+      "sha256": "36b03d5d83b18cf3",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e079cc5fc2597a7e2d1db0",
+      "species_name": "Pacific Gray Whale Barnacle",
+      "scientific_name": null,
+      "filename": "69e079cc5fc2597a7e2d1db0_pacific_gray_whale_barnacle.jpg",
+      "sha256": "1d8849da7cfe8891",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e079cc5fc2597a7e2d1daa",
+      "species_name": "Gray Whale",
+      "scientific_name": "Eschrichtius robustus",
+      "filename": "69e079cc5fc2597a7e2d1daa_gray_whale.jpg",
+      "sha256": "f1ec075f7b291b0a",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e0765f427b014b9f73ad68",
+      "species_name": "Bewick's Wren",
+      "scientific_name": "Thryomanes bewickii",
+      "filename": "69e0765f427b014b9f73ad68_bewick_s_wren.jpg",
+      "sha256": "ea99c3835e89995e",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e06e68cf4d2b90195b966e",
+      "species_name": "Red-winged Blackbird",
+      "scientific_name": null,
+      "filename": "69e06e68cf4d2b90195b966e_red_winged_blackbird.jpg",
+      "sha256": "cc90686758bb3fb5",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e06e68cf4d2b90195b966a",
+      "species_name": "Red Swamp Crayfish",
+      "scientific_name": null,
+      "filename": "69e06e68cf4d2b90195b966a_red_swamp_crayfish.jpg",
+      "sha256": "ec1f6a0c373df9b5",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e06e68cf4d2b90195b966b",
+      "species_name": "Whirligig Beetle",
+      "scientific_name": null,
+      "filename": "69e06e68cf4d2b90195b966b_whirligig_beetle.jpg",
+      "sha256": "1da8645010d8df69",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e06e68cf4d2b90195b9663",
+      "species_name": "Pacific Forktail Damselfly",
+      "scientific_name": null,
+      "filename": "69e06e68cf4d2b90195b9663_pacific_forktail_damselfly.jpg",
+      "sha256": "e77b4e7beb54168b",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e06d1b6b18942acbeb4a46",
+      "species_name": "American Crow",
+      "scientific_name": null,
+      "filename": "69e06d1b6b18942acbeb4a46_american_crow.jpg",
+      "sha256": "b788d1b874c8f6a6",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e06d1b6b18942acbeb4a4b",
+      "species_name": "Barn Owl",
+      "scientific_name": null,
+      "filename": "69e06d1b6b18942acbeb4a4b_barn_owl.jpg",
+      "sha256": "4ed02630d8daf0f6",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e065e49189fb73f2ccd8b1",
+      "species_name": "Sunflower Sea Star",
+      "scientific_name": null,
+      "filename": "69e065e49189fb73f2ccd8b1_sunflower_sea_star.jpg",
+      "sha256": "da37cc0d2793d5c9",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e065e49189fb73f2ccd8ab",
+      "species_name": "Bat Ray",
+      "scientific_name": null,
+      "filename": "69e065e49189fb73f2ccd8ab_bat_ray.jpg",
+      "sha256": "603e45cb40ba1dc0",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e05fc59189fb73f2ccd6b9",
+      "species_name": "Miner's Lettuce",
+      "scientific_name": null,
+      "filename": "69e05fc59189fb73f2ccd6b9_miner_s_lettuce.jpg",
+      "sha256": "bea3362bee66807a",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e05dbbdb0b3061a57e504d",
+      "species_name": "Ice Plant (Introduced)",
+      "scientific_name": null,
+      "filename": "69e05dbbdb0b3061a57e504d_ice_plant_introduced.jpg",
+      "sha256": "3a563de3f3c5938e",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781123",
+      "species_name": "Raccoon",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781123_raccoon.jpg",
+      "sha256": "cd6ee8c7348db7ad",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781111",
+      "species_name": "White-lined Sphinx Moth",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781111_white_lined_sphinx_moth.jpg",
+      "sha256": "2eb14fc7bc416be9",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e02d33e2df851cbc365b26",
+      "species_name": "Arboreal Salamander",
+      "scientific_name": null,
+      "filename": "69e02d33e2df851cbc365b26_arboreal_salamander.jpg",
+      "sha256": "1a4acaae9ecfc832",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e02d33e2df851cbc365b20",
+      "species_name": "California Kingsnake",
+      "scientific_name": null,
+      "filename": "69e02d33e2df851cbc365b20_california_kingsnake.jpg",
+      "sha256": "dcae5b95b9782d93",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e02d33e2df851cbc365b1b",
+      "species_name": "Southern Alligator Lizard",
+      "scientific_name": null,
+      "filename": "69e02d33e2df851cbc365b1b_southern_alligator_lizard.jpg",
+      "sha256": "c7d60fd7b5523c0e",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e0275eb86f643c61ebf55b",
+      "species_name": "Morning Glory",
+      "scientific_name": null,
+      "filename": "69e0275eb86f643c61ebf55b_morning_glory.jpg",
+      "sha256": "37d3cd4205d75a65",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e022bcf49cfde3dd250f5c",
+      "species_name": "Flame Skimmer",
+      "scientific_name": null,
+      "filename": "69e022bcf49cfde3dd250f5c_flame_skimmer.jpg",
+      "sha256": "e7a248cd43df3841",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e021cf9e2af58079fc2a5d",
+      "species_name": "Western Gray Squirrel",
+      "scientific_name": null,
+      "filename": "69e021cf9e2af58079fc2a5d_western_gray_squirrel.jpg",
+      "sha256": "5465bd6834d30c6e",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e020f9eed3e1502b6c253b",
+      "species_name": "Poison Oak",
+      "scientific_name": null,
+      "filename": "69e020f9eed3e1502b6c253b_poison_oak.jpg",
+      "sha256": "85163cbe866e529d",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e020f9eed3e1502b6c2544",
+      "species_name": "Chaparral Yucca",
+      "scientific_name": null,
+      "filename": "69e020f9eed3e1502b6c2544_chaparral_yucca.jpg",
+      "sha256": "117f53fc5effcc77",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e02013006eee883036b383",
+      "species_name": "Barn Swallow",
+      "scientific_name": null,
+      "filename": "69e02013006eee883036b383_barn_swallow.jpg",
+      "sha256": "2f1673bbf249e2c4",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e00a1f2d5d38c53b1eac6e",
+      "species_name": "Belted Kingfisher",
+      "scientific_name": null,
+      "filename": "69e00a1f2d5d38c53b1eac6e_belted_kingfisher.jpg",
+      "sha256": "b2d42b1fd7280a08",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e00a1f2d5d38c53b1eac73",
+      "species_name": "Anna's Hummingbird",
+      "scientific_name": null,
+      "filename": "69e00a1f2d5d38c53b1eac73_anna_s_hummingbird.jpg",
+      "sha256": "d856024a0eda2d77",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e00a1f2d5d38c53b1eac67",
+      "species_name": "Burrowing Owl",
+      "scientific_name": null,
+      "filename": "69e00a1f2d5d38c53b1eac67_burrowing_owl.jpg",
+      "sha256": "bcac1caf992a517e",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e00a1f2d5d38c53b1eac70",
+      "species_name": "House Finch",
+      "scientific_name": null,
+      "filename": "69e00a1f2d5d38c53b1eac70_house_finch.jpg",
+      "sha256": "d544e623ff82c1d7",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e0051da85ec45909dc10d9",
+      "species_name": "California Poppy",
+      "scientific_name": null,
+      "filename": "69e0051da85ec45909dc10d9_california_poppy.jpg",
+      "sha256": "88b55d7768ee70d2",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e004e2a85ec45909dc10b9",
+      "species_name": "American Kestrel",
+      "scientific_name": null,
+      "filename": "69e004e2a85ec45909dc10b9_american_kestrel.jpg",
+      "sha256": "217dd1c7bdbf3803",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e004e2a85ec45909dc10bd",
+      "species_name": "Allen's Hummingbird",
+      "scientific_name": "Selasphorus sasin",
+      "filename": "69e004e2a85ec45909dc10bd_allen_s_hummingbird.jpg",
+      "sha256": "95f7fd11527aa673",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e004a8a85ec45909dc10ac",
+      "species_name": "Rim Lichen",
+      "scientific_name": "Lecanora muralis",
+      "filename": "69e004a8a85ec45909dc10ac_rim_lichen.jpg",
+      "sha256": "a9d347f69dd069cc",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e004a8a85ec45909dc10a8",
+      "species_name": "Shaggy Mane",
+      "scientific_name": "Coprinus comatus",
+      "filename": "69e004a8a85ec45909dc10a8_shaggy_mane.jpg",
+      "sha256": "c00aa62710823900",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e004a8a85ec45909dc10ab",
+      "species_name": "Sunburst Lichen",
+      "scientific_name": "Xanthoria parietina",
+      "filename": "69e004a8a85ec45909dc10ab_sunburst_lichen.jpg",
+      "sha256": "24f8063fb986d658",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000f49189fb73f2cca8ea",
+      "species_name": "Prickly Pear Cactus",
+      "scientific_name": "Opuntia ficus-indica",
+      "filename": "69e000f49189fb73f2cca8ea_prickly_pear_cactus.jpg",
+      "sha256": "544d11d5397f81b0",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000c19189fb73f2cca8ca",
+      "species_name": "Monarch Butterfly",
+      "scientific_name": null,
+      "filename": "69e000c19189fb73f2cca8ca_monarch_butterfly.jpg",
+      "sha256": "c3d5b2792291391b",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000c19189fb73f2cca8d3",
+      "species_name": "California Gnatcatcher",
+      "scientific_name": "Polioptila californica",
+      "filename": "69e000c19189fb73f2cca8d3_california_gnatcatcher.jpg",
+      "sha256": "169fb0d1e8a871cb",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000c19189fb73f2cca8cc",
+      "species_name": "Tarantula Hawk",
+      "scientific_name": "Pepsis grossa",
+      "filename": "69e000c19189fb73f2cca8cc_tarantula_hawk.jpg",
+      "sha256": "345794618909dff5",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000899189fb73f2cca8b8",
+      "species_name": "Mule Deer",
+      "scientific_name": "Odocoileus hemionus",
+      "filename": "69e000899189fb73f2cca8b8_mule_deer.jpg",
+      "sha256": "ab1b1dd3628b7dd1",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000899189fb73f2cca8b7",
+      "species_name": "Coyote",
+      "scientific_name": "Canis latrans",
+      "filename": "69e000899189fb73f2cca8b7_coyote.jpg",
+      "sha256": "d634e95287ba054a",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000899189fb73f2cca8ba",
+      "species_name": "Southern Pacific Rattlesnake",
+      "scientific_name": "Crotalus oreganus helleri",
+      "filename": "69e000899189fb73f2cca8ba_southern_pacific_rattlesnake.jpg",
+      "sha256": "fa954629d5b546f9",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000539189fb73f2cca88f",
+      "species_name": "Great Blue Heron",
+      "scientific_name": "Ardea herodias",
+      "filename": "69e000539189fb73f2cca88f_great_blue_heron.jpg",
+      "sha256": "bb6775fa39ba4f85",
+      "status": "archived"
+    },
+    {
+      "species_id": "69e000539189fb73f2cca88e",
+      "species_name": "California Brown Pelican",
+      "scientific_name": "Pelecanus occidentalis californicus",
+      "filename": "69e000539189fb73f2cca88e_california_brown_pelican.jpg",
+      "sha256": "80101bbf0f012e77",
+      "status": "archived"
+    }
+  ],
+  "missing": [
+    {
+      "species_id": "69ee9f7ca279469421385e2f",
+      "species_name": "Great White Shark",
+      "scientific_name": "Carcharodon carcharias",
+      "filename": "69ee9f7ca279469421385e2f_great_white_shark.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de78111f",
+      "species_name": "Common Poorwill",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de78111f_common_poorwill.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de78111c",
+      "species_name": "Western Leaf-footed Bug",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de78111c_western_leaf_footed_bug.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de78111d",
+      "species_name": "California Dobsonfly",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de78111d_california_dobsonfly.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de78111e",
+      "species_name": "Pallid Bat",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de78111e_pallid_bat.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781114",
+      "species_name": "Jerusalem Cricket",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781114_jerusalem_cricket.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781117",
+      "species_name": "Black Witch Moth",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781117_black_witch_moth.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781119",
+      "species_name": "Pandorus Sphinx Moth",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781119_pandorus_sphinx_moth.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781116",
+      "species_name": "Western Predatory Bush Katydid",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781116_western_predatory_bush_katydid.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781113",
+      "species_name": "Sacred Datura",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781113_sacred_datura.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de78111a",
+      "species_name": "Click Beetle",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de78111a_click_beetle.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de78111b",
+      "species_name": "Darkling Beetle",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de78111b_darkling_beetle.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781115",
+      "species_name": "California Firefly",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781115_california_firefly.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e05aca90a2b592de781118",
+      "species_name": "Western Tussock Moth",
+      "scientific_name": null,
+      "filename": "69e05aca90a2b592de781118_western_tussock_moth.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e0588e6e2b14d3e53129af",
+      "species_name": "Southern Sea Otter",
+      "scientific_name": null,
+      "filename": "69e0588e6e2b14d3e53129af_southern_sea_otter.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e0275eb86f643c61ebf55d",
+      "species_name": "California Aster",
+      "scientific_name": null,
+      "filename": "69e0275eb86f643c61ebf55d_california_aster.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e022bcf49cfde3dd250f5a",
+      "species_name": "Yellow-faced Bumble Bee",
+      "scientific_name": null,
+      "filename": "69e022bcf49cfde3dd250f5a_yellow_faced_bumble_bee.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e021cf9e2af58079fc2a58",
+      "species_name": "Striped Skunk",
+      "scientific_name": null,
+      "filename": "69e021cf9e2af58079fc2a58_striped_skunk.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e021cf9e2af58079fc2a5e",
+      "species_name": "Big Brown Bat",
+      "scientific_name": null,
+      "filename": "69e021cf9e2af58079fc2a5e_big_brown_bat.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e021cf9e2af58079fc2a57",
+      "species_name": "Gray Fox",
+      "scientific_name": null,
+      "filename": "69e021cf9e2af58079fc2a57_gray_fox.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e00590a85ec45909dc1111",
+      "species_name": "Western Whiptail",
+      "scientific_name": null,
+      "filename": "69e00590a85ec45909dc1111_western_whiptail.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e0051da85ec45909dc10db",
+      "species_name": "Arroyo Willow",
+      "scientific_name": null,
+      "filename": "69e0051da85ec45909dc10db_arroyo_willow.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e0051da85ec45909dc10da",
+      "species_name": "California Sycamore",
+      "scientific_name": null,
+      "filename": "69e0051da85ec45909dc10da_california_sycamore.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e000899189fb73f2cca8b5",
+      "species_name": "Harbor Seal",
+      "scientific_name": "Phoca vitulina",
+      "filename": "69e000899189fb73f2cca8b5_harbor_seal.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e000899189fb73f2cca8b6",
+      "species_name": "Common Bottlenose Dolphin",
+      "scientific_name": "Tursiops truncatus",
+      "filename": "69e000899189fb73f2cca8b6_common_bottlenose_dolphin.jpg",
+      "status": "dead_url_404"
+    },
+    {
+      "species_id": "69e000899189fb73f2cca8b4",
+      "species_name": "California Sea Lion",
+      "scientific_name": "Zalophus californianus",
+      "filename": "69e000899189fb73f2cca8b4_california_sea_lion.jpg",
+      "status": "dead_url_404"
+    }
+  ],
+  "note": "EarthEye OC personal photo archive \u2014 Sep 6 2026. 'missing' entries had CDN URLs that return 404 (likely placeholder URLs from a seeded batch, never real uploads)."
+}

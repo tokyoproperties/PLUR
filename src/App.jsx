@@ -1,5 +1,6 @@
 // Build: 2026-06-21 — PLUR GitHub Pages build
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Layout from './pages/Layout';
 import AtlasCore from './pages/AtlasCore';
 import Biomes from './pages/Biomes';
@@ -33,9 +34,23 @@ import ImageAudit from './pages/ImageAudit';
 import CuratorReview from './pages/CuratorReview';
 import TrailAudit from './pages/TrailAudit';
 
+
+// ScrollToTop — v4.1 ergonomics
+// Every page opens at the top. Without this, the router inherits the previous
+// page's scroll offset (why detail pages opened at the bottom, and why browser
+// back landed mid-list). Constitutional behavior: a page begins at its beginning.
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter basename="/PLUR">
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/home" replace />} />

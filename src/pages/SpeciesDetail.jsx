@@ -12,7 +12,7 @@ import {
 
 function Section({ label, children }) {
   return (
-    <div style={{ marginBottom: "24px" }}>
+    <div style={{ marginBottom: "28px" }}>
       <div style={{ ...whisperStyle, marginBottom: "10px" }}>{label}</div>
       {children}
     </div>
@@ -185,7 +185,7 @@ export default function SpeciesDetail() {
 
         {s.ecologicalRole && (
           <Section label="Ecological role">
-            <p style={{ ...bodyStyle, marginTop: 0, marginBottom: 0 }}>{s.ecologicalRole}</p>
+            <p style={{ ...narrativeStyle, marginTop: 0, marginBottom: 0 }}>{s.ecologicalRole}</p>
           </Section>
         )}
 

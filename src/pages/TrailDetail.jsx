@@ -12,7 +12,7 @@ import {
 
 function Section({ label, children }) {
   return (
-    <div style={{ marginBottom: "24px" }}>
+    <div style={{ marginBottom: "28px" }}>
       <div style={{ ...whisperStyle, marginBottom: "10px" }}>{label}</div>
       {children}
     </div>
