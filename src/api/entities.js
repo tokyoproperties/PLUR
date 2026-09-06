@@ -1,31 +1,35 @@
 // src/api/entities.js
-// EarthEye OC — simplified local loader using existing dummyPoints.json
+// EarthEye OC — live atlas data layer (v4, Sep 5 2026)
+// Reads the full atlas through getAtlasData — the same Mission 13C source
+// the mobile app reads. Flat records, module-cached after first load.
+// Observation records are never fetched (doctrine: sighting locations
+// are private; the public endpoint answers []).
 
-import data from "@/data/dummyPoints.json";
+import { getJSON } from "./restClient";
 
-// Species = all features where properties.type === "Species"
+let _species = null;
+let _trails = null;
+
 export async function listSpecies() {
-  return data.features.filter(f => f.properties?.type === "Species");
+  if (!_species) _species = (await getJSON("Species")) || [];
+  return _species;
 }
 
 export async function getSpecies(id) {
-  return data.features.find(
-    f => f.id == id && f.properties?.type === "Species"
-  );
+  const all = await listSpecies();
+  return all.find((r) => String(r.id) === String(id)) || null;
 }
 
-// Trails = all features where properties.type === "Trail"
 export async function listTrails() {
-  return data.features.filter(f => f.properties?.type === "Trail");
+  if (!_trails) _trails = (await getJSON("Trail")) || [];
+  return _trails;
 }
 
 export async function getTrail(id) {
-  return data.features.find(
-    f => f.id == id && f.properties?.type === "Trail"
-  );
+  const all = await listTrails();
+  return all.find((r) => String(r.id) === String(id)) || null;
 }
 
-// Observations (optional)
 export async function listObservations() {
   return [];
 }

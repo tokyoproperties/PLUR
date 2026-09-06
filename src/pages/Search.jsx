@@ -1,125 +1,203 @@
-// Search.jsx
-// Plain-English: Search across species and trails with live filtering.
+// Search.jsx — EarthEye OC constitutional index
+// Quiet search across species and trails. Dark input, whisper section
+// labels, tappable Georgia serif results.
 
-import BottomNav from "./BottomNav";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { listSpecies, listTrails } from "@/api/entities";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {
+  T, cardHoverStyle, whisperStyle, narrativeStyle, inputStyle,
+  PAGE_PX, NAV_H, getSeason, isSpeciesActiveNow,
+} from "@/theme";
 
 export default function Search() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const [species, setSpecies] = useState([]);
   const [trails, setTrails] = useState([]);
-  const [query, setQuery] = useState(searchParams.get("q") || "");
-  const [loading, setLoading] = useState(true);
-
-  const hasLoaded = useRef(false);
+  const [query, setQuery] = useState("");
+  const [state, setState] = useState("loading");
 
   useEffect(() => {
-    if (hasLoaded.current) return;
-    hasLoaded.current = true;
-
-    async function loadData() {
+    let cancelled = false;
+    async function load() {
       try {
-        const [speciesData, trailsData] = await Promise.all([
-          listSpecies(),
-          listTrails(),
-        ]);
-
-        setSpecies(speciesData || []);
-        setTrails(trailsData || []);
-      } catch (err) {
-        console.error("Error loading search data:", err);
-      } finally {
-        setLoading(false);
+        const [s, t] = await Promise.all([listSpecies(), listTrails()]);
+        if (!cancelled) {
+          setSpecies(s || []);
+          setTrails(t || []);
+          setState("ready");
+        }
+      } catch (e) {
+        if (!cancelled) setState("error");
       }
     }
-
-    loadData();
+    load();
+    return () => { cancelled = true; };
   }, []);
 
-  function updateQuery(value) {
-    setQuery(value);
-    setSearchParams({ q: value });
-  }
+  const q = query.toLowerCase();
+  const filteredSpecies = q
+    ? species.filter((s) =>
+        String(s.name || "").toLowerCase().includes(q) ||
+        String(s.scientificName || "").toLowerCase().includes(q)
+      )
+    : [];
+  const filteredTrails = q
+    ? trails.filter((t) => String(t.name || "").toLowerCase().includes(q))
+    : [];
 
-  const filteredSpecies = species.filter((s) =>
-    s.name?.toLowerCase().includes(query.toLowerCase())
-  );
-
-  const filteredTrails = trails.filter((t) =>
-    t.name?.toLowerCase().includes(query.toLowerCase())
-  );
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.5rem" }}>
-        Searching EarthEye…
-      </div>
-    );
-  }
+  const season = getSeason();
 
   return (
-    <div style={{ padding: "2rem", paddingBottom: "5rem" }}>
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          marginBottom: "1rem",
-          padding: "0.5rem 1rem",
-          borderRadius: "6px",
-          border: "1px solid #ccc",
-          cursor: "pointer",
-        }}
-      >
-        ← Back
-      </button>
-
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        Search
-      </h1>
-
+    <div style={{ padding: "20px " + PAGE_PX + "px", paddingBottom: NAV_H + 32 + "px" }}>
       <input
         type="text"
         value={query}
-        onChange={(e) => updateQuery(e.target.value)}
-        placeholder="Search species or trails…"
-        style={{
-          width: "100%",
-          padding: "0.75rem",
-          borderRadius: "6px",
-          border: "1px solid #ccc",
-          marginBottom: "1.5rem",
-        }}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search the atlas…"
+        autoFocus
+        style={{ ...inputStyle, marginBottom: "24px" }}
       />
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Species</h2>
-        {filteredSpecies.length === 0 ? (
-          <p>No matching species</p>
-        ) : (
-          <ul>
-            {filteredSpecies.map((s) => (
-              <li key={s.id}>{s.name}</li>
-            ))}
-          </ul>
-        )}
-      </section>
+      {state === "loading" && <p style={{ ...narrativeStyle }}>Opening the atlas…</p>}
 
-      <section>
-        <h2>Trails</h2>
-        {filteredTrails.length === 0 ? (
-          <p>No matching trails</p>
-        ) : (
-          <ul>
-            {filteredTrails.map((t) => (
-              <li key={t.id}>{t.name}</li>
-            ))}
-          </ul>
-        )}
-      </section>
+      {state === "error" && (
+        <div style={{ ...cardHoverStyle, cursor: "default", textAlign: "center" }}>
+          <div style={{ ...whisperStyle, marginBottom: "12px" }}>Atlas</div>
+          <p style={{ ...narrativeStyle, marginBottom: 0 }}>
+            The atlas is unavailable. Check your connection and reopen.
+          </p>
+        </div>
+      )}
 
+      {state === "ready" && !q && (
+        <p style={{ ...narrativeStyle }}>
+          {species.length} species and {trails.length} trails recorded across the county.
+          Begin typing to search by name.
+        </p>
+      )}
+
+      {state === "ready" && q && (
+        <>
+          <div style={{ ...whisperStyle, marginBottom: "12px" }}>
+            Species · {filteredSpecies.length}
+          </div>
+          {filteredSpecies.slice(0, 20).map((s) => (
+            <button
+              key={s.id}
+              onClick={() => navigate("/species/" + s.id)}
+              style={{
+                ...cardHoverStyle,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                textAlign: "left",
+                fontFamily: "inherit",
+                color: "inherit",
+                width: "100%",
+                marginBottom: "10px",
+                padding: "12px 16px",
+                minHeight: "44px",
+              }}
+            >
+              <span>
+                <span
+                  style={{
+                    display: "block",
+                    fontFamily: T.serif,
+                    fontSize: "15px",
+                    color: "rgba(255,255,255,0.88)",
+                  }}
+                >
+                  {s.name}
+                </span>
+                {s.scientificName && (
+                  <span
+                    style={{
+                      display: "block",
+                      fontStyle: "italic",
+                      fontSize: "11px",
+                      color: "rgba(255,255,255,0.45)",
+                      fontFamily: T.serif,
+                      marginTop: "2px",
+                    }}
+                  >
+                    {s.scientificName}
+                  </span>
+                )}
+              </span>
+              {isSpeciesActiveNow(s, season) && (
+                <span
+                  aria-label="active now"
+                  style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    background: T.sage,
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+            </button>
+          ))}
+
+          <div style={{ ...whisperStyle, margin: "24px 0 12px" }}>
+            Trails · {filteredTrails.length}
+          </div>
+          {filteredTrails.slice(0, 20).map((t) => (
+            <button
+              key={t.id}
+              onClick={() => navigate("/trails/" + t.id)}
+              style={{
+                ...cardHoverStyle,
+                display: "block",
+                textAlign: "left",
+                fontFamily: "inherit",
+                color: "inherit",
+                width: "100%",
+                marginBottom: "10px",
+                padding: "12px 16px",
+                minHeight: "44px",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: T.serif,
+                  fontSize: "15px",
+                  color: "rgba(255,255,255,0.88)",
+                }}
+              >
+                {t.name}
+              </span>
+              {t.jurisdiction && (
+                <span
+                  style={{
+                    display: "block",
+                    fontSize: "10px",
+                    color: T.inkGhost,
+                    letterSpacing: "0.10em",
+                    textTransform: "uppercase",
+                    marginTop: "4px",
+                    fontFamily: T.sans,
+                  }}
+                >
+                  {t.jurisdiction}
+                </span>
+              )}
+            </button>
+          ))}
+
+          {filteredSpecies.length === 0 && filteredTrails.length === 0 && (
+            <div style={{ ...cardHoverStyle, cursor: "default", textAlign: "center" }}>
+              <div style={{ ...whisperStyle, marginBottom: "12px" }}>Field record</div>
+              <p style={{ ...narrativeStyle, marginBottom: 0 }}>
+                Nothing recorded for “{query}.”
+              </p>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
