@@ -29,11 +29,11 @@ function SeasonalBanner({ total, activeCount }) {
   );
 }
 
-function SpeciesCard({ s, navigate }) {
+function SpeciesCard({ s, navigate, persistScroll }) {
   const active = isSpeciesActiveNow(s);
   return (
     <button
-      onClick={() => navigate("/species/" + s.id)}
+      onClick={() => { persistScroll(); navigate("/species/" + s.id); }}
       style={{
         ...cardHoverStyle,
         display: "flex",
@@ -124,7 +124,9 @@ export default function SpeciesPage() {
 
   const [species, setSpecies] = useState([]);
   const [state, setState] = useState("loading");
-  const [shown, setShown] = useState(PAGE_SIZE);
+  const restorePg = Math.max(1, parseInt(searchParams.get("pg") || "1", 10) || 1);
+  const restoreSy = parseInt(searchParams.get("sy") || "0", 10) || 0;
+  const [shown, setShown] = useState(restorePg * PAGE_SIZE);
 
   useEffect(() => {
     let cancelled = false;
@@ -140,6 +142,23 @@ export default function SpeciesPage() {
 
   const season = getSeason();
 
+  // Scroll restore — ?sy with a retry loop; images load lazily and the
+  // document grows, so keep trying until the page is tall enough.
+  useEffect(() => {
+    if (state !== "ready" || !restoreSy) return;
+    let tries = 0;
+    const t = setInterval(() => {
+      tries++;
+      const tallEnough = document.documentElement.scrollHeight - window.innerHeight >= restoreSy - 8;
+      if (tallEnough || tries > 40) {
+        window.scrollTo(0, restoreSy);
+        clearInterval(t);
+      }
+    }, 250);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
+
   const filtered = useMemo(() => {
     let out = species;
     if (activeNow) out = out.filter((s) => isSpeciesActiveNow(s, season));
@@ -152,13 +171,11 @@ export default function SpeciesPage() {
           String(s.group || "").toLowerCase().includes(q)
       );
     }
-    // active-now species first, then alphabetical
-    out = [...out].sort((a, b) => {
-      const aa = isSpeciesActiveNow(a, season) ? 0 : 1;
-      const bb = isSpeciesActiveNow(b, season) ? 0 : 1;
-      if (aa !== bb) return aa - bb;
-      return String(a.name || "").localeCompare(String(b.name || ""));
-    });
+    // one continuous alphabetical sequence — the whole atlas, A to Z.
+    // active-now species carry the sage dot instead of floating to the top.
+    out = [...out].sort((a, b) =>
+      String(a.name || "").localeCompare(String(b.name || ""))
+    );
     return out;
   }, [species, query, activeNow, season]);
 
@@ -166,6 +183,13 @@ export default function SpeciesPage() {
     () => species.filter((s) => isSpeciesActiveNow(s, season)).length,
     [species, season]
   );
+
+  function persistScroll() {
+    const next = new URLSearchParams(searchParams);
+    next.set("pg", String(Math.ceil(shown / PAGE_SIZE)));
+    next.set("sy", String(Math.round(window.scrollY)));
+    setSearchParams(next, { replace: true });
+  }
 
   function setParam(key, value) {
     const next = new URLSearchParams(searchParams);
@@ -240,11 +264,14 @@ export default function SpeciesPage() {
           ) : (
             <>
               {filtered.slice(0, shown).map((s) => (
-                <SpeciesCard key={s.id} s={s} navigate={navigate} />
+                <SpeciesCard key={s.id} s={s} navigate={navigate} persistScroll={persistScroll} />
               ))}
               {shown < filtered.length && (
                 <button
-                  onClick={() => setShown((n) => n + PAGE_SIZE)}
+                  onClick={() => {
+                    setShown((n) => n + PAGE_SIZE);
+                    setParam("pg", String(Math.ceil((shown + PAGE_SIZE) / PAGE_SIZE)));
+                  }}
                   style={{
                     ...cardHoverStyle,
                     width: "100%",
