@@ -1,0 +1,22 @@
+{
+ "reverts": ["Bat Star","Backswimmer","Domestic Goat","Domestic Sheep"],
+ "onedrive_swaps": {
+   "Eastern Fox Squirrel (currently deer pic)": "proper fox squirrel",
+   "Western Kingbird (currently roadrunner)": "proper kingbird; roadrunner photo to Roadrunner if in drive",
+   "Red-tailed Hawk": "his photos from drive",
+   "Rock Pigeon": "fat pigeon, San Clemente pier deck, post Las Ramblas hike w/ Justin Tritt",
+   "Cattail": "current is his squirrel photo - needs proper cattail; find fat bench squirrel owner species",
+   "Mourning Dove": "may have in drive",
+   "Pandorus Sphinx Moth": "in drive",
+   "Trail Register": "Peters Canyon register - his shoutout, 100+ visits",
+   "Great Blue Heron (currently his lizard pic w/ Carly)": "proper heron; lizard pic to correct lizard species?",
+   "Turkey Tail Fungus": "verify species ID of his image; if wrong, move to matching species"
+ },
+ "upgrades_natural": ["California Carpenter Ant","Giant Kelp","Giant Water Bug (also check dupe vs Water Boatman)","Green Lacewing (his call)","Kelp Crab","Lined Shore Crab","Moon Jelly","Mosquitofish","Nuttall's Woodpecker","Prickly Sculpin","Water Boatman","Western Honey Bee (hive->specimen? his call)","Wandering Glider (fingers visible)","Bald Eagle (much better)","Big Brown Bat (replacement)","Peregrine Falcon (upgrade)","Common Bottlenose Dolphin (upgrade)","Great White Shark (upgrade)","California Gull (tourism ad out)","California Sea Lion (dolphin-like out)","California Spiny Lobster (handheld out)","Purple Sea Urchin (bird mouth out)","Snowy Egret (new)","Southern Sea Otter (pink skull out)","Striped Skunk (unnatural out)","Sunflower Sea Star (handheld out)","Pallid Bat (stop-motion: wants motion/GIF else swap)","Mourning Dove (wrong birds)","Homo Sapiens - Scat (balled TP in bushes)","Lost Keys (currently reptile basking)","Western Snowy Plover (collapsed sign out)","California Condor (tag #46 prominent - better framing)","Western Toad (asphalt night out)","Western Snowy Plover","Great Blue Heron"],
+ "verify_ids": ["Sphinx Moth (correct image?)","Disturbed Rock (acorn grinding holes - clarify keep)","Dead Man's Foot (accuracy check)","Pilobolus crystallinus vs Pixie Cup Lichen (look same - differentiate)"],
+ "common_names": ["Lingulodinium polyedra (add common name)","Pilobolus crystallinus","other latin-named species get common names"],
+ "motion_media": "GIF/animated file for kelp (and possibly other species) - investigate limits",
+ "special": "White Sage: fitting image honoring cultural/medicinal/cleansing history + card text point re: overharvesting, seen bundled for sale at registers; first thing Carly taught him on trail",
+ "scinames": "populate missing scientificName fields for all species",
+ "q_and_a": "Convergent Ladybug vs Lady Beetle difference; Giant Water Bug vs Water Boatman dupe check"
+}
