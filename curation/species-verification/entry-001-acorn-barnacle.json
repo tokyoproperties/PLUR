@@ -1,0 +1,27 @@
+{
+  "entry": 1,
+  "date": "2026-09-09",
+  "verifier": "Stryder (cockpit analysis, Spectrum off-app pass)",
+  "executor": "Special Agent 44",
+  "species": "Balanus glandula",
+  "commonName": "Acorn Barnacle",
+  "protocol": "EarthEye Species Verification Protocol v1.0",
+  "sources": ["ITIS", "NOAA", "UCSC/MARINe", "Stanford", "UBC", "Puget Sound", "ecological studies on B. glandula recruitment"],
+  "verdicts": {
+    "identity": "PASS", "taxonomy": "PASS", "ocHabitat": "PASS", "range": "PASS",
+    "feeding": "PASS", "ecologicalRole": "PASS", "lookalikes": "PASS",
+    "yearRoundPresence": "PASS (clarified: adults year-round, reproduction seasonal)",
+    "reproductiveClaims": "REVISE (species-general wording applied, superlative removed)",
+    "adhesiveClaim": "REVISE (7,000 psi figure HELD — no species-specific primary citation found this pass)",
+    "elNinoClaim": "REVISE (upward-boundary shift HELD — recruitment/community effects supported, OC boundary shift not established)",
+    "safety": "REVISE (reframed as stewardship observation)",
+    "conservation": "REVISE ('stable' replaced with explicit no-assessment posture + geographic range note)"
+  },
+  "overall": "REVISE",
+  "applied_in": "v53 (species_v53_built.json, deployed 2026-09-09)",
+  "held_pending_citation": [
+    "7,000 psi adhesive strength figure — needs primary experimental citation",
+    "El Niño upward boundary shift in OC — needs species/location-specific study"
+  ],
+  "notes": "Card retained, not failed. Pattern: observation vs interpretation separated; species-specific evidence distinguished from general barnacle facts; universals removed where indefensible. Entry 001 sets the template for all subsequent species verification passes."
+}
