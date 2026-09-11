@@ -1,0 +1,2458 @@
+[
+ {
+  "file": "20211120_080922.jpg",
+  "taken": "2021-11-20",
+  "subject": "road",
+  "landmark": "",
+  "quality": 3,
+  "description": "A paved road stretches into the distance toward desert mountains under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_080928.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A wide-angle view of a desert landscape with scrub brush and distant mountain ranges under a bright sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_083501.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 3,
+  "description": "A desolate, rocky desert terrain with sparse vegetation and distant mountains under a clear sky.",
+  "note": "Desert pavement and alluvial fan deposits.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_083509.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A vast, arid desert basin with sparse shrubs and distant mountains under a clear sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_084106.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A desert landscape with scattered shrubs and large white boulders in the foreground under a clear sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_085754.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A deep, narrow crevice in rocky desert terrain, viewed from above.",
+  "note": "Mine shaft or natural fissure.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_090251.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up view of a dark, deep hole in the ground, framed by rough, rocky edges.",
+  "note": "Mine shaft opening.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_090415.jpg",
+  "taken": "2021-11-20",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 4,
+  "description": "A metal grate covers a deep, dark hole in the rocky desert ground.",
+  "note": "Mine shaft safety grate.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_090434.jpg",
+  "taken": "2021-11-20",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 4,
+  "description": "A metal grate covers a deep, dark hole in the rocky desert ground.",
+  "note": "Mine shaft safety grate.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_090436.jpg",
+  "taken": "2021-11-20",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up view through a metal grate into a dark, deep opening in the ground.",
+  "note": "Mine shaft safety grate.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_095939.jpg",
+  "taken": "2021-11-20",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A paved road curves through a vast desert valley toward distant mountains under a blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_102143.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 5,
+  "description": "A high-angle view of a vast desert valley floor with rugged mountains in the foreground.",
+  "note": "View from Dante's View.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_102145.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 5,
+  "description": "A panoramic view of a vast, flat desert basin surrounded by distant mountain ranges.",
+  "note": "View from Dante's View.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_102203.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 5,
+  "description": "A wide, expansive view of a desert valley floor with distant mountains under a clear sky.",
+  "note": "View from Dante's View.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_103016.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A high-angle view of rolling, arid desert hills under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_104224.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 5,
+  "description": "A stone cairn sits atop a rocky mountain peak overlooking a vast desert valley.",
+  "note": "Summit cairn.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_104349.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A panoramic view of rugged, arid mountain ridges under a clear sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_104400.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 5,
+  "description": "A high-angle view of a vast desert valley floor stretching between mountain ranges.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_104615.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 4,
+  "description": "A high-angle view of a desert valley floor with rugged mountains in the foreground.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_113138.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A view of eroded, light-colored desert hills under a bright blue sky.",
+  "note": "Badlands formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_115222.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A narrow desert canyon with light-colored, eroded rock walls under a clear sky.",
+  "note": "Eroded sedimentary rock.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_115346.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A steep, light-colored rocky slope against a deep blue sky.",
+  "note": "Sedimentary rock formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_120447.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A towering, light-colored rock face with visible sedimentary layers.",
+  "note": "Sedimentary rock strata.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_120558.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A trail winds through eroded, light-colored desert badlands with mountains in the distance; person present.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_120918.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 4,
+  "description": "Close-up of light-colored, eroded sedimentary rock formations under a clear blue sky.",
+  "note": "Artist's Palette/Furnace Creek Formation sedimentary layers.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_120922.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 4,
+  "description": "Wide view of rugged, light-colored badlands against a deep blue sky.",
+  "note": "Eroded lakebed sediments of the Furnace Creek Formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_120928.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "Panoramic view of undulating, light-colored badlands leading to darker, layered mountains.",
+  "note": "Classic badlands topography.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_120934.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 4,
+  "description": "View of light-colored, eroded hills contrasting with darker, rugged mountain peaks.",
+  "note": "Geological contrast between sedimentary badlands and volcanic mountains.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_121124.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 4,
+  "description": "Expansive view of rolling, light-colored badlands under a bright blue sky.",
+  "note": "Eroded sedimentary landscape.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_121135.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "Wide landscape of light-colored, sharp-ridged badlands with distant mountains.",
+  "note": "Eroded lakebed sediments.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_121257.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 4,
+  "description": "View of light-colored badlands with wispy clouds over distant mountains.",
+  "note": "Eroded sedimentary landscape.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_121304.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "Wide panoramic view of light-colored badlands and distant mountain ranges.",
+  "note": "Eroded sedimentary landscape.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_121853.jpg",
+  "taken": "2021-11-20",
+  "person_frame": true,
+  "reviewed": true
+ },
+ {
+  "file": "20211120_124531.jpg",
+  "taken": "2021-11-20",
+  "subject": "structure",
+  "landmark": "Furnace Creek",
+  "quality": 3,
+  "description": "A gas station price sign showing high fuel costs under a clear blue sky.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_130710.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "Looking up through a narrow, rocky canyon passage with steep, light-colored walls.",
+  "note": "Sedimentary canyon walls.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_135333.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow, winding canyon path flanked by tall, light-colored rock walls.",
+  "note": "Eroded sedimentary canyon.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_135421.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow canyon passage with steep, textured, light-colored rock walls.",
+  "note": "Eroded sedimentary canyon.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_135438.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "Looking out from a narrow, rocky canyon toward a bright, light-colored mountain slope.",
+  "note": "Eroded sedimentary canyon.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_135548.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Badwater Basin",
+  "quality": 5,
+  "description": "A vast, flat expanse of jagged, salt-crusted ground under a cloudy sky.",
+  "note": "Salt flats/halite crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_141706.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "Wide view of the salt-crusted basin floor with distant mountains.",
+  "note": "Salt flats/halite crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_141710.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "Expansive view of the salt-crusted basin floor under a clear blue sky.",
+  "note": "Salt flats/halite crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_141713.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "Wide view of the salt-crusted basin floor with distant mountain ranges.",
+  "note": "Salt flats/halite crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_142158.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "Wide view of the salt-crusted basin floor with distant mountain ranges.",
+  "note": "Salt flats/halite crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_142200.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 5,
+  "description": "A natural rock arch spanning a narrow, dry canyon passage.",
+  "note": "Natural rock arch formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144445.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 4,
+  "description": "A natural rock arch spanning a narrow, dry canyon passage.",
+  "note": "Natural rock arch formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144450.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 5,
+  "description": "Looking up through a natural rock arch toward the blue sky.",
+  "note": "Natural rock arch formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144546.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 4,
+  "description": "A natural rock arch spanning a narrow, dry canyon passage.",
+  "note": "Natural rock arch formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144555.jpg",
+  "taken": "2021-11-20",
+  "person_frame": false,
+  "reviewed": false
+ },
+ {
+  "file": "20211120_144606.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 4,
+  "description": "A low-angle view looking up through a natural rock arch in a narrow canyon under a clear blue sky.",
+  "note": "Sedimentary rock formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144735.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 4,
+  "description": "A view through a natural rock archway into a narrow, sunlit canyon passage.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144744.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 4,
+  "description": "A perspective looking through a natural rock arch into the depths of a desert canyon.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144905.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 4,
+  "description": "A narrow canyon passage with a natural arch, backlit by the sun creating a bright glow.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144927.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 3,
+  "description": "Sunlight flares through a narrow canyon opening, framing a natural rock arch in the distance.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144932.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 3,
+  "description": "A dramatic lens flare illuminates a narrow canyon path with a natural arch in the background.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_144943.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 3,
+  "description": "The sun shines brightly through a narrow canyon gap, casting a rainbow flare over the rock formations.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_145034.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A steep, narrow canyon wall with vertical erosion patterns under a clear blue sky.",
+  "note": "Eroded sedimentary canyon walls.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_145049.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A vertical perspective of narrow, eroded canyon walls reaching toward a bright blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_145550.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A rocky canyon floor leading into a narrow, shadowed passage between steep, rugged cliffs.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_145559.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A view looking up a rocky canyon slope toward a narrow, sunlit opening between cliffs.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_145619.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A wide, gravelly canyon floor flanked by steep, rugged rock walls under a clear sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_145846.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up of a steep, weathered canyon wall showing vertical streaks of erosion.",
+  "note": "Desert varnish or water-streaked sediment.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_145852.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A detailed view of a rugged canyon wall with vertical erosion marks and rocky debris at the base.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_145904.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up of a textured rock face with vertical erosion streaks in a canyon setting.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_150608.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A steep, rocky slope looking out toward a distant, sunlit valley floor.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_150615.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A rocky, barren hillside overlooking a vast, sunlit valley under a bright sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_150622.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A view from a high, rocky vantage point looking down into a sun-drenched valley.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151343.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 3,
+  "description": "A close-up of a rocky canyon floor with a small, dark opening in the cliff base.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151356.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 3,
+  "description": "A close-up of a rocky canyon wall with a small, dark cave-like opening at the base.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151406.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 5,
+  "description": "A close-up of a boulder with distinct dark, vertical mineral streaks or banding.",
+  "note": "Metamorphic or sedimentary banding.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151609.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A rugged, sunlit rock face forming a small overhang or alcove in a canyon.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151616.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A jagged, sunlit rock formation against a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151708.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Natural Bridge",
+  "quality": 4,
+  "description": "A narrow canyon passage with a natural arch visible in the distance under a bright sky.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151733.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow canyon passage with high, rugged rock walls and a natural arch formation under soft, warm light.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151733_remastered.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow canyon passage with high, rugged rock walls and a natural arch formation under soft, warm light.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151736.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow canyon passage with high, rugged rock walls and a natural arch formation under soft, warm light.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151741.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow canyon passage with high, rugged rock walls and a natural arch formation under soft, warm light.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151747.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow canyon passage with high, rugged rock walls and a natural arch formation under soft, warm light.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151807.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow canyon passage with high, rugged rock walls and a natural arch formation under soft, warm light.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151821.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "A narrow canyon passage with high, rugged rock walls and a natural arch formation under soft, warm light.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151833.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Golden Canyon",
+  "quality": 4,
+  "description": "Looking up through a natural rock arch in a narrow canyon towards a bright, clear sky.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_151936.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "A vast, arid desert landscape with rolling hills under a bright sky with wispy clouds.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_154822.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "A vast, arid desert landscape with rolling hills under a bright sky with wispy clouds.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_154824.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "A vast, arid desert landscape with rolling hills under a bright sky with wispy clouds.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_154826.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "Artist's Palette formation",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_154930.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "Artist's Palette formation",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_154938.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "Artist's Palette formation",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_154951.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 4,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky with vehicles in the foreground.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160310.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160315.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160414.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160508.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160531.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 4,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky with vehicles in the foreground.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160536.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160540.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160547.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "Zabriskie Point",
+  "quality": 4,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky with vehicles in the foreground.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160602.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Zabriskie Point",
+  "quality": 5,
+  "description": "A panoramic view of colorful, eroded desert mountains under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160611.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A panoramic view of colorful, eroded desert hills under soft, golden morning light.",
+  "note": "Miocene-age volcanic deposits, rich in iron, manganese, and chlorite minerals.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160630.jpg",
+  "taken": "2021-11-20",
+  "person_frame": true,
+  "reviewed": true
+ },
+ {
+  "file": "20211120_160709.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "Golden sunlight illuminates the peaks of rugged, multi-colored desert hills.",
+  "note": "Eroded volcanic tuff and sedimentary layers.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160718.jpg",
+  "taken": "2021-11-20",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A vast, barren desert landscape under a clear sky with a distant road visible.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160735.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "Golden morning light hits the tops of colorful, weathered desert hills.",
+  "note": "Oxidized mineral deposits creating varied hues.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160854.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "Rugged desert mountains are bathed in warm, early morning light.",
+  "note": "Eroded volcanic landscape.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160910.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A view of desert hills with a single peak catching the first light of dawn.",
+  "note": "Early morning alpenglow on volcanic peaks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160917.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A distant, sunlit mountain peak rises above a rugged, shadowed desert landscape.",
+  "note": "Sunrise illumination on volcanic terrain.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160925.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "Golden light touches the ridges of desert mountains against a clear blue sky.",
+  "note": "Eroded volcanic formations.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160942.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A single mountain peak glows in the morning sun above a range of shadowed hills.",
+  "note": "Sunrise light on volcanic peaks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_160952.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A single peak is illuminated by the rising sun above a colorful, shadowed desert range.",
+  "note": "Sunrise light on volcanic peaks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161001.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A sharp, sun-drenched mountain peak rises above dark, shadowed desert slopes.",
+  "note": "Sunrise light on volcanic peaks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161024.jpg",
+  "taken": "2021-11-20",
+  "subject": "road",
+  "landmark": "",
+  "quality": 3,
+  "description": "A desert road stretches through a vast, arid landscape under a soft, twilight sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161042.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A single sunlit peak stands out against a range of colorful, shadowed desert hills.",
+  "note": "Sunrise light on volcanic peaks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161104.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A single peak catches the morning light above a range of colorful, eroded desert hills.",
+  "note": "Sunrise light on volcanic peaks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161128.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A winding, dry desert wash cuts through rugged, rocky terrain.",
+  "note": "Alluvial fan and wash erosion.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161252.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A winding, dry desert wash snakes through barren, rocky hills.",
+  "note": "Eroded desert wash.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161304.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A single peak is illuminated by the sun above a rugged, shadowed desert landscape.",
+  "note": "Sunrise light on volcanic peaks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161340.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "Artists Palette",
+  "quality": 4,
+  "description": "A single peak glows in the morning light above a range of colorful, eroded desert hills.",
+  "note": "Sunrise light on volcanic peaks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_161349.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up view of rugged, weathered rock formations in a desert canyon.",
+  "note": "Eroded sedimentary rock layers.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_162250.jpg",
+  "taken": "2021-11-20",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A steep, rocky desert cliff face rises above a barren, gravelly slope.",
+  "note": "Eroded desert cliff.",
+  "person_frame": false
+ },
+ {
+  "file": "20211120_162256.jpg",
+  "taken": "2021-11-20",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A view from inside a car looking out at a desert road during a soft, pastel-colored twilight.",
+  "note": "Twilight in the desert.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_062408.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A view from inside a car looking out at a desert road during a soft, pastel-colored twilight.",
+  "note": "Twilight in the desert.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_062415.jpg",
+  "taken": "2021-11-21",
+  "person_frame": false,
+  "reviewed": false
+ },
+ {
+  "file": "20211121_062913.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A long, straight road stretches toward distant mountains under a soft, pastel-colored twilight sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_071859.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 3,
+  "description": "A close-up, high-angle shot of a dark-furred donkey's head, showing its ears and white muzzle in natural light.",
+  "note": "Equus asinus",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_071903.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A direct, eye-level portrait of a donkey's face, highlighting its dark eyes and white muzzle against a dusty background.",
+  "note": "Equus asinus",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_071906.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up, eye-level view of a donkey's face, focusing on its features and expression in bright, natural light.",
+  "note": "Equus asinus",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_071913.jpg",
+  "taken": "2021-11-21",
+  "person_frame": true,
+  "reviewed": true
+ },
+ {
+  "file": "20211121_071951.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A full-body shot of a dark donkey standing on a gravelly desert floor with a moon visible in the clear blue sky.",
+  "note": "Equus asinus",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_081558.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A rugged, rocky mountain peak rises against a clear, deep blue sky, showing distinct geological layers.",
+  "note": "Death Valley volcanic rock formations",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_081607.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A wide view of arid, rolling hills and rocky slopes covered in sparse desert scrub under a bright blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_081620.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A desert mountain range under a clear sky, with a small white vehicle visible on the road at the base.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_081622.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A desert landscape featuring rocky hills and a small white vehicle parked on a road below.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_081624.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A vast, arid valley floor with sparse desert vegetation, framed by distant, hazy mountain ranges under a bright sun.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_081735.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A panoramic view of rolling, sun-drenched desert hills leading to distant, layered mountain peaks.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_081740.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A wide, sweeping view of a rugged desert valley with undulating hills and distant mountains under a clear sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_083130.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A steep, rocky mountain slope showing complex geological strata and desert vegetation in bright sunlight.",
+  "note": "Sedimentary rock layers",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_083204.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A steep, rocky mountain face with visible geological layering, captured from a low angle.",
+  "note": "Sedimentary rock layers",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_083331.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 5,
+  "description": "A wide, panoramic view of a desert basin with colorful, eroded hills and distant mountain ranges.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_083334.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 5,
+  "description": "A wide, panoramic view of a desert basin with colorful, eroded hills and distant mountain ranges.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_085407.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 3,
+  "description": "The remains of a collapsed, corrugated metal structure sit in a desolate, rocky desert landscape.",
+  "note": "Abandoned mining structure",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_085414.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 3,
+  "description": "A collapsed, rusted metal structure lies on a gravelly desert floor against a backdrop of barren hills.",
+  "note": "Abandoned mining structure",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_090533.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Rhyolite",
+  "quality": 4,
+  "description": "A weathered, two-story building made of corrugated metal stands in a remote, arid desert environment.",
+  "note": "Ghost town architecture",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_090542.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Rhyolite",
+  "quality": 4,
+  "description": "A weathered, two-story building made of corrugated metal stands in a remote, arid desert environment.",
+  "note": "Ghost town architecture",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_090609.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Rhyolite",
+  "quality": 3,
+  "description": "The interior of a dilapidated wooden and metal structure, showing exposed framing and a rocky floor.",
+  "note": "Ghost town interior",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_090632.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Rhyolite",
+  "quality": 3,
+  "description": "The interior of a derelict building with peeling walls and a rocky floor, viewed through a doorway.",
+  "note": "Ghost town interior",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_090758.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Rhyolite",
+  "quality": 3,
+  "description": "The interior of a derelict building with corrugated metal walls and a dirt floor, showing signs of decay.",
+  "note": "Ghost town interior",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_090808.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 4,
+  "description": "A rusted corrugated metal structure stands against a backdrop of arid, rocky hills under a clear blue sky.",
+  "note": "Abandoned mining structure.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_090846.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 4,
+  "description": "The interior of a dilapidated, rusted metal building shows a view through to the desert landscape beyond.",
+  "note": "Abandoned mining structure.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091239.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A dark mine entrance is carved into a rocky, scrub-covered hillside near some scattered wooden debris.",
+  "note": "Abandoned mine adit.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091247.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 4,
+  "description": "A small, rusted metal shack sits at the base of a steep, barren desert slope.",
+  "note": "Abandoned mining structure.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091249.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 4,
+  "description": "A small, rusted metal shack sits at the base of a steep, barren desert slope.",
+  "note": "Abandoned mining structure.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091301.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 3,
+  "description": "A metal safe or heavy door is embedded into a rock wall inside a dark, cavernous space.",
+  "note": "Mining equipment/safe.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091322.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 3,
+  "description": "A view looking through a corrugated metal pipe, showing a dark opening at the far end and scattered rocks on the bottom.",
+  "note": "Culvert or ventilation pipe.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091327.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 3,
+  "description": "A view looking through a corrugated metal pipe, showing a dark opening at the far end and scattered rocks on the bottom.",
+  "note": "Culvert or ventilation pipe.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091405.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 3,
+  "description": "A weathered wooden crate or workbench sits inside a dilapidated structure with rusted metal walls.",
+  "note": "Mining equipment/workbench.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091910.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "",
+  "quality": 3,
+  "description": "A low, dry-stacked stone wall sits on a desert hillside with sparse vegetation.",
+  "note": "Historic rock wall/foundation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_091923.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A desert landscape features mine tailings piles and small structures at the base of a large, barren mountain.",
+  "note": "Mining site with tailings.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_092518.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 3,
+  "description": "A view from inside a vehicle looking out onto a gravel road leading toward a steep, sunlit mountain face.",
+  "note": "Desert road.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_094623.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A gravel road winds through a narrow, rocky canyon with steep, sunlit walls.",
+  "note": "Canyon road.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_094735.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A gravel road leads into a narrow, rocky canyon with steep, sunlit walls.",
+  "note": "Canyon road.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_094743.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A gravel road leads into a narrow, rocky canyon with steep, sunlit walls.",
+  "note": "Canyon road.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_094751.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A gravel road leads into a narrow, rocky canyon with steep, sunlit walls.",
+  "note": "Canyon road.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_094757.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 4,
+  "description": "A gravel road leads into a narrow, rocky canyon with steep, sunlit walls.",
+  "note": "Canyon road.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_094802.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 3,
+  "description": "A gravel road leads into a narrow, rocky canyon with steep, sunlit walls, viewed from inside a vehicle.",
+  "note": "Canyon road.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_094803.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "",
+  "quality": 3,
+  "description": "A gravel road leads into a narrow, rocky canyon with steep, sunlit walls, viewed from inside a vehicle.",
+  "note": "Canyon road.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_104129.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Ubehebe Crater",
+  "quality": 5,
+  "description": "A wide, panoramic view looks down into a large, deep volcanic crater with steep, layered walls.",
+  "note": "Volcanic maar crater.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_104136.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Ubehebe Crater",
+  "quality": 5,
+  "description": "A wide, panoramic view looks down into a large, deep volcanic crater with steep, layered walls.",
+  "note": "Volcanic maar crater.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_104309.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Ubehebe Crater",
+  "quality": 4,
+  "description": "A steep, gravelly path leads down into a large volcanic crater with dramatic, layered walls.",
+  "note": "Volcanic maar crater.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_104817.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Ubehebe Crater",
+  "quality": 5,
+  "description": "A panoramic view of the floor of a large volcanic crater under a bright sun.",
+  "note": "Volcanic maar crater floor.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_104848.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Ubehebe Crater",
+  "quality": 4,
+  "description": "A view of the steep, layered walls of a volcanic crater rising above a desert floor.",
+  "note": "Volcanic maar crater walls.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_105100.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 3,
+  "description": "A steep, rocky gully ascends toward a clear blue sky under bright, direct sunlight.",
+  "note": "Erosional drainage feature in desert terrain.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_105220.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A wide-angle view of a barren, sloping desert hillside under a cloudless sky.",
+  "note": "Alluvial fan or desert slope.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_105458.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 3,
+  "description": "A desert slope features a distinct, light-colored geological formation contrasting with dark gravel.",
+  "note": "Exposed sedimentary or volcanic strata.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_105504.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A desert trail winds up a steep, dark-gravel hillside toward a bright, light-colored rock formation.",
+  "note": "Geological contact zone.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_121534.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A vast, arid desert landscape stretches toward distant mountains under a clear blue sky.",
+  "note": "Typical Death Valley basin floor.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_121536.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A view from a vehicle looking out over a dry, scrub-covered desert plain toward distant mountains.",
+  "note": "Desert scrub habitat.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134001.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A large, light-colored, rounded hill rises from a desert floor with sparse vegetation under a bright sun.",
+  "note": "Badlands-style erosional feature.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134011.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A bright, sunlit desert hill stands above a dry, salt-crusted basin with low-lying shrubs.",
+  "note": "Badlands topography.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134049.jpg",
+  "taken": "2021-11-21",
+  "subject": "flora",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up view of a shallow stream bed covered in a dense, dark, patterned algal mat.",
+  "note": "Cyanobacteria or algal mat in a desert spring.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134105.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A narrow desert stream flows through a marshy area with green shrubs, viewed from a wooden boardwalk.",
+  "note": "Riparian habitat in a desert environment.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134112.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A small, clear stream winds through a desert landscape with light-colored hills in the background.",
+  "note": "Riparian corridor.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134122.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A narrow desert stream flows through a scrubby plain toward distant, arid mountains.",
+  "note": "Riparian habitat.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134124.jpg",
+  "taken": "2021-11-21",
+  "person_frame": true,
+  "reviewed": true
+ },
+ {
+  "file": "20211121_134304.jpg",
+  "taken": "2021-11-21",
+  "subject": "flora",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up of a succulent desert plant with segmented, reddish-green stems.",
+  "note": "Salicornia (pickleweed), a salt-tolerant halophyte.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134316.jpg",
+  "taken": "2021-11-21",
+  "subject": "flora",
+  "landmark": "",
+  "quality": 5,
+  "description": "A detailed close-up of the segmented, colorful stems of a salt-tolerant desert plant.",
+  "note": "Salicornia (pickleweed).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134608.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A desert stream flows through a landscape of low shrubs toward light-colored, eroded hills.",
+  "note": "Riparian habitat.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_134612.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A desert stream winds through a scrubby landscape toward distant, light-colored hills.",
+  "note": "Riparian habitat.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135309.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A shallow, clear stream bed shows animal tracks in the sandy bottom, viewed from above.",
+  "note": "Wildlife tracks in riparian sediment.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135317.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A small, dark fish swims in clear, shallow water over a sandy bottom.",
+  "note": "Pupfish (Cyprinodon sp.) in a desert spring.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135329.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A small, dark fish is visible in the clear, shallow water of a desert stream.",
+  "note": "Pupfish (Cyprinodon sp.).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135331.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A small, dark fish swims in clear water, creating ripples on the surface.",
+  "note": "Pupfish (Cyprinodon sp.).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135343.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A small, dark fish swims in clear water, creating ripples on the surface.",
+  "note": "Pupfish (Cyprinodon sp.).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135409.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A shallow desert stream shows animal tracks in the sand and clear, rippling water.",
+  "note": "Riparian habitat with wildlife tracks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135410.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 4,
+  "description": "A shallow desert stream shows animal tracks in the sand and clear, rippling water.",
+  "note": "Riparian habitat with wildlife tracks.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135412.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A shallow, sunlit stream flows over sandy ground with animal tracks and a prominent rock.",
+  "note": "Tracks likely coyote or similar mammal.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135636.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up of a water strider resting on the surface of a shallow, algae-covered pool.",
+  "note": "Water strider (Gerridae).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135649.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A water strider sits on the surface of a shallow, algae-rich pool in bright sunlight.",
+  "note": "Water strider (Gerridae).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135707.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 5,
+  "description": "A water strider is captured in sharp detail on the surface of a shallow, bubbly pool.",
+  "note": "Water strider (Gerridae).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135719.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A water strider rests on the surface of a shallow, algae-covered pool.",
+  "note": "Water strider (Gerridae).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135726.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A water strider is positioned on the surface of a shallow, algae-covered pool.",
+  "note": "Water strider (Gerridae).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135735.jpg",
+  "taken": "2021-11-21",
+  "subject": "wildlife",
+  "landmark": "",
+  "quality": 4,
+  "description": "A water strider rests on the surface of a shallow, algae-covered pool.",
+  "note": "Water strider (Gerridae).",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_135739.jpg",
+  "taken": "2021-11-21",
+  "subject": "flora",
+  "landmark": "",
+  "quality": 3,
+  "description": "A close-up of algae and bubbles on the surface of a shallow pool.",
+  "note": "Cyanobacteria/algal mat.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_140232.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "A narrow, shallow stream flowing through a salt-crusted landscape, captured in bright, clear daylight.",
+  "note": "Salt crust and stream",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_140240.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "Close-up of salt crust formations and dark, algae-covered mud in a shallow pool, bright sunlight.",
+  "note": "Salt crust and microbial mats",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_140248.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A close-up of turquoise-tinted mineral deposits and algae in a shallow pool.",
+  "note": "Mineralized algal mat.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_140255.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A detailed view of turquoise-tinted mineral deposits and algae in a shallow pool.",
+  "note": "Mineralized algal mat.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_140303.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "",
+  "quality": 4,
+  "description": "A macro view of turquoise-tinted mineral deposits and algae in a shallow pool.",
+  "note": "Mineralized algal mat.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_141938.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "",
+  "quality": 3,
+  "description": "A vast, arid desert landscape under a clear blue sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_143319.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Harmony Borax Works",
+  "quality": 4,
+  "description": "The rusted remains of an old industrial boiler stand within stone ruins.",
+  "note": "Historic borax processing equipment.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_143332.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Harmony Borax Works",
+  "quality": 4,
+  "description": "A wide shot of the rusted boiler and stone ruins at a historic site.",
+  "note": "Historic borax processing equipment.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_143341.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Harmony Borax Works",
+  "quality": 4,
+  "description": "A view of the historic boiler and stone ruins against a desert mountain backdrop.",
+  "note": "Historic borax processing equipment.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_151721.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 3,
+  "description": "A rocky mountain slope rises above a salt flat with a fenced walkway.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_151737.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 3,
+  "description": "A rocky mountain slope rises above a salt flat with a fenced walkway.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_152205.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 3,
+  "description": "A rocky mountain slope rises above a salt flat with a fenced walkway.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_152218.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 3,
+  "description": "A rocky mountain slope rises above a salt flat with a fenced walkway.",
+  "note": "person present",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153421.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "A close-up of the jagged, salt-crusted ground at a famous basin.",
+  "note": "Salt polygons/crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153441.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "A close-up of the jagged, salt-crusted ground at a famous basin.",
+  "note": "Salt polygons/crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153455.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "A wide view of the vast, salt-crusted basin under a clear sky.",
+  "note": "Salt pan.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153503.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "The sun hangs low over the vast, textured salt flats of Badwater Basin, casting long shadows.",
+  "note": "Salt pan polygonal crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153514.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "A wide view of the salt pan stretching toward distant mountains under a clear blue sky.",
+  "note": "Salt pan polygonal crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153523.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "Rugged, arid mountains rise sharply above the salt-crusted valley floor.",
+  "note": "Alluvial fan and salt pan.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153525.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "The sunlit salt flats lead the eye toward the base of the steep, rocky mountain range.",
+  "note": "Salt pan and mountain front.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153537.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Badwater Basin",
+  "quality": 3,
+  "description": "A small structure sits at the base of a massive, weathered mountain slope overlooking the salt flats.",
+  "note": "Small building near the base of the Black Mountains.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153557.jpg",
+  "taken": "2021-11-21",
+  "subject": "structure",
+  "landmark": "Badwater Basin",
+  "quality": 3,
+  "description": "A small building is nestled against the dramatic, craggy face of the mountains.",
+  "note": "Small building near the base of the Black Mountains.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153612.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "Close-up of the intricate, salt-encrusted ridges and patterns on the desert floor.",
+  "note": "Salt pan polygonal crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153613.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "A path of cracked, salt-covered earth stretches toward the horizon under a bright sky.",
+  "note": "Salt pan polygonal crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153615.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "The textured, geometric patterns of the salt pan extend toward distant, hazy mountains.",
+  "note": "Salt pan polygonal crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153617.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 4,
+  "description": "A low-angle view highlights the sharp, salt-crusted edges of the desert floor.",
+  "note": "Salt pan polygonal crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153620.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 5,
+  "description": "A wide panoramic view captures the vastness of the salt flats under the bright sun.",
+  "note": "Salt pan polygonal crust.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153652_remastered.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 5,
+  "description": "A panoramic view of the salt flats at sunset with the sun low on the horizon.",
+  "note": "Salt crust formations.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_153715_remastered.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Badwater Basin",
+  "quality": 5,
+  "description": "A panoramic view of the salt flats at sunset with a long shadow cast across the ground.",
+  "note": "person present; salt crust formations.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161007.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "The desert landscape glows in the soft, warm light of late afternoon.",
+  "note": "View from a vehicle.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161018.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "Golden light hits the mountain peaks while the valley floor remains in shadow.",
+  "note": "View from a vehicle.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161020.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "The desert floor and distant mountains are bathed in the gentle light of sunset.",
+  "note": "View from a vehicle.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161024.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "A wide, arid valley stretches toward mountains under a clear, fading sky.",
+  "note": "View from a vehicle.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161025.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "The sun begins to dip behind the mountain range, casting a soft glow over the desert.",
+  "note": "View from a vehicle.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161116.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "The sun sets behind the distant mountain peaks, viewed from inside a car.",
+  "note": "View from a vehicle.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161125.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "The sun is nearly hidden behind the mountain silhouette at dusk.",
+  "note": "View from a vehicle.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161133.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "The sun sets behind the mountains, casting a final golden light over the desert.",
+  "note": "View from a vehicle.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161552.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Death Valley",
+  "quality": 4,
+  "description": "A weathered rock formation features a natural hole, set against a rugged, arid hillside.",
+  "note": "Eroded rock formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161558.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Death Valley",
+  "quality": 4,
+  "description": "A close-up of a natural rock arch or hole in a desert cliffside.",
+  "note": "Eroded rock formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161620.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "A small, dark opening is visible in the side of a steep, sun-drenched mountain slope.",
+  "note": "Eroded rock formation.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161624.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Death Valley",
+  "quality": 4,
+  "description": "A close-up of a weathered rock formation with a natural hole, illuminated by warm golden hour light.",
+  "note": "Tafoni weathering in volcanic rock.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161637.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "A wide shot of a rocky desert hillside under a clear blue sky, with the upper ridge catching the golden hour light.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161639.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Death Valley",
+  "quality": 4,
+  "description": "A rocky desert slope featuring a prominent, weathered rock formation with a hole, bathed in soft sunset light.",
+  "note": "Tafoni weathering.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161648.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Death Valley",
+  "quality": 4,
+  "description": "A detailed view of a rock outcrop with a distinct natural aperture, set against a rugged desert slope.",
+  "note": "Tafoni weathering.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161735.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "A distant view of a rocky desert hillside during the golden hour, with sparse vegetation in the foreground.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_161742.jpg",
+  "taken": "2021-11-21",
+  "subject": "geology",
+  "landmark": "Death Valley",
+  "quality": 4,
+  "description": "A rocky desert slope with a prominent, weathered rock formation featuring a natural hole, illuminated by warm light.",
+  "note": "Tafoni weathering.",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_165003.jpg",
+  "taken": "2021-11-21",
+  "subject": "landscape",
+  "landmark": "Death Valley",
+  "quality": 3,
+  "description": "A desert landscape at dusk with silhouettes of mountains against a fading twilight sky.",
+  "note": "",
+  "person_frame": false
+ },
+ {
+  "file": "20211121_165714.jpg",
+  "taken": "2021-11-21",
+  "subject": "road",
+  "landmark": "Death Valley",
+  "quality": 4,
+  "description": "A view from a moving vehicle looking down a long, straight desert road toward distant mountains at twilight.",
+  "note": "",
+  "person_frame": false
+ }
+]

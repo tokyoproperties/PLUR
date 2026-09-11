@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "b91409cf-e383-4f38-88f0-aa46a47e6f88"
+      }
+    },
+    "android": {
+      "package": "com.stryder44.eartheyeoc"
+    }
+  }
+}

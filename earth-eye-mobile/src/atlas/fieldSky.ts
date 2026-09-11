@@ -64,7 +64,7 @@ export const MIN_SKY_SAMPLES = 12;
 function safeLux(v: number | null | undefined): number {
   if (v === null || v === undefined || isNaN(v)) return 0;
   return Math.max(0, v);
-} ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+}
 
 function mean(arr: number[]): number {
   if (!arr.length) return 0;

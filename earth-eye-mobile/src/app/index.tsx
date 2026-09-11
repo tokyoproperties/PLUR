@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,6 +29,7 @@ import { useSymbolicMode } from '@/contexts/mode-context';
 import { useSensors } from '@/hooks/useSensors';
 import { evaluateLiteMode } from '@/modes/lite';
 import { evaluateYardMode } from '@/modes/yard';
+import { loadSpecies } from '@/atlas/atlasApi';
 
 // Staggered fade-in — first breath of the instrument
 const FADE_TITLE = FadeIn.duration(400).delay(0);
@@ -118,6 +119,16 @@ function chunkPairs<T>(items: T[]): T[][] {
 }
 
 export default function HomeScreen() {
+  // Arc 69: live atlas count on the Species tile (was hardcoded '542')
+  const [atlasCount, setAtlasCount] = useState<number | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    loadSpecies()
+      .then((species) => { if (mounted) setAtlasCount(species.length); })
+      .catch(() => { /* hint stays generic if the atlas is unreachable */ });
+    return () => { mounted = false; };
+  }, []);
+
   const { snapshot } = useSensors();
   const { mode } = useSymbolicMode();
   const soul = useFieldSoul();
@@ -282,7 +293,12 @@ export default function HomeScreen() {
                   {row.map((item, i) => (
                     <QuickLaunchTile
                       key={item.href}
-                      item={item}
+                      item={{
+                        ...item,
+                        hint: item.href === '/species' && atlasCount !== null
+                          ? `${atlasCount} atlas entries`
+                          : item.hint,
+                      }}
                       index={rowIndex * 2 + i}
                       isLastInRow={i === row.length - 1}
                       accent={tileAccents[item.href]}

@@ -26,8 +26,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Host: media.base44.com (permanent CDN, same host as all atlas imagery)
 // ──────────────────────────────────────────────────────────────────
 export const ATLAS_URLS = {
-  species: 'https://media.base44.com/files/public/69dffe15eb268f56342f8e58/f2725f3b3_eartheye_species.json',
-  trails:  'https://media.base44.com/files/public/69dffe15eb268f56342f8e58/34af6d78d_eartheye_trails.json',
+  // Arc 69 — STABLE ROUTER CONTRACT (modular data layer, locked Sep 10 2026).
+  // The router always serves the current atlas (v73+, 591 species) so every
+  // atlas deploy flows into the app with zero rebuilds. Static CDN snapshots
+  // remain as fallback if this endpoint is ever retired:
+  //   species: '...f2725f3b3_eartheye_species.json'  (Jul 2026 test file, 6 records)
+  //   trails:   '...34af6d78d_eartheye_trails.json'  (74 active trails)
+  species: 'https://special-agent-44-342f8e58.base44.app/functions/getAtlasData?entity=Species',
+  trails:  'https://special-agent-44-342f8e58.base44.app/functions/getAtlasData?entity=Trail',
 } as const;
 
 const CACHE_KEYS = {
@@ -118,7 +124,9 @@ async function readCache<T>(key: string, tsKey: string): Promise<T[] | null> {
     const ts = tsRaw ? parseInt(tsRaw, 10) : 0;
     if (Date.now() - ts > CACHE_TTL_MS) return null; // stale, refresh
 
-    return JSON.parse(raw) as T[];
+    const parsed = JSON.parse(raw) as T[];
+    // Arc 69: never trust an empty cache (poisoned by the old parse bug) — refetch
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
   } catch {
     return null;
   }
@@ -159,10 +167,14 @@ async function fetchAtlasEntity<T>(
     });
     if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
 
-    const payload = (await res.json()) as AtlasPayload<T>;
-    const records = payload.records ?? [];
+    const payload = (await res.json()) as AtlasPayload<T> | T[];
+    // Router contract: bare top-level array. Legacy CDN snapshots: { records: [...] }.
+    const records = Array.isArray(payload) ? payload : (payload.records ?? []);
 
-    await writeCache<T>(cacheKey, tsCacheKey, records);
+    // Arc 69: only cache real data — never persist an empty fetch
+    if (records.length > 0) {
+      await writeCache<T>(cacheKey, tsCacheKey, records);
+    }
     return records;
   } catch (networkErr) {
     // Network failed — try stale cache as fallback (ignore TTL)
