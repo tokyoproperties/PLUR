@@ -1,0 +1,51 @@
+# EAS archive rules - when this file exists, EAS uses it INSTEAD of .gitignore
+# (mirrors .gitignore plus build artifacts and caches)
+
+# dependencies
+node_modules/
+
+# Expo / generated
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.kotlin/
+/ios
+/android
+
+# build artifacts
+*.apk
+*.aab
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+*.tsbuildinfo
+
+# caches and tooling
+.eas/
+.metro-health-check*
+.vscode/
+.claude/
+.DS_Store
+
+# debug / env
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.env
+.env*.local
+!.env.example
+
+# local leftovers
+example
+earth-eye-clean/
+export-log*.txt
+
+# large media never needed for the build
+photos/
+*.mp4
+*.mov
