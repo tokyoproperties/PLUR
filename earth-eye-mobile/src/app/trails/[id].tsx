@@ -68,7 +68,7 @@ export default function TrailDetailScreen() {
             <TrailMapPreview
               geometry={geometry}
               trailName={trail.name}
-              onPress={() => router.push('/map')}
+              onPress={() => router.push({ pathname: '/map', params: { focusTrail: trail.id } })}
             />
           </Section>
 

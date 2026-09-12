@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import MapView, { PROVIDER_DEFAULT } from 'react-native-maps';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,6 +9,7 @@ import { CorridorLayer } from '@/components/map/CorridorLayer';
 import { LayerControls, type MapLayers } from '@/components/map/LayerControls';
 import { SpeciesHotspotLayer } from '@/components/map/SpeciesHotspotLayer';
 import { TrailMarkerLayer } from '@/components/map/TrailMarkerLayer';
+import { TrailRoutesLayer } from '@/components/map/TrailRoutesLayer';
 import { useSpeciesHotspots } from '@/hooks/useSpeciesHotspots';
 import { loadSpecies, type AtlasSpecies, type AtlasTrail } from '@/atlas/atlasApi';
 import { EcosystemRing } from '@/components/map/EcosystemRing';
@@ -67,6 +69,10 @@ export default function MapScreen() {
   const sensorSummary = mode === 'plur' ? lite.summary : yardEval.summary;
 
   const [overlaysVisible, setOverlaysVisible] = useState(true);
+  // Mission 16 — focused route view (opened from a trail detail screen)
+  const focusTrailId = (useLocalSearchParams<{ focusTrail?: string }>().focusTrail ?? null) as string | null;
+  const focusTrail = focusTrailId ? trails.find((t) => t.id === focusTrailId) ?? null : null;
+
   const [mapLayers, setMapLayers] = useState<MapLayers>({
     trails: true, hotspots: false, overlays: true,
   });
@@ -81,13 +87,14 @@ export default function MapScreen() {
 
   const hotspots = useSpeciesHotspots(allSpecies, allTrails, mapLayers.hotspots);
 
-  const initialRegion = useMemo(
-    () =>
-      mode === 'love'
-        ? { latitude: yard.lat, longitude: yard.lng, latitudeDelta: 0.01, longitudeDelta: 0.01 }
-        : { latitude: 33.6, longitude: -117.75, latitudeDelta: 0.9, longitudeDelta: 0.9 },
-    [mode, yard.lat, yard.lng]
-  );
+  const initialRegion = useMemo(() => {
+    if (focusTrail?.lat && focusTrail?.lng) {
+      return { latitude: focusTrail.lat, longitude: focusTrail.lng, latitudeDelta: 0.08, longitudeDelta: 0.08 };
+    }
+    return mode === 'love'
+      ? { latitude: yard.lat, longitude: yard.lng, latitudeDelta: 0.01, longitudeDelta: 0.01 }
+      : { latitude: 33.6, longitude: -117.75, latitudeDelta: 0.9, longitudeDelta: 0.9 };
+  }, [mode, yard.lat, yard.lng, focusTrail?.lat, focusTrail?.lng]);
 
   const hasGPS = location !== null;
   const userLat = location?.latitude ?? null;
@@ -105,6 +112,7 @@ export default function MapScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <MapView
+          key={focusTrailId ?? 'full'}
           
           style={styles.map}
           provider={PROVIDER_DEFAULT}
@@ -144,6 +152,9 @@ export default function MapScreen() {
               hasGPS={hasGPS}
             />
           )}
+
+          {/* Mission 16 — real trail route geometry (OpenStreetMap) */}
+          <TrailRoutesLayer visible={mapLayers.trails} focusTrailId={focusTrailId} />
 
           {/* Trail markers — tappable, navigate to trail detail */}
           <TrailMarkerLayer trails={allTrails} visible={mapLayers.trails} />

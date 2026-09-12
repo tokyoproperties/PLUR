@@ -1,32 +1,16 @@
 /**
- * TrailMapPreview.tsx — Mission 15/16
+ * TrailMapPreview.tsx — Mission 16 revision
  *
- * Static map thumbnail using Google Maps Static API.
- * Replaced MapView to avoid the Android "child already has a parent"
- * crash that occurs when two MapView instances exist simultaneously
- * (main Map screen + trail detail screen).
+ * The static thumbnail service (staticmap.openstreetmap.de) went offline,
+ * so the preview is now an honest route card: it states whether the trail
+ * has a mapped route and hands off to the full Map screen, which opens
+ * focused on this trail with its real route drawn (TrailRoutesLayer).
  *
- * Tapping navigates to the full Map screen.
+ * Observational register — no directives, no exclamation marks.
  */
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { Accents } from '@/constants/theme';
 import type { TrailGeometry } from '@/hooks/useTrailGeometry';
-
-const STATIC_MAP_SIZE = '400x200';
-const ZOOM = 13;
-
-// Google Maps Static API — free tier covers this usage at this scale.
-// No API key needed for the fallback tile; key is needed for production.
-// For now we use a deterministic OpenStreetMap tile via staticmap.
-function buildStaticUrl(lat: number, lng: number): string {
-  // openstreetmap-based static map — no key required
-  return (
-    `https://staticmap.openstreetmap.de/staticmap.php` +
-    `?center=${lat},${lng}&zoom=${ZOOM}&size=${STATIC_MAP_SIZE}` +
-    `&markers=${lat},${lng},red-pushpin`
-  );
-}
 
 type Props = {
   geometry:  TrailGeometry;
@@ -43,38 +27,51 @@ export function TrailMapPreview({ geometry, trailName, onPress }: Props) {
     );
   }
 
-  const { latitude, longitude } = geometry.center;
-  const uri = buildStaticUrl(latitude, longitude);
+  const hasRoute = geometry.hasRoute;
+  const segCount = geometry.segments.length;
 
   return (
-    <Pressable onPress={onPress} style={styles.container}>
-      <Image
-        source={{ uri }}
-        style={styles.img}
-        resizeMode="cover"
-      />
-      {onPress && (
-        <View style={styles.overlay}>
-          <ThemedText style={styles.overlayText}>Open in Map →</ThemedText>
-        </View>
-      )}
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+    >
+      <View style={styles.routeGlyph}>
+        <View style={styles.routeLine} />
+        <View style={[styles.routeDot, styles.routeDotStart]} />
+        <View style={[styles.routeDot, styles.routeDotEnd]} />
+      </View>
+      <View style={styles.textColumn}>
+        <ThemedText style={styles.label}>
+          {hasRoute ? 'ROUTE · MAPPED' : 'TRAILHEAD · MAPPED'}
+        </ThemedText>
+        <ThemedText style={styles.value}>
+          {hasRoute
+            ? `Route geometry on record${segCount > 0 ? ` · ${segCount} segment${segCount === 1 ? '' : 's'}` : ''}. Opens on the map.`
+            : 'Center point on record. Opens on the map.'}
+        </ThemedText>
+      </View>
+      <ThemedText style={styles.arrow}>→</ThemedText>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: 180,
+    minHeight: 64,
     borderRadius: 12,
-    overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.07)',
     marginBottom: 16,
-    backgroundColor: '#1C3A2A',
+    backgroundColor: '#1A1A17',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
   },
-  img: {
-    width: '100%',
-    height: '100%',
+  pressed: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    transform: [{ scale: 0.99 }],
   },
   fallback: {
     justifyContent: 'center',
@@ -86,19 +83,48 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: 'rgba(255,255,255,0.30)',
   },
-  overlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    backgroundColor: 'rgba(15,15,13,0.72)',
+  routeGlyph: {
+    width: 44,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  overlayText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: Accents.sage,
-    letterSpacing: 0.3,
+  routeLine: {
+    position: 'absolute',
+    width: 34,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: 'rgba(122,184,122,0.55)',
+  },
+  routeDot: {
+    position: 'absolute',
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: '#7AB87A',
+  },
+  routeDotStart: { left: 2 },
+  routeDotEnd: { right: 2 },
+  textColumn: {
+    flex: 1,
+    gap: 3,
+  },
+  label: {
+    fontSize: 9,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.12,
+    color: 'rgba(255,255,255,0.35)',
+  },
+  value: {
+    fontSize: 13,
+    fontFamily: 'Georgia',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.62)',
+    lineHeight: 18,
+  },
+  arrow: {
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.35)',
   },
 });
