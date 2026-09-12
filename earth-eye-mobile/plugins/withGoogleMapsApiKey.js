@@ -11,7 +11,7 @@
 const { withAndroidManifest } = require('@expo/config-plugins');
 
 const MAPS_META_NAME = 'com.google.android.geo.API_KEY';
-const API_KEY = 'AIzaSyCombWGLM-pMIFUbAV-is3bknfuJs8VA38';
+const API_KEY = 'AIzaSyB6IKEmMhLeOV3q3WGkRfsPxZH5LKRPRhI';
 
 function withGoogleMapsApiKey(config) {
   return withAndroidManifest(config, async (mod) => {

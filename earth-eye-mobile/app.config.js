@@ -26,7 +26,7 @@ export default {
       package: "com.anonymous.eartheyemobile",
       config: {
         googleMaps: {
-          apiKey: "AIzaSyCombWGLM-pMIFUbAV-is3bknfuJs8VA38",
+          apiKey: "AIzaSyB6IKEmMhLeOV3q3WGkRfsPxZH5LKRPRhI",
         },
       },
     },
