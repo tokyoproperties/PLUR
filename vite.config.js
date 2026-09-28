@@ -5,10 +5,14 @@ import path from "path";
 export default defineConfig({
   logLevel: "error",
   plugins: [react()],
-  base: "/PLUR/",
+  base: process.env.VITE_BASE_PATH || "/PLUR/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
+  },
+  server: {
+    host: true,
+    allowedHosts: true,
   },
 });

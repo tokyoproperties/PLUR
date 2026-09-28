@@ -49,7 +49,7 @@ function ScrollToTop() {
 
 function App() {
   return (
-    <BrowserRouter basename="/PLUR">
+    <BrowserRouter basename={import.meta.env.VITE_BASE_PATH || "/PLUR"}>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>

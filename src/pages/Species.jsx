@@ -1,7 +1,7 @@
 // EarthEye OC — Species v4 — Yard Edition DNA
 import { useState, useEffect, useMemo, useRef } from "react";
 import BottomNav from "./BottomNav";
-import { Species, Observation } from "@/api/entities";
+import { listSpecies, listObservations } from "@/api/entities";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
@@ -251,14 +251,7 @@ export default function SpeciesPage() {
   useEffect(() => {
     (async () => {
       try {
-        let all = [], skip = 0;
-        while (true) {
-          const b = await Species.filter({}, null, 500, skip);
-          const r = Array.isArray(b) ? b : (b?.records || []);
-          all = all.concat(r);
-          if (r.length < 500) break;
-          skip += 500;
-        }
+        const all = await listSpecies();
         all.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
         setAllSpecies(all);
       } catch (e) { console.error(e); }
@@ -270,15 +263,7 @@ export default function SpeciesPage() {
   useEffect(() => {
     (async () => {
       try {
-        let all = [], skip = 0;
-        while (true) {
-          const b = await Observation.filter({}, null, 500, skip);
-          const r = Array.isArray(b) ? b : (b?.records || []);
-          if (!r.length) break;
-          all = all.concat(r);
-          if (r.length < 500) break;
-          skip += 500;
-        }
+        const all = await listObservations();
         const bySp = {}, recentSp = new Set();
         all.forEach(o => {
           if (!o.speciesId) return;
